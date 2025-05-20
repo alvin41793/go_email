@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  go-email-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config:/app/config
+    restart: unless-stopped 
