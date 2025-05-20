@@ -1,17 +1,27 @@
 package mailclient
 
 import (
+	"bytes"
 	"crypto/tls"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"mime"
+	"mime/multipart"
+	"mime/quotedprintable"
+	"net/mail"
 	"net/smtp"
 	"strings"
 	"time"
 
+	"net/textproto"
+
 	"github.com/emersion/go-imap"
 	"github.com/emersion/go-imap/client"
+	"golang.org/x/text/encoding/ianaindex"
+	"golang.org/x/text/transform"
 )
 
 // MailClient 结构体，用于处理邮件收发
@@ -269,97 +279,248 @@ func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) 
 	r := msg.GetBody(section)
 
 	if r != nil {
-		bodyBytes, err := io.ReadAll(r)
-		if err == nil {
-			// 尝试将邮件解析为字符串
-			bodyContent := string(bodyBytes)
-			fmt.Println("bodyContent", bodyContent)
-			// 检查邮件类型并提取内容
+		// 先保存原始内容，以便出现解析错误时使用
+		rawBytes, _ := io.ReadAll(r)
+		rawContent := ""
+		if len(rawBytes) > 0 {
+			rawContent = string(rawBytes)
+		}
 
-			fmt.Println("msg.BodyStructure.MIMEType==============================", msg.BodyStructure.MIMEType)
+		// 尝试获取原始邮件数据进行备用
+		// 这是为了保证在解析失败时，我们仍然有数据返回
+		email.Body = "无法解析邮件内容，可能是格式复杂或不支持的格式"
 
-			if msg.BodyStructure.MIMEType == "text" {
-				if msg.BodyStructure.MIMESubType == "plain" {
-					email.Body = bodyContent
-				} else if msg.BodyStructure.MIMESubType == "html" {
-					email.BodyHTML = bodyContent
-				}
-			} else if msg.BodyStructure.MIMEType == "multipart" {
-				// 对于多部分邮件，我们需要使用更复杂的解析逻辑
-				// 这里采用简化方式：返回原始内容并添加标记
+		// 如果是简单的文本邮件，直接解析
+		if msg.BodyStructure.MIMEType == "text" {
+			if msg.BodyStructure.MIMESubType == "plain" {
+				email.Body = rawContent
+			} else if msg.BodyStructure.MIMESubType == "html" {
+				email.BodyHTML = rawContent
+			}
+		} else if msg.BodyStructure.MIMEType == "multipart" {
+			// 对于多部分邮件，使用特殊的解析逻辑
+			// 重新构建一个Reader
+			r = bytes.NewReader(rawBytes)
+			err = m.parseMultipartMessage(msg, email, r)
+			if err != nil {
+				log.Printf("解析多部分邮件失败: %v", err)
 
-				// 由于原始数据可能包含二进制数据，需要处理
-				textBody := ""
-				htmlBody := ""
-
-				fmt.Println("msg.BodyStructure.Parts=======================================", msg.BodyStructure.Parts)
-				// 查找纯文本和HTML部分
-				for _, part := range msg.BodyStructure.Parts {
-					fmt.Println("part.MIMEType", part.MIMEType)
-					if part.MIMEType == "text" {
-						// 获取此部分的内容
-						partSection := &imap.BodySectionName{
-							Peek: true,
-						}
-						fmt.Println("part.MIMESubType", part.MIMESubType)
-						// 根据part的位置创建section
-						if part.MIMESubType == "plain" {
-							partReader := msg.GetBody(partSection)
-							fmt.Println("part.Body11", partReader)
-							if partReader != nil {
-								partBytes, _ := io.ReadAll(partReader)
-								textBody = string(partBytes)
-								fmt.Println("part.Body22", textBody)
-							}
-						} else if part.MIMESubType == "html" {
-							partReader := msg.GetBody(partSection)
-							fmt.Println("partReader11", partReader)
-
-							if partReader != nil {
-								partBytes, _ := io.ReadAll(partReader)
-								htmlBody = string(partBytes)
-								fmt.Println("part.BodyHTML", htmlBody)
-							}
-						}
-					} else if part.Disposition == "attachment" {
-						// 处理附件
-
-						// 优先使用DispositionParams中的filename，如果没有则使用Params中的name
-						attachmentFilename := part.DispositionParams["filename"]
-						if attachmentFilename == "" {
-							attachmentFilename = part.Params["name"]
-						}
-
-						email.Attachments = append(email.Attachments, AttachmentInfo{
-							Filename: attachmentFilename,
-							SizeKB:   float64(part.Size) / 1024.0,
-							MimeType: part.MIMEType + "/" + part.MIMESubType,
-						})
-					}
+				// 如果解析失败，尝试使用备选方法
+				if email.Body == "无法解析邮件内容，可能是格式复杂或不支持的格式" {
+					// 尝试提取纯文本内容
+					email.Body = extractPlainText(rawContent)
 				}
 
-				// 如果还是无法解析文本内容，返回完整的邮件原始内容
-				if textBody == "" {
-					email.Body = "无法解析纯文本内容，邮件可能是复杂格式。原始内容大小: " + fmt.Sprintf("%d 字节", len(bodyBytes))
-				} else {
-					email.Body = textBody
-				}
-
-				if htmlBody == "" {
-					email.BodyHTML = "无法解析HTML内容，邮件可能是复杂格式。"
-				} else {
-					email.BodyHTML = htmlBody
+				if email.BodyHTML == "" {
+					// 尝试提取HTML内容
+					email.BodyHTML = extractHTML(rawContent)
 				}
 			}
+		}
 
-			// 如果Body和BodyHTML都为空，返回完整内容
-			if email.Body == "" && email.BodyHTML == "" {
-				email.Body = "邮件内容解析失败，返回原始内容:\n" + bodyContent
+		// 确保至少有一部分内容能够返回
+		if (email.Body == "" || email.Body == "无法解析邮件内容，可能是格式复杂或不支持的格式") &&
+			(email.BodyHTML == "" || email.BodyHTML == "无法解析HTML内容，邮件可能是复杂格式。") {
+			email.Body = extractPlainText(rawContent)
+			if email.Body == "" {
+				email.Body = "邮件内容解析失败，原始内容:\n" + rawContent
 			}
 		}
 	}
 
 	return email, nil
+}
+
+// parseMultipartMessage 解析多部分邮件
+func (m *MailClient) parseMultipartMessage(msg *imap.Message, email *Email, reader io.Reader) error {
+	// 使用mail包解析邮件
+	mr, err := mail.ReadMessage(reader)
+	if err != nil {
+		return fmt.Errorf("读取邮件内容失败: %v", err)
+	}
+
+	// 获取媒体类型
+	contentType := mr.Header.Get("Content-Type")
+	mediaType, params, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		return fmt.Errorf("解析Content-Type失败: %v", err)
+	}
+
+	// 处理多部分邮件
+	if strings.HasPrefix(mediaType, "multipart/") {
+		// 创建一个递归函数来处理嵌套的多部分邮件
+		var parseMultipart func(reader io.Reader, boundary string, depth int) error
+		parseMultipart = func(reader io.Reader, boundary string, depth int) error {
+			mr := multipart.NewReader(reader, boundary)
+
+			// 遍历每个部分
+			for {
+				p, err := mr.NextPart()
+				if err == io.EOF {
+					break
+				}
+				if err != nil {
+					if depth == 0 {
+						return fmt.Errorf("读取下一部分失败: %v", err)
+					}
+					// 对于嵌套部分的错误，我们只记录而不中断
+					log.Printf("解析嵌套部分失败: %v", err)
+					continue
+				}
+
+				// 获取此部分的内容类型
+				partContentType := p.Header.Get("Content-Type")
+				partMediaType, partParams, err := mime.ParseMediaType(partContentType)
+				if err != nil {
+					continue // 跳过无法解析类型的部分
+				}
+
+				// 处理嵌套的多部分邮件
+				if strings.HasPrefix(partMediaType, "multipart/") {
+					partBoundary := partParams["boundary"]
+					if partBoundary != "" {
+						// 递归处理嵌套部分
+						bodyBytes, err := io.ReadAll(p)
+						if err == nil {
+							parseMultipart(bytes.NewReader(bodyBytes), partBoundary, depth+1)
+						}
+					}
+				} else if strings.HasPrefix(partMediaType, "text/plain") {
+					// 读取纯文本部分
+					bodyBytes, err := io.ReadAll(p)
+					if err != nil {
+						continue
+					}
+					// 解码内容
+					decodedBody, err := decodeContent(p.Header, bodyBytes)
+					if err == nil && decodedBody != "" {
+						email.Body = decodedBody
+					} else if len(bodyBytes) > 0 {
+						email.Body = string(bodyBytes)
+					}
+				} else if strings.HasPrefix(partMediaType, "text/html") {
+					// 读取HTML部分
+					bodyBytes, err := io.ReadAll(p)
+					if err != nil {
+						continue
+					}
+					// 解码内容
+					decodedBody, err := decodeContent(p.Header, bodyBytes)
+					if err == nil && decodedBody != "" {
+						// 清理HTML内容，移除\r\n和多余的空白
+						cleanedHTML := cleanHTMLContent(decodedBody)
+						email.BodyHTML = cleanedHTML
+					} else if len(bodyBytes) > 0 {
+						// 清理HTML内容，移除\r\n和多余的空白
+						cleanedHTML := cleanHTMLContent(string(bodyBytes))
+						email.BodyHTML = cleanedHTML
+					}
+				} else if disposition := p.Header.Get("Content-Disposition"); strings.HasPrefix(disposition, "attachment") {
+					// 处理附件
+					_, params, err := mime.ParseMediaType(disposition)
+					if err != nil {
+						continue
+					}
+
+					filename := params["filename"]
+					if filename == "" {
+						_, contentTypeParams, _ := mime.ParseMediaType(partContentType)
+						filename = contentTypeParams["name"]
+					}
+
+					if filename != "" {
+						// 读取附件内容以获取大小
+						attachBytes, err := io.ReadAll(p)
+						if err != nil {
+							log.Printf("读取附件内容失败: %v", err)
+							continue
+						}
+
+						email.Attachments = append(email.Attachments, AttachmentInfo{
+							Filename: filename,
+							SizeKB:   float64(len(attachBytes)) / 1024.0,
+							MimeType: partMediaType,
+						})
+					}
+				}
+			}
+			return nil
+		}
+
+		// 使用递归函数处理多部分邮件
+		boundary := params["boundary"]
+		if boundary == "" {
+			return fmt.Errorf("未找到boundary参数")
+		}
+
+		return parseMultipart(mr.Body, boundary, 0)
+	} else if strings.HasPrefix(mediaType, "text/plain") {
+		// 对于单一的纯文本邮件
+		bodyBytes, err := io.ReadAll(mr.Body)
+		if err != nil {
+			return err
+		}
+		email.Body = string(bodyBytes)
+	} else if strings.HasPrefix(mediaType, "text/html") {
+		// 对于单一的HTML邮件
+		bodyBytes, err := io.ReadAll(mr.Body)
+		if err != nil {
+			return err
+		}
+		// 清理HTML内容
+		cleanedHTML := cleanHTMLContent(string(bodyBytes))
+		email.BodyHTML = cleanedHTML
+	}
+
+	return nil
+}
+
+// decodeContent 根据邮件头解码内容
+func decodeContent(header textproto.MIMEHeader, content []byte) (string, error) {
+	// 处理内容编码
+	encoding := header.Get("Content-Transfer-Encoding")
+	var reader io.Reader
+
+	switch strings.ToLower(encoding) {
+	case "base64":
+		reader = base64.NewDecoder(base64.StdEncoding, bytes.NewReader(content))
+	case "quoted-printable":
+		reader = quotedprintable.NewReader(bytes.NewReader(content))
+	default:
+		reader = bytes.NewReader(content)
+	}
+
+	decoded, err := io.ReadAll(reader)
+	if err != nil {
+		return "", err
+	}
+
+	// 处理字符集
+	contentType := header.Get("Content-Type")
+	_, params, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		return string(decoded), nil
+	}
+
+	charset := params["charset"]
+	if charset == "" {
+		return string(decoded), nil
+	}
+
+	// 统一处理所有字符集
+	charset = strings.ToLower(charset)
+	e, err := ianaindex.MIME.Encoding(charset)
+	if err != nil || e == nil {
+		return string(decoded), nil
+	}
+
+	utf8Reader := transform.NewReader(bytes.NewReader(decoded), e.NewDecoder())
+	utf8Content, err := io.ReadAll(utf8Reader)
+	if err != nil {
+		return string(decoded), nil
+	}
+
+	return string(utf8Content), nil
 }
 
 // GetAttachment 获取特定邮件的特定附件
@@ -601,4 +762,96 @@ func parseAddressList(addresses []*imap.Address) string {
 	}
 
 	return strings.Join(addrList, ", ")
+}
+
+// extractPlainText 从原始邮件内容中提取纯文本内容
+func extractPlainText(content string) string {
+	// 查找纯文本部分的标记
+	plainStart := strings.Index(content, "Content-Type: text/plain")
+	if plainStart < 0 {
+		return ""
+	}
+
+	// 找到内容部分的开始
+	bodyStart := strings.Index(content[plainStart:], "\r\n\r\n")
+	if bodyStart < 0 {
+		bodyStart = strings.Index(content[plainStart:], "\n\n")
+		if bodyStart < 0 {
+			return ""
+		}
+	}
+
+	// 计算实际的内容开始位置
+	plainStart += bodyStart
+
+	// 找到下一个边界
+	boundary := "--_"
+	boundaryPos := strings.Index(content[plainStart:], boundary)
+
+	var plainText string
+	if boundaryPos < 0 {
+		// 如果找不到下一个边界，就取到末尾
+		plainText = content[plainStart:]
+	} else {
+		// 找到了边界，就取到边界为止
+		plainText = content[plainStart : plainStart+boundaryPos]
+	}
+
+	// 清理文本
+	plainText = strings.TrimSpace(plainText)
+	return plainText
+}
+
+// extractHTML 从原始邮件内容中提取HTML内容
+func extractHTML(content string) string {
+	// 查找HTML部分的标记
+	htmlStart := strings.Index(content, "Content-Type: text/html")
+	if htmlStart < 0 {
+		return ""
+	}
+
+	// 找到内容部分的开始
+	bodyStart := strings.Index(content[htmlStart:], "\r\n\r\n")
+	if bodyStart < 0 {
+		bodyStart = strings.Index(content[htmlStart:], "\n\n")
+		if bodyStart < 0 {
+			return ""
+		}
+	}
+
+	// 计算实际的内容开始位置
+	htmlStart += bodyStart
+
+	// 找到下一个边界
+	boundary := "--_"
+	boundaryPos := strings.Index(content[htmlStart:], boundary)
+
+	var htmlText string
+	if boundaryPos < 0 {
+		// 如果找不到下一个边界，就取到末尾
+		htmlText = content[htmlStart:]
+	} else {
+		// 找到了边界，就取到边界为止
+		htmlText = content[htmlStart : htmlStart+boundaryPos]
+	}
+
+	// 清理文本
+	htmlText = strings.TrimSpace(htmlText)
+	return htmlText
+}
+
+// cleanHTMLContent 清理HTML内容，移除\r\n和多余的空白
+func cleanHTMLContent(html string) string {
+	// 替换\r\n为空
+	html = strings.ReplaceAll(html, "\r\n", " ")
+
+	//// 替换连续的空白字符为单个空格
+	//re := regexp.MustCompile(`\s+`)
+	//html = re.ReplaceAllString(html, " ")
+
+	//// 处理HTML标签之间的不必要空格
+	//re = regexp.MustCompile(`>\s+<`)
+	//html = re.ReplaceAllString(html, "><")
+
+	return strings.TrimSpace(html)
 }
