@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
+	"go_email/api/oss"
 	"go_email/pkg/mailclient"
 
 	"github.com/gin-gonic/gin"
@@ -81,36 +83,32 @@ func ListAttachments(c *gin.Context) {
 		return
 	}
 
+	// 上传附件到OSS（如果有）
+	for i, attachment := range email.Attachments {
+		if attachment.Base64Data != "" {
+			// 确定文件类型
+			fileType := ""
+			if attachment.MimeType != "" {
+				parts := strings.Split(attachment.MimeType, "/")
+				if len(parts) > 1 {
+					fileType = parts[1]
+				}
+			}
+
+			// 上传到OSS
+			ossURL, err := oss.UploadBase64ToOSS(attachment.Filename, attachment.Base64Data, fileType)
+			if err != nil {
+				fmt.Printf("上传附件到OSS失败: %v\n", err)
+				// 继续处理其他附件，不中断流程
+			} else {
+				// 保存OSS URL
+				email.Attachments[i].OssURL = ossURL
+				fmt.Printf("附件 %s 上传到OSS成功，URL: %s\n", attachment.Filename, ossURL)
+			}
+		}
+	}
+
 	ResponseOK(c, email.Attachments)
-}
-
-// 下载附件
-func DownloadAttachment(c *gin.Context) {
-	uidStr := c.Param("uid")
-	filename := c.Query("filename")
-	folder := c.DefaultQuery("folder", "INBOX")
-
-	if filename == "" {
-		ResponseError(c, http.StatusBadRequest, "未提供文件名")
-		return
-	}
-
-	uid, err := strconv.ParseUint(uidStr, 10, 32)
-	if err != nil {
-		ResponseError(c, http.StatusBadRequest, "无效的UID")
-		return
-	}
-
-	// 获取附件内容
-	data, contentType, err := mailClient.GetAttachment(uint32(uid), filename, folder)
-	if err != nil {
-		HandleError(c, err)
-		return
-	}
-
-	// 下载附件是特殊情况，直接返回文件内容而不是JSON
-	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
-	c.Data(http.StatusOK, contentType, data)
 }
 
 // 发送邮件请求结构

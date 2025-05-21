@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"mime"
 	"mime/multipart"
@@ -47,9 +46,11 @@ type EmailInfo struct {
 
 // 附件信息结构体
 type AttachmentInfo struct {
-	Filename string  `json:"filename"`
-	SizeKB   float64 `json:"size_kb"`
-	MimeType string  `json:"mime_type"`
+	Filename   string  `json:"filename"`
+	SizeKB     float64 `json:"size_kb"`
+	MimeType   string  `json:"mime_type"`
+	Base64Data string  `json:"base64_data,omitempty"` // base64编码的附件内容
+	OssURL     string  `json:"oss_url,omitempty"`     // OSS存储链接
 }
 
 // Email 结构体，包含邮件完整内容
@@ -285,7 +286,7 @@ func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) 
 		if len(rawBytes) > 0 {
 			rawContent = string(rawBytes)
 		}
-
+		fmt.Println("rawContent", rawContent)
 		// 尝试获取原始邮件数据进行备用
 		// 这是为了保证在解析失败时，我们仍然有数据返回
 		email.Body = "无法解析邮件内容，可能是格式复杂或不支持的格式"
@@ -436,10 +437,14 @@ func (m *MailClient) parseMultipartMessage(msg *imap.Message, email *Email, read
 							continue
 						}
 
+						// 替换\r\n为空字符串
+						//attachBytes = bytes.ReplaceAll(attachBytes, []byte("\r\n"), []byte(""))
+
 						email.Attachments = append(email.Attachments, AttachmentInfo{
-							Filename: filename,
-							SizeKB:   float64(len(attachBytes)) / 1024.0,
-							MimeType: partMediaType,
+							Filename:   filename,
+							SizeKB:     float64(len(attachBytes)) / 1024.0,
+							MimeType:   partMediaType,
+							Base64Data: string(attachBytes),
 						})
 					}
 				}
@@ -523,7 +528,7 @@ func decodeContent(header textproto.MIMEHeader, content []byte) (string, error) 
 	return string(utf8Content), nil
 }
 
-// GetAttachment 获取特定邮件的特定附件
+// 获取特定邮件的特定附件
 func (m *MailClient) GetAttachment(uid uint32, filename string, folder string) ([]byte, string, error) {
 	if folder == "" {
 		folder = "INBOX"
@@ -557,6 +562,27 @@ func (m *MailClient) GetAttachment(uid uint32, filename string, folder string) (
 		return nil, "", fmt.Errorf("未找到邮件")
 	}
 
+	// 获取完整邮件内容并解析附件
+	email, err := m.GetEmailContent(uid, folder)
+	if err != nil {
+		return nil, "", fmt.Errorf("获取邮件内容失败: %w", err)
+	}
+
+	// 查找指定的附件
+	for _, attachment := range email.Attachments {
+		if attachment.Filename == filename {
+			// 如果已经保存了base64数据，直接解码并返回
+			if attachment.Base64Data != "" {
+				data, err := base64.StdEncoding.DecodeString(attachment.Base64Data)
+				if err != nil {
+					return nil, "", fmt.Errorf("解码附件内容失败: %w", err)
+				}
+				return data, attachment.MimeType, nil
+			}
+		}
+	}
+
+	// 如果在Email对象中找不到附件或base64数据，尝试使用旧方法获取
 	// 获取完整邮件
 	seqSet := new(imap.SeqSet)
 	seqSet.AddNum(ids...)
@@ -587,7 +613,7 @@ func (m *MailClient) GetAttachment(uid uint32, filename string, folder string) (
 	}
 
 	// 确保关闭reader
-	_, err = ioutil.ReadAll(reader)
+	_, err = io.ReadAll(reader)
 	if err != nil {
 		return nil, "", fmt.Errorf("读取邮件内容失败: %w", err)
 	}
@@ -645,7 +671,7 @@ func (m *MailClient) GetAttachment(uid uint32, filename string, folder string) (
 
 		// 读取附件内容
 		if attachmentContent := attachMsg.GetBody(attachmentSection); attachmentContent != nil {
-			data, err := ioutil.ReadAll(attachmentContent)
+			data, err := io.ReadAll(attachmentContent)
 			if err != nil {
 				return nil, "", fmt.Errorf("读取附件内容失败: %w", err)
 			}
