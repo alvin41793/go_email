@@ -1,16 +1,14 @@
 package config
 
 import (
-	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-
-	"gopkg.in/yaml.v3"
+	"github.com/fsnotify/fsnotify"
+	"github.com/spf13/viper"
+	"github.com/zxmrlc/log"
+	"strings"
 )
 
 // Config 应用配置结构体
-type Config struct {
+type EmailConfig struct {
 	Email struct {
 		IMAPServer   string `yaml:"imap_server"`
 		SMTPServer   string `yaml:"smtp_server"`
@@ -28,7 +26,7 @@ type Config struct {
 }
 
 // EmailConfig 邮箱配置
-type EmailConfig struct {
+type EmailConfigInfo struct {
 	IMAPServer   string
 	SMTPServer   string
 	EmailAddress string
@@ -38,80 +36,63 @@ type EmailConfig struct {
 	UseSSL       bool
 }
 
-// 获取配置文件路径
-func getConfigPath() (string, error) {
-	// 首先尝试当前工作目录
-	configPath := "config/config.yaml"
-	if _, err := os.Stat(configPath); err == nil {
-		return configPath, nil
-	}
-
-	// 然后尝试相对于可执行文件的路径
-	execDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		return "", err
-	}
-	configPath = filepath.Join(execDir, "config/config.yaml")
-	if _, err := os.Stat(configPath); err == nil {
-		return configPath, nil
-	}
-
-	// 再尝试用户主目录
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-	configPath = filepath.Join(homeDir, ".go_email/config.yaml")
-	if _, err := os.Stat(configPath); err == nil {
-		return configPath, nil
-	}
-
-	return "", fmt.Errorf("配置文件未找到")
+type Config struct {
+	Name string
 }
 
-// LoadConfig 加载配置
-func LoadConfig() (*Config, error) {
-	configPath, err := getConfigPath()
-	if err != nil {
-		return nil, err
+func Init(cfg string) error {
+	c := Config{
+		Name: cfg,
 	}
 
-	data, err := ioutil.ReadFile(configPath)
-	if err != nil {
-		return nil, fmt.Errorf("读取配置文件失败: %w", err)
+	// 初始化配置文件
+	if err := c.initConfig(); err != nil {
+		return err
 	}
 
-	var config Config
-	if err := yaml.Unmarshal(data, &config); err != nil {
-		return nil, fmt.Errorf("解析配置文件失败: %w", err)
+	// 不再初始化日志包，由各服务自行初始化
+
+	// 监控配置文件变化并热加载程序
+	c.watchConfig()
+
+	return nil
+}
+
+func (c *Config) initConfig() error {
+	if c.Name != "" {
+		viper.SetConfigName(c.Name) // 如果指定了配置文件，则解析指定的配置文件
+	}
+	//println("文件名", c.Name)
+	viper.AddConfigPath("./config")
+	viper.SetConfigType("yaml") // 设置配置文件格式为YAML
+	viper.AutomaticEnv()        // 读取匹配的环境变量
+	replacer := strings.NewReplacer(".", "_")
+	viper.SetEnvKeyReplacer(replacer)
+	if err := viper.ReadInConfig(); err != nil { // viper解析配置文件
+		return err
 	}
 
-	return &config, nil
+	return nil
 }
 
 // GetEmailConfig 获取邮箱配置
-func GetEmailConfig() (*EmailConfig, error) {
-	config, err := LoadConfig()
-	if err != nil {
-		return nil, err
-	}
+func GetEmailConfig() (*EmailConfigInfo, error) {
 
-	return &EmailConfig{
-		IMAPServer:   config.Email.IMAPServer,
-		SMTPServer:   config.Email.SMTPServer,
-		EmailAddress: config.Email.EmailAddress,
-		password: REDACTED
-		IMAPPort:     config.Email.IMAPPort,
-		SMTPPort:     config.Email.SMTPPort,
-		UseSSL:       config.Email.UseSSL,
+	return &EmailConfigInfo{
+		IMAPServer:   "imap.ipage.com",
+		SMTPServer:   "smtp.ipage.com",
+		EmailAddress: "aiteam@primeagencygroup.com",
+		password: REDACTED,
+		IMAPPort:     993,
+		SMTPPort:     587,
+		UseSSL:       true,
 	}, nil
 }
 
-// GetServerPort 获取服务器端口
-func GetServerPort() int {
-	config, err := LoadConfig()
-	if err != nil {
-		return 8080 // 默认端口
-	}
-	return config.Server.Port
+// 监控配置文件变化并热加载程序
+func (c *Config) watchConfig() {
+	viper.WatchConfig()
+	viper.OnConfigChange(func(e fsnotify.Event) {
+		log.Infof("Config file changed: %s", e.Name)
+	})
 }

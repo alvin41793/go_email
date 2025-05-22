@@ -1,13 +1,47 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"log"
-
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"go_email/api"
 	"go_email/config"
+	"log"
+	"os"
+	"path/filepath"
 )
 
+func initStdLog() {
+	// 获取默认日志文件路径
+	logFile := viper.GetString("log.logger_file")
+
+	// 确保日志路径是子目录
+	if logFile == "" || logFile == "log/api_server.log" {
+		logFile = "log/api_server.log"
+	}
+
+	// 确保目录存在
+	dir := filepath.Dir(logFile)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		err = os.MkdirAll(dir, 0777)
+		if err != nil {
+			fmt.Println("无法创建日志目录:", err)
+		}
+	}
+
+	// 打开日志文件
+	f, err := os.OpenFile(logFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	if err != nil {
+		fmt.Printf("打开标准日志文件失败，继续使用标准输出: %v\n", err)
+		return
+	}
+
+	// 设置标准日志输出到文件
+	log.SetOutput(f)
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.Printf("标准日志已重定向到 %s", logFile)
+}
 func main() {
 	// 获取邮箱配置
 	emailConfig, err := config.GetEmailConfig()
@@ -26,16 +60,31 @@ func main() {
 		emailConfig.UseSSL,
 	)
 
+	env := flag.String("env", "", "环境名称（如 dev, prod）")
+	flag.Parse()
+
+	// 根据环境名称读取配置文件
+	if *env == "" {
+		log.Fatal("必须指定环境参数 -env")
+	}
+
+	if err := config.Init(*env); err != nil {
+		panic(err)
+	}
+
+	// 初始化标准库日志
+	initStdLog()
+
+	// Set gin mode.
+	gin.SetMode(viper.GetString("run_mode"))
 	// 设置路由
-	r := api.SetupRouter()
 
-	// 获取服务端口
-	port := config.GetServerPort()
-
-	// 启动服务
-	serverAddr := fmt.Sprintf(":%d", port)
-	log.Printf("邮件服务启动在端口 %d", port)
-	if err := r.Run(serverAddr); err != nil {
-		log.Fatalf("服务启动失败: %v", err)
+	g := gin.New()
+	api.Load1(
+		g,
+	)
+	err = g.Run(viper.GetString("addr1"))
+	if err != nil {
+		panic(err)
 	}
 }

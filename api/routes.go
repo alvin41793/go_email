@@ -1,25 +1,25 @@
 package api
 
 import (
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"go_email/api/middleware"
+	"net/http"
 )
 
-// SetupRouter 设置路由
-func SetupRouter() *gin.Engine {
-	r := gin.Default()
-
-	// 配置CORS
-	r.Use(cors.New(cors.Config{
-		AllowAllOrigins:  true,
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length", "Content-Disposition"},
-		AllowCredentials: true,
-	}))
-
+func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
+	g.Use(gin.Recovery())
+	//g.Use(middleware.Auth())
+	g.Use(middleware.NoCache)
+	g.Use(middleware.Options)
+	g.Use(middleware.Secure)
+	g.Use(mw...)
+	//定时任务
+	//crontab.Cron()
+	g.NoRoute(func(c *gin.Context) {
+		c.String(http.StatusNotFound, "The incorrect API route...")
+	})
 	// API 路由组
-	v1 := r.Group("/api/v1")
+	v1 := g.Group("/api/v1")
 	{
 		// 邮件相关路由
 		emails := v1.Group("/emails")
@@ -38,5 +38,5 @@ func SetupRouter() *gin.Engine {
 		}
 	}
 
-	return r
+	return g
 }

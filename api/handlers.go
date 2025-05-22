@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"go_email/api/oss"
 	"go_email/pkg/mailclient"
-	"net/http"
+	"go_email/pkg/utils"
 	"strconv"
 	"strings"
 
@@ -38,11 +38,11 @@ func ListEmails(c *gin.Context) {
 
 	emails, err := mailClient.ListEmails(folder, limit)
 	if err != nil {
-		HandleError(c, err)
+		utils.SendResponse(c, err, nil)
 		return
 	}
 
-	ResponseOK(c, emails)
+	utils.SendResponse(c, err, emails)
 }
 
 // 获取邮件内容
@@ -52,13 +52,13 @@ func GetEmailContent(c *gin.Context) {
 
 	uid, err := strconv.ParseUint(uidStr, 10, 32)
 	if err != nil {
-		ResponseError(c, http.StatusBadRequest, "无效的UID")
+		utils.SendResponse(c, err, "无效的UID")
 		return
 	}
 
 	email, err := mailClient.GetEmailContent(uint32(uid), folder)
 	if err != nil {
-		HandleError(c, err)
+		utils.SendResponse(c, err, nil)
 		return
 	}
 	// 上传附件到OSS（如果有）
@@ -83,11 +83,14 @@ func GetEmailContent(c *gin.Context) {
 				email.Attachments[i].OssURL = ossURL
 				fmt.Printf("附件 %s 上传到OSS成功，URL: %s\n", attachment.Filename, ossURL)
 			}
-		}
 
+			// 上传完成后，清除base64数据，减少返回数据量
+			email.Attachments[i].Base64Data = ""
+		}
 	}
 
-	ResponseOK(c, email)
+	utils.SendResponse(c, err, email)
+
 }
 
 // 列出邮件附件
@@ -97,17 +100,16 @@ func ListAttachments(c *gin.Context) {
 
 	uid, err := strconv.ParseUint(uidStr, 10, 32)
 	if err != nil {
-		ResponseError(c, http.StatusBadRequest, "无效的UID")
+		utils.SendResponse(c, err, "无效的UID")
 		return
 	}
 
 	email, err := mailClient.GetEmailContent(uint32(uid), folder)
 	if err != nil {
-		HandleError(c, err)
+		utils.SendResponse(c, err, nil)
 		return
 	}
-
-	ResponseOK(c, email.Attachments)
+	utils.SendResponse(c, err, email.Attachments)
 }
 
 // 发送邮件请求结构
@@ -122,7 +124,7 @@ type SendEmailRequest struct {
 func SendEmail(c *gin.Context) {
 	var req SendEmailRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		ResponseError(c, http.StatusBadRequest, err.Error())
+		utils.SendResponse(c, err, "无效的参数")
 		return
 	}
 
@@ -133,9 +135,9 @@ func SendEmail(c *gin.Context) {
 
 	err := mailClient.SendEmail(req.To, req.Subject, req.Body, contentType)
 	if err != nil {
-		HandleError(c, err)
+		utils.SendResponse(c, err, nil)
+
 		return
 	}
-
-	ResponseOKWithMsg(c, "邮件发送成功", nil)
+	utils.SendResponse(c, err, "邮件发送成功")
 }
