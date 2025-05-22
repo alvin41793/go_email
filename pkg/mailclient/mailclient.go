@@ -286,7 +286,7 @@ func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) 
 		if len(rawBytes) > 0 {
 			rawContent = string(rawBytes)
 		}
-		fmt.Println("rawContent", rawContent)
+		//fmt.Println("rawContent", rawContent)
 		// 尝试获取原始邮件数据进行备用
 		// 这是为了保证在解析失败时，我们仍然有数据返回
 		email.Body = "无法解析邮件内容，可能是格式复杂或不支持的格式"

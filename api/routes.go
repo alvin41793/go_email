@@ -31,7 +31,7 @@ func SetupRouter() *gin.Engine {
 			emails.GET("/content/:uid", GetEmailContent)
 
 			// 获取附件列表
-			emails.GET("/attachments/:uid", ListAttachments)
+			//emails.GET("/attachments/:uid", ListAttachments)
 
 			// 发送邮件
 			emails.POST("/send", SendEmail)

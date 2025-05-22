@@ -2,12 +2,11 @@ package api
 
 import (
 	"fmt"
+	"go_email/api/oss"
+	"go_email/pkg/mailclient"
 	"net/http"
 	"strconv"
 	"strings"
-
-	"go_email/api/oss"
-	"go_email/pkg/mailclient"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,7 +30,7 @@ func InitMailClient(imapServer, smtpServer, emailAddress, password string, imapP
 // 获取邮件列表
 func ListEmails(c *gin.Context) {
 	folder := c.DefaultQuery("folder", "INBOX")
-	limitStr := c.DefaultQuery("limit", "50")
+	limitStr := c.DefaultQuery("limit", "200")
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil {
 		limit = 10
@@ -62,27 +61,6 @@ func GetEmailContent(c *gin.Context) {
 		HandleError(c, err)
 		return
 	}
-
-	ResponseOK(c, email)
-}
-
-// 列出邮件附件
-func ListAttachments(c *gin.Context) {
-	uidStr := c.Param("uid")
-	folder := c.DefaultQuery("folder", "INBOX")
-
-	uid, err := strconv.ParseUint(uidStr, 10, 32)
-	if err != nil {
-		ResponseError(c, http.StatusBadRequest, "无效的UID")
-		return
-	}
-
-	email, err := mailClient.GetEmailContent(uint32(uid), folder)
-	if err != nil {
-		HandleError(c, err)
-		return
-	}
-
 	// 上传附件到OSS（如果有）
 	for i, attachment := range email.Attachments {
 		if attachment.Base64Data != "" {
@@ -106,6 +84,27 @@ func ListAttachments(c *gin.Context) {
 				fmt.Printf("附件 %s 上传到OSS成功，URL: %s\n", attachment.Filename, ossURL)
 			}
 		}
+
+	}
+
+	ResponseOK(c, email)
+}
+
+// 列出邮件附件
+func ListAttachments(c *gin.Context) {
+	uidStr := c.Param("uid")
+	folder := c.DefaultQuery("folder", "INBOX")
+
+	uid, err := strconv.ParseUint(uidStr, 10, 32)
+	if err != nil {
+		ResponseError(c, http.StatusBadRequest, "无效的UID")
+		return
+	}
+
+	email, err := mailClient.GetEmailContent(uint32(uid), folder)
+	if err != nil {
+		HandleError(c, err)
+		return
 	}
 
 	ResponseOK(c, email.Attachments)
