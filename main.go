@@ -63,7 +63,7 @@ func main() {
 		emailConfig.UseSSL,
 	)
 
-	env := flag.String("env", "", "环境名称（如 dev, prod）")
+	env := flag.String("env", "", "环境名称（如 debug, prod）")
 	flag.Parse()
 
 	// 根据环境名称读取配置文件
@@ -75,13 +75,13 @@ func main() {
 		panic(err)
 	}
 
-	// 初始化标准库日志
+	// 初始化标准库日志，确保在设置gin之前初始化
 	initStdLog()
 
 	// Set gin mode.
 	gin.SetMode(viper.GetString("run_mode"))
-	// 设置路由
 
+	// 设置路由
 	g := gin.New()
 	api.Load1(
 		g,

@@ -9,8 +9,8 @@ import (
 
 func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	g.Use(gin.Recovery())
-	// 添加日志中间件
-	g.Use(middleware.Logger())
+	// 使用Gin自带的Logger中间件
+	//g.Use(gin.Logger())
 	//g.Use(middleware.Auth())
 	g.Use(middleware.NoCache)
 	g.Use(middleware.Options)

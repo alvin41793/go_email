@@ -31,7 +31,7 @@ func InitMailClient(imapServer, smtpServer, emailAddress, password string, imapP
 
 // 获取邮件列表
 func ListEmails(c *gin.Context) {
-	fmt.Println("请求邮箱列表")
+	//fmt.Println("请求邮箱列表")
 	folder := c.DefaultQuery("folder", "INBOX")
 	limitStr := c.DefaultQuery("limit", "200")
 	limit, err := strconv.Atoi(limitStr)

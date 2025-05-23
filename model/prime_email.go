@@ -34,9 +34,9 @@ func BatchCreateEmails(emails []*PrimeEmail) error {
 	return tx.Commit().Error
 }
 
-// GetEmailByID 根据ID获取邮件
-func GetEmailByID(id uint) (*PrimeEmail, error) {
+// GetEmailByEmailID 根据EmailID获取邮件
+func GetEmailByEmailID(emailId uint) (*PrimeEmail, error) {
 	var email PrimeEmail
-	err := db.DB().Where("id = ?", id).First(&email).Error
+	err := db.DB().Where("email_id = ?", emailId).First(&email).Error
 	return &email, err
 }

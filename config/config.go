@@ -34,7 +34,7 @@ func (c *Config) initConfig() error {
 		viper.SetConfigName(c.Name) // 如果指定了配置文件，则解析指定的配置文件
 	}
 	//println("文件名", c.Name)
-	viper.AddConfigPath("./config")
+	viper.AddConfigPath("config")
 	viper.SetConfigType("yaml") // 设置配置文件格式为YAML
 	viper.AutomaticEnv()        // 读取匹配的环境变量
 	replacer := strings.NewReplacer(".", "_")
