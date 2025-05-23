@@ -1,41 +1,48 @@
-2025/05/22 17:33:35 main.go:43: 标准日志已重定向到 log/default/api_server.log
-2025/05/22 17:34:31 main.go:43: 标准日志已重定向到 log/default/api_server.log
-2025/05/22 17:35:04 main.go:43: 标准日志已重定向到 log/default/api_server.log
-2025/05/22 17:45:15 main.go:44: 标准日志已重定向到 log/default/api_server.log
-2025/05/22 17:46:19 main.go:44: 标准日志已重定向到 log/default/api_server.log
-2025/05/22 18:14:36 main.go:44: 标准日志已重定向到 log/default/api_server.log
-2025/05/22 18:15:20 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_57285_20250522_181520.eml
-2025/05/22 18:23:21 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_57206_20250522_182321.eml
-2025/05/23 09:44:54 main.go:44: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 09:46:22 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59111_20250523_094622.eml
-2025/05/23 10:25:28 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59116_20250523_102528.eml
-2025/05/23 15:15:07 main.go:44: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:15:18 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59162_20250523_151518.eml
-2025/05/23 15:18:15 main.go:44: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:24:12 main.go:44: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:25:29 main.go:44: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:26:24 main.go:44: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:35:30 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:36:06 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:36:54 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:37:37 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:38:29 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:38:31 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:39:05 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:40:24 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:40:57 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:44:07 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:50:25 main.go:46: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:51:50 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:56:54 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:59:01 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:59:01 main.go:87: Gin日志输出到控制台和日志文件
-2025/05/23 15:59:18 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:59:18 main.go:87: Gin日志输出到控制台和日志文件
-2025/05/23 15:59:41 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 15:59:41 main.go:87: Gin日志输出到控制台和日志文件
-2025/05/23 16:01:15 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 16:01:15 main.go:87: Gin日志输出到控制台和日志文件
-2025/05/23 16:07:27 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 16:12:51 main.go:45: 标准日志已重定向到 log/default/api_server.log
-2025/05/23 16:16:54 main.go:45: 标准日志已重定向到 log/default/api_server.log
+{"level":"INFO","timestamp":"2025-05-23 16:25:46.301","file":"middleware/logger.go:32","msg":"| 200 | 45.776164733s |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 16:31:21 main.go:45: 标准日志已重定向到 log/default/api_server.log
+{"level":"INFO","timestamp":"2025-05-23 16:31:51.521","file":"middleware/logger.go:32","msg":"| 200 |  25.66777419s |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 16:32:14 main.go:45: 标准日志已重定向到 log/default/api_server.log
+{"level":"INFO","timestamp":"2025-05-23 16:32:52.575","file":"middleware/logger.go:32","msg":"| 200 | 17.204391695s |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+{"level":"INFO","timestamp":"2025-05-23 16:41:36.592","file":"middleware/logger.go:32","msg":"| 200 | 22.010564362s |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 16:45:22 main.go:45: 标准日志已重定向到 log/default/api_server.log
+{"level":"INFO","timestamp":"2025-05-23 16:46:09.604","file":"middleware/logger.go:32","msg":"| 200 | 21.187159216s |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 16:52:37 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 17:09:22 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 17:09:41 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59348_20250523_170941.eml
+{"level":"INFO","timestamp":"2025-05-23 17:09:41.891","file":"middleware/logger.go:32","msg":"| 200 | 10.326466504s |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 17:09:53 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59347_20250523_170953.eml
+2025/05/23 17:09:56 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59346_20250523_170956.eml
+2025/05/23 17:09:59 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59345_20250523_170959.eml
+2025/05/23 17:10:06 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59344_20250523_171006.eml
+2025/05/23 17:10:09 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59343_20250523_171009.eml
+2025/05/23 17:10:12 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59342_20250523_171012.eml
+2025/05/23 17:10:15 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59341_20250523_171015.eml
+2025/05/23 17:10:30 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59340_20250523_171030.eml
+2025/05/23 17:10:32 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59339_20250523_171032.eml
+{"level":"INFO","timestamp":"2025-05-23 17:10:33.261","file":"middleware/logger.go:32","msg":"| 200 | 56.829126097s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 17:13:11 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 17:14:07 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 17:16:41 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 17:16:55 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59348_20250523_171655.eml
+2025/05/23 17:17:02 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59347_20250523_171702.eml
+2025/05/23 17:17:05 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59346_20250523_171705.eml
+2025/05/23 17:17:08 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59345_20250523_171708.eml
+2025/05/23 17:17:11 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59344_20250523_171711.eml
+2025/05/23 17:17:15 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59343_20250523_171715.eml
+2025/05/23 17:17:18 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59342_20250523_171718.eml
+2025/05/23 17:17:21 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59341_20250523_171721.eml
+2025/05/23 17:17:37 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59340_20250523_171737.eml
+2025/05/23 17:17:39 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59339_20250523_171739.eml
+{"level":"INFO","timestamp":"2025-05-23 17:17:39.871","file":"middleware/logger.go:32","msg":"| 200 | 48.222179479s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 17:26:56 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 17:27:02 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59348_20250523_172702.eml
+2025/05/23 17:27:11 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59347_20250523_172711.eml
+2025/05/23 17:27:14 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59346_20250523_172714.eml
+2025/05/23 17:27:17 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59345_20250523_172717.eml
+2025/05/23 17:27:21 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59344_20250523_172721.eml
+2025/05/23 17:27:25 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59343_20250523_172725.eml
+2025/05/23 17:27:28 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59342_20250523_172728.eml
+2025/05/23 17:27:31 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59341_20250523_172731.eml
+2025/05/23 17:27:37 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59340_20250523_172737.eml
+2025/05/23 17:27:39 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59339_20250523_172739.eml
+{"level":"INFO","timestamp":"2025-05-23 17:27:40.257","file":"middleware/logger.go:32","msg":"| 200 | 40.588739448s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}

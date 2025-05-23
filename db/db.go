@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"time"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/spf13/viper"
@@ -17,7 +18,7 @@ type Model struct {
 	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
 }
 
-//数据库对象
+// 数据库对象
 func DB() *gorm.DB {
 	if db == nil {
 		newDb, err := newDB()
@@ -52,4 +53,9 @@ func newDB() (*gorm.DB, error) {
 	}
 	// set for db connection
 	return db, nil
+}
+
+// IsRecordNotFoundError 判断错误是否为记录未找到的错误
+func IsRecordNotFoundError(err error) bool {
+	return gorm.IsRecordNotFoundError(err)
 }

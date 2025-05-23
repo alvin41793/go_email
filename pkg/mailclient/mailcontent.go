@@ -200,7 +200,7 @@ func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) 
 		if len(rawBytes) > 0 {
 			rawContent = string(rawBytes)
 		}
-		fmt.Println("邮件内容====================================", rawContent)
+		//fmt.Println("邮件内容====================================", rawContent)
 
 		// 将原始邮件内容保存到文件
 		if err := saveRawContentToFile(uid, rawContent); err != nil {

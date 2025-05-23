@@ -32,7 +32,7 @@ func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 			emails.GET("/list", ListEmails)
 
 			// 获取邮件内容
-			emails.GET("/content/:uid", GetEmailContent)
+			emails.GET("/content", GetEmailContent)
 
 			// 获取附件列表
 			//emails.GET("/attachments/:uid", ListAttachments)

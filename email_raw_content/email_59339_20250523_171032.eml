@@ -1,0 +1,213 @@
+Return-Path: <neway@800firms.com>
+Delivered-To: operator@primeagencygroup.com
+Received: from bospopproxy15.eigbox.net ([10.20.15.4])
+	by bospop33.eigbox.net with LMTP
+	id oK9bHdwVMGjZYAAA4ayZ1w
+	(envelope-from <neway@800firms.com>)
+	for <operator@primeagencygroup.com>; Fri, 23 May 2025 02:29:48 -0400
+Received: from bosmailscan04.eigbox.net ([10.20.15.4])
+	by bospopproxy15.eigbox.net with LMTP
+	id CNY2HdwVMGg8TwAACZGTbQ
+	(envelope-from <neway@800firms.com>)
+	for <operator@primeagencygroup.com>; Fri, 23 May 2025 02:29:48 -0400
+Return-path: <neway@800firms.com>
+Envelope-to: operator@primeagencygroup.com
+Delivery-date: Fri, 23 May 2025 02:29:48 -0400
+Received: from [10.115.3.5] (helo=bosimpinc05)
+	by bosmailscan04.eigbox.net with esmtp (Exim)
+	id 1uILue-0000Ou-8H
+	for operator@primeagencygroup.com; Fri, 23 May 2025 02:29:48 -0400
+Received: from sonic308-14.consmr.mail.gq1.yahoo.com ([98.137.68.38])
+	by bizsmtp with ESMTP
+	id ILubuAVEhXJRwILudumMSp; Fri, 23 May 2025 02:29:48 -0400
+X-EN-OrigIP: 98.137.68.38
+X-EN-IMPSID: ILubuAVEhXJRwILudumMSp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1747981785; bh=5BNuiXt5xR7Kp+F57hmAdc3gOW2O18j7K9byRLWXG/E=; h=Date:From:Reply-To:To:In-Reply-To:References:Subject:From:Subject:Reply-To; b=GYVk98nUXVBIVyNiJHvfOhZ7XrvIKhgdUgAxINUQco5ernxTCGNVTNChGAmE5LxmrAfyT9itZmV7hyusqPvj0T1FqAN8UIEWymBqwk+Kgs8bHCAvmd5fdJHum/9eXVCiMKLRnv+3vjckD6f5rffRMnSJFUx1oXOPh8yFqXdHvkURXOqTPACmRTVjBXzjYKa4GcsRn349QGiWPxV/c09I0fUVPmIiz9z5l1KgVxivcMyDcCAKAEZ4wYLihdnLdNe3vo7Z6dHf2d5zS8mIv6l6UHg263Aww8LdwJ23F3HKwYRCMWcL9CL1N9xQJAXx6zHBffk4ndW0I0OV8YF7tUuflQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1747981785; bh=LTcjbw40q4beGCYeoGHFCZgBxyHy/jTyFtOyenq77A+=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=pHgIhaqP05hTzeYDR0sfKfT7lxs/Txi85TELCqwgKy5hxj7TddI5UvQgQzBdk4KhkL85kdHtKXKibqg4DA5+84D9t+tVIl/SfiYW/CFDtDthITuPpyFlZEZoLufsnP9MAcjA9mdvVUrz981pskHzOH7758e/5fK95sUH/BtbxCxi4m+pm9tTNhGU/cEN9gXABsOQcL/qx9VsOoCdjYHUawzh/wbEf7tMbuoGdJL39BP4dVwhz85HWQK0t6KVeQkhUI/pBatchmkns6bWBIBe/4CCBP7QJW8GzvyjrlPOxW7pduI2jld5ys3YIGqeDD711UAtUIHENgWnihYZiUfBxw==
+X-YMail-OSG: s_WA6aQVM1mjzmn_DB1ZTC4578HRWK_3vKSWaodP8bAFx_Nx2GCHMup87PZpKOk
+ eBHwZ3SnXIJxubc1_wCgkrBW6bJpNB.wO38jFoAuXpG7TKV5EFKrmStP6GL2SQ8i5pRvdMusdEkj
+ VjdML0kH9GQ4ymfnh0eBIXV28JnyIviCbRUrdUcR8bt4z0TdHspRnOKcrQhKhP5._GtT4oskNFDL
+ 4NtMlSSQSLw3SJjN3isRj7rtVDwFdfpDBznXLMjEJEQ.nECY4FJ9Vs0OGnAiD1swRscZpjs1LAEY
+ n6dcubVyVhz5UhweFjqupGczkheGWk4U.ZZtsMsg1F3NUY1QuxESpzAoPx1YgMTL07unxVYUpsJG
+ ww2dKobzCsv1mGk384F5F6YxCP7FKM6NU5120jK.0zfIU6pe3uMy28ghvHa01XhPKwnr3mgWAgKq
+ 5jbqiIec64A_KABiI3QUQNipYKKy0Tui1ldYgwSCOvI41X4xOLZQz8wBa09J88edlIpklnkjTge4
+ kg94rrzwe5wx6YRCFSZd3XwyDySSvPNM1K1cU6ynyMGSNRtIkvqbXSKaUe8D.SYrvIWBMQ2MOMHG
+ UxKVksgAcXJfJvuHShdJJZ34tf1qkYHl30eltgkcZXxO665T6sMOb6NPwYDMvCcxMmMzus9mdjJH
+ xY0scDrsM6cOfLgyxLIdsA3J2EdX4Cl.05Ena5YIJ05qgMFrHaWkto9tb6.y16BP7S4k09AZI8d5
+ XlF_Vvc3fQzccHYtHMtDzUrtqcCVldoOSpY2kcdC__bioI9a01Xd.7ZO5qBsCQBxPdJNjcZJwg4A
+ xYkRoh5521t__XHY5E3BniFmtk0JargeVTCGZqU5X_FtlN8mc0FMz7iBGBJPMH983eElsym6mr9j
+ o2_Im43_8l5kswcUUAobdAIfGCv4bmbU.lz1_rqBstmQ5uJb.EdtCPfuKmRiapdMPrXbTcoHVPq7
+ OzvNjnZJ1wvKrj5tesa5kg0wiC5TRM2lMuxLrw0AR8OzIvt.ItttxiDmFQBMPxj_lu.wcCeg_e0U
+ z0UTi3Fm1FowoiIzLupgzKYIP1SkzLKS.tvFMh8DEcueNSfueZt0iFQFnnT_5_2oPUsOVGgpkld2
+ ALDydL2Gv.5Uq4lMt2_V8UQJ__pF_3KsnPzOs1WKUjuZjgAtmo6ukAbUjHEHe6NKl35wrbTc4uR6
+ 3w6dV9LSzvHCVPfia1KjouTmOhJeuSCA7keiVqSwAEUTRFr0SAX12Q2VOkf79hl5ayoRWGE0ne9K
+ k4VZb__5Qrp7ATfxjvNPt.Hc3bq0YstbIbiIOS1Gx7ZpaKoX40KoqZ5jmrXZN57z9cf.v2Zu0hEL
+ wGRoLnp3LWa9l5hqAVSpW2iXUGKKzbxZMYCYygDWGo7nl9XkK0XAZCFLlEOi.fzehjRIKNGTna1g
+ dYTtpHeTN9DO6iEcP1PvvS2wQnrKNy7oRdnsj6gcZsI4x0kCppzPpomzqUbVuzRXwW5jMpGTfYlP
+ YkqobV_dQrniCdsUx2UHDKGMP9IkvQJdfTSg2r1bXo.jhXuxTHM3c1OY23.AotFjLw71R.uHSPpW
+ 87AB0E002Ytnk5nUQ4l1LbMX.0pNLps7ArmQKWY7_fpryRYsCku2VF.lAeBCt6R9kD.V2oDZJWnq
+ Hbt2ADtwfZZsHlr3txxPFOKhzeY5zp6AiykInK4plsTlhvgkUox1JhuaX4c.JFzHFtUyQmMCGRdf
+ VOQBPWiXoe5oljZc6qRzVo1X2GOvvutdyc62qVm4B2p5urBDI4A_ZC0dTJnryOdwNzQeWp1eu9UX
+ P80SxLJch1TyqrpZXWmQwg0JcRcb4SoTdcGnvVlT4bGxQd_xuOTRD0QaEF96EwchfvcmIq4kYbyk
+ UOClVx4lkrh..KmVYEhBa2AIkFKTkAwAAYOoo3VJXwfa6v0VIoVPOk69_Ks7rS1AHGdrMHxz.Vj9
+ 8wNcKrQmqnZrXC_rrORqObIeGb1Gswl5UpnpL7hNWYKj.HmDMlVW4BLhgf4D3PwZvBqAORl0dj45
+ cudtA9as7_0XQRZ8cC_Zjjs3__Phrb1vDkbT.4Dncfxx8kd8nbpgQPyCxjU_cnbrKDvXIBEekbge
+ 7cd19xP7XqSe3R2t9KtVrgi8jnGy9DwgK028Cqr0fNSCF_E0T8OCA0Ulnd2KF4Vb0dCKQwJQEdQ1
+ 6LKxq96WEHlGbIq7SmP.28Y_VjrsBRb3ONRtMWBDzCR6E1WuqIRUCQWqd0paUUzD9mUwny9wKW0G
+ LJcnLR2104A6dafAXskXCs.8.7XbwCxzsdtwdNg--
+X-Sonic-MF: <neway@800firms.com>
+X-Sonic-ID: f99004db-9826-4689-9c47-f85c51b851e5
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic308.consmr.mail.gq1.yahoo.com with HTTP; Fri, 23 May 2025 06:29:45 +0000
+Date: Fri, 23 May 2025 06:29:41 +0000 (UTC)
+From: "neway ." <neway@800firms.com>
+Reply-To: "neway ." <neway@800firms.com>
+To: Ming <ming@usprimeagency.com>, Ming <ming@usaprimeagency.com>, 
+	"operator@primeagencygroup.com" <operator@primeagencygroup.com>
+Message-ID: <696487821.528984.1747981781516@mail.yahoo.com>
+In-Reply-To: <483583745.105674.1747963500113@ebl-notification-20240712054517131-deployment-dc987d8cc-zlhbs>
+References: <483583745.105674.1747963500113@ebl-notification-20240712054517131-deployment-dc987d8cc-zlhbs>
+Subject: =?UTF-8?Q?Fw:_IQAX_eBL_=E2=80=93_eBL#_OOLU2158550180?=
+ =?UTF-8?Q?_Transferred_to_you_(DO_NOT_REPLY)?=
+MIME-Version: 1.0
+Content-Type: multipart/alternative; 
+	boundary="----=_Part_528983_39714987.1747981781515"
+X-Mailer: WebService/1.1.23884 YMailNorrin
+Content-Length: 5479
+X-CMAE-Envelope: MS4wfLHViiEi3MZd7zVnU2Xuhc+orA9ItA3o19zJsfSUEjuFQ3LkvOS60j/noYFLLj4er4ZZl0/uWReo3s7sugQkIy6s5D2mIvBGf4Lv9LkEgXrCIDUUoURc
+ JsXqBTgMHT+SxdC0qE6YDjNJW9XPBWTwNRnaVJdjveo+Ciukxc+B0uSTsS9Ap8YBwHkcToB0MkBMVymUs6PwQ/jkklIFgVD6bqM=
+
+------=_Part_528983_39714987.1747981781515
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+PRIMORSE25050632
+jin
+
+-----------------------------
+Customer Service
+NEWAY DISTRIBUTION INC.
+Email: neway@800firms.com=20
+
+   ----- Forwarded Message ----- From: IQAX System Notifications <sysnotify=
+@iqax.com>To: "neway@800firms.com" <neway@800firms.com>Sent: Thursday, May =
+22, 2025 at 09:25:12 PM EDTSubject: IQAX eBL =E2=80=93 eBL# OOLU2158550180 =
+Transferred to you (DO NOT REPLY)
+    Dear NEWAY DISTRIBUTION INC. - United States,
+
+ Sender: RS Logistics Limited
+  Recipient: NEWAY DISTRIBUTION INC. - United States   Sender's Remarks: RS=
+ Logistics Limited Transferred the eBL to NEWAY DISTRIBUTION INC. - United =
+States.  =20
+=20
+| eBL Number | Version | Document Type | Date of Issue | First Port of Load=
+ing | Last Port of Discharge | BL Vessel Voyage |
+| OOLU2158550180 | 1 | Straight | May 14, 2025 | Ningbo, Zhejiang, China | =
+Long Beach, California, United States | CSCL EAST CHINA SEA 070E |
+
+=20
+ Please click here to login and check for more detail. Thanks.=20
+
+ Notes: This is a system email and please do not reply. We are currently up=
+dating our email templates, and you may come across different templates
+during this period. For any inquiries, please contact IQAX CUSTOMER SERVICE=
+S customerservices@iqax.com.
+
+ Regards,
+ IQAX eBL =20
+------=_Part_528983_39714987.1747981781515
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<html><head></head><body><div class=3D"ydpe68a73ffyahoo-style-wrap" style=
+=3D"font-family:times new roman, new york, times, serif;font-size:16px;"><d=
+iv><div dir=3D"ltr" data-setdir=3D"false"><span><span style=3D"color: rgb(0=
+, 0, 0); font-family: Verdana, sans-serif; font-size: medium;">PRIMORSE2505=
+0632</span></span><br></div><div dir=3D"ltr" data-setdir=3D"false"><span><s=
+pan style=3D"color: rgb(0, 0, 0); font-family: Verdana, sans-serif; font-si=
+ze: medium;">jin</span></span></div><div><br></div><div class=3D"ydpe68a73f=
+fsignature"><div style=3D"font-family:new times, serif;font-size:16px;"><br=
+><div>-----------------------------<br></div>Customer Service<br>NEWAY DIST=
+RIBUTION INC.<br>Email: neway@800firms.com</div></div></div>
+        <div><br></div><div><br></div>
+       =20
+        </div><div id=3D"ydp80cc903dyahoo_quoted_8808439443" class=3D"ydp80=
+cc903dyahoo_quoted">
+            <div style=3D"font-family:'Helvetica Neue', Helvetica, Arial, s=
+ans-serif;font-size:13px;color:#26282a;">
+                <div>----- Forwarded Message -----</div>
+                <div><b>From:</b> IQAX System Notifications &lt;sysnotify@i=
+qax.com&gt;</div><div><b>To:</b> "neway@800firms.com" &lt;neway@800firms.co=
+m&gt;</div><div><b>Sent:</b> Thursday, May 22, 2025 at 09:25:12 PM EDT</div=
+><div><b>Subject:</b> IQAX eBL =E2=80=93 eBL# OOLU2158550180 Transferred to=
+ you (DO NOT REPLY)</div><div><br></div>
+               =20
+               =20
+                <div><div id=3D"ydp80cc903dyiv9335418527">
+
+
+   =20
+   =20
+
+<div>
+<div>
+    <div>
+        Dear <span>NEWAY DISTRIBUTION INC. - United States</span>,<br><br>
+        <span style=3D"font-weight:bold;">Sender:</span> <span>RS Logistics=
+ Limited</span><br>
+        <div style=3D"margin-top:3px;">
+            <span style=3D"font-weight:bold;">Recipient:</span>
+            <span>NEWAY DISTRIBUTION INC. - United States</span>
+        </div>
+        <div style=3D"margin-top:3px;">
+            <span style=3D"font-weight:bold;">Sender's Remarks:</span>
+            <span>RS Logistics Limited Transferred the eBL to NEWAY DISTRIB=
+UTION INC. - United States.</span>
+        </div>
+    </div>
+    <br>
+
+    <table border=3D"1" cellspacing=3D"0">
+        <tbody><tr>
+            <th style=3D"width:127px;min-height:35px;">eBL Number</th>
+            <th style=3D"width:127px;min-height:35px;">Version</th>
+            <th style=3D"width:127px;min-height:35px;">Document Type</th>
+            <th style=3D"width:127px;min-height:35px;">Date of Issue</th>
+            <th style=3D"width:127px;min-height:35px;">First Port of Loadin=
+g</th>
+            <th style=3D"width:145px;min-height:35px;">Last Port of Dischar=
+ge</th>
+            <th style=3D"width:127px;min-height:35px;">BL Vessel Voyage</th=
+>
+        </tr>
+        <tr>
+            <td style=3D"min-height:35px;">OOLU2158550180</td>
+            <td style=3D"min-height:35px;">1</td>
+            <td style=3D"min-height:35px;">Straight</td>
+            <td style=3D"min-height:35px;">May 14, 2025</td>
+            <td style=3D"min-height:35px;">Ningbo, Zhejiang, China</td>
+            <td style=3D"min-height:35px;">Long Beach, California, United S=
+tates</td>
+            <td style=3D"min-height:35px;">CSCL EAST CHINA SEA 070E</td>
+        </tr>
+    </tbody></table>
+    <br>
+   =20
+        Please click <a href=3D"https://ebl.shrd.iqax.com" rel=3D"nofollow"=
+ target=3D"_blank">here</a> to login and check for more detail. Thanks.
+   =20
+    <br><br>
+    <span style=3D"font-weight:bold;">Notes: </span>This is a system email =
+and please do not reply. We are currently updating our email templates, and=
+ you may
+    come across different templates<br>during this period. For any inquirie=
+s, please contact IQAX CUSTOMER SERVICES <a>customerservices@iqax.com</a>.<=
+br><br>
+    Regards,<br>
+    IQAX eBL
+</div>
+</div>
+
+</div></div>
+            </div>
+        </div></body></html>
+------=_Part_528983_39714987.1747981781515--
