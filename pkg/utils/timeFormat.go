@@ -6,6 +6,9 @@ import (
 	"time"
 )
 
+// 从time.go导入，删除重复的常量声明
+// const Format = "2006-01-02 15:04:05"
+
 type JsonTime struct {
 	time.Time
 }

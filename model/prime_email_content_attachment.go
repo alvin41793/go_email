@@ -3,6 +3,8 @@ package model
 import (
 	"go_email/db"
 	"go_email/pkg/utils"
+	"log"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -36,7 +38,41 @@ func BatchCreateAttachments(attachments []*PrimeEmailContentAttachment) error {
 
 // BatchCreateAttachmentsWithTransaction 使用事务批量创建邮件附件记录
 func BatchCreateAttachmentsWithTransaction(tx *gorm.DB, attachments []*PrimeEmailContentAttachment) error {
-	return tx.Create(attachments).Error
+	if len(attachments) == 0 {
+		log.Println("[附件批量保存] 没有附件需要保存")
+		return nil
+	}
+
+	// 记录要保存的每个附件的信息，并清理文件名
+	for i, attachment := range attachments {
+		// 清理文件名中的非法UTF-8字符
+		attachment.FileName = utils.SanitizeUTF8(attachment.FileName)
+		attachment.MimeType = utils.SanitizeUTF8(attachment.MimeType)
+		attachment.OssUrl = utils.SanitizeUTF8(attachment.OssUrl)
+
+		// 确保时间字段已初始化
+		if attachment.CreatedAt.Time.IsZero() {
+			attachment.CreatedAt = utils.JsonTime{Time: time.Now()}
+		}
+		if attachment.UpdatedAt.Time.IsZero() {
+			attachment.UpdatedAt = utils.JsonTime{Time: time.Now()}
+		}
+
+		log.Printf("[附件批量保存] 准备保存附件 %d/%d: 邮件ID=%d, 文件名=%s, 大小=%.2f KB, 类型=%s",
+			i+1, len(attachments), attachment.EmailID, attachment.FileName, attachment.SizeKb, attachment.MimeType)
+	}
+
+	// 使用单个Create而不是批量操作，避免反射问题
+	for _, attachment := range attachments {
+		if err := tx.Create(attachment).Error; err != nil {
+			log.Printf("[附件批量保存] 保存附件失败: 邮件ID=%d, 文件名=%s, 错误=%v",
+				attachment.EmailID, attachment.FileName, err)
+			return err
+		}
+	}
+
+	log.Printf("[附件批量保存] 成功批量保存 %d 个附件", len(attachments))
+	return nil
 }
 
 // GetAttachmentsByIDs 根据ID列表获取附件

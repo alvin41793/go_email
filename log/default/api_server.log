@@ -46,3 +46,239 @@
 2025/05/23 17:27:37 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59340_20250523_172737.eml
 2025/05/23 17:27:39 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59339_20250523_172739.eml
 {"level":"INFO","timestamp":"2025-05-23 17:27:40.257","file":"middleware/logger.go:32","msg":"| 200 | 40.588739448s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 17:56:18 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 17:56:19 handlers.go:81: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/23 17:56:19 handlers.go:93: [邮件处理] 正在处理邮件 ID: 59348
+2025/05/23 17:56:23 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59348_20250523_175623.eml
+2025/05/23 17:56:23 handlers.go:101: [邮件处理] 成功获取邮件内容，邮件ID: 59348, 主题: MY SHIPMENTS, 发件人: rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 17:56:23 prime_email_content.go:40: [邮件内容保存] 准备保存邮件内容: ID=59348, 主题=MY SHIPMENTS, 发件人=rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 17:56:23 prime_email_content.go:44: [邮件内容保存] 保存邮件内容失败: ID=59348, 错误=Error 1366: Incorrect string value: '\xA1\xAFt ac...' for column 'content' at row 1
+2025/05/23 17:56:23 handlers.go:117: [邮件处理] 保存邮件内容到数据库失败，邮件ID: 59348, 错误: Error 1366: Incorrect string value: '\xA1\xAFt ac...' for column 'content' at row 1
+{"level":"INFO","timestamp":"2025-05-23 17:56:23.333","file":"middleware/logger.go:32","msg":"| 200 |  3.550880473s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 17:57:58 handlers.go:81: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/23 17:57:58 handlers.go:93: [邮件处理] 正在处理邮件 ID: 59348
+2025/05/23 17:58:08 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59348_20250523_175808.eml
+2025/05/23 17:58:09 handlers.go:101: [邮件处理] 成功获取邮件内容，邮件ID: 59348, 主题: MY SHIPMENTS, 发件人: rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 17:58:09 prime_email_content.go:40: [邮件内容保存] 准备保存邮件内容: ID=59348, 主题=MY SHIPMENTS, 发件人=rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 17:58:09 prime_email_content.go:44: [邮件内容保存] 保存邮件内容失败: ID=59348, 错误=Error 1366: Incorrect string value: '\xA1\xAFt ac...' for column 'content' at row 1
+2025/05/23 17:58:09 handlers.go:117: [邮件处理] 保存邮件内容到数据库失败，邮件ID: 59348, 错误: Error 1366: Incorrect string value: '\xA1\xAFt ac...' for column 'content' at row 1
+{"level":"INFO","timestamp":"2025-05-23 17:58:09.032","file":"middleware/logger.go:32","msg":"| 200 |  10.27312085s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 18:01:57 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 18:01:59 handlers.go:81: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/23 18:01:59 handlers.go:93: [邮件处理] 正在处理邮件 ID: 59348
+2025/05/23 18:02:01 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59348_20250523_180201.eml
+2025/05/23 18:02:02 handlers.go:101: [邮件处理] 成功获取邮件内容，邮件ID: 59348, 主题: MY SHIPMENTS, 发件人: rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 18:02:02 string_utils.go:19: [字符集处理] 检测到非法UTF-8字符，进行清洗
+2025/05/23 18:02:02 string_utils.go:19: [字符集处理] 检测到非法UTF-8字符，进行清洗
+2025/05/23 18:02:02 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59348, 主题=MY SHIPMENTS, 发件人=rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 18:02:02 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59348
+2025/05/23 18:02:02 handlers.go:122: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59348
+2025/05/23 18:02:02 handlers.go:126: [邮件处理] 邮件含有 1 个附件，邮件ID: 59348
+2025/05/23 18:02:02 handlers.go:130: [附件处理] 开始处理附件 1/1，邮件ID: 59348, 文件名: Rachel052325.xls, 大小: 36.27 KB, 类型: application/octet-stream
+2025/05/23 18:02:02 handlers.go:143: [附件处理] 开始上传附件到OSS，邮件ID: 59348, 文件名: Rachel052325.xls
+2025/05/23 18:02:02 handlers.go:151: [附件处理] 成功上传附件到OSS，邮件ID: 59348, 文件名: Rachel052325.xls, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/e0deb5565f4d482a8646c26621cf187b.xls
+2025/05/23 18:02:02 handlers.go:171: [附件处理] 准备批量保存 1 个附件记录到数据库，邮件ID: 59348
+2025/05/23 18:02:02 prime_email_content_attachment.go:52: [附件批量保存] 准备保存附件 1/1: 邮件ID=59348, 文件名=Rachel052325.xls, 大小=36.27 KB, 类型=application/octet-stream
+2025/05/23 18:02:02 handlers.go:88: [邮件处理] 发生异常，事务回滚: reflect: call of reflect.Value.Interface on zero Value
+{"level":"INFO","timestamp":"2025-05-23 18:02:02.767","file":"middleware/logger.go:32","msg":"| 200 |  3.773759322s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 18:14:58 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 18:15:00 handlers.go:82: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/23 18:15:00 handlers.go:96: [邮件处理] 正在处理邮件 ID: 59348
+2025/05/23 18:15:10 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59348_20250523_181510.eml
+2025/05/23 18:15:10 handlers.go:107: [邮件处理] 成功获取邮件内容，邮件ID: 59348, 主题: MY SHIPMENTS, 发件人: rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 18:15:10 string_utils.go:19: [字符集处理] 检测到非法UTF-8字符，进行清洗
+2025/05/23 18:15:10 string_utils.go:19: [字符集处理] 检测到非法UTF-8字符，进行清洗
+2025/05/23 18:15:10 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59348, 主题=MY SHIPMENTS, 发件人=rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 18:15:10 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59348
+2025/05/23 18:15:10 handlers.go:131: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59348
+2025/05/23 18:15:10 handlers.go:136: [邮件处理] 邮件含有 1 个附件，邮件ID: 59348
+2025/05/23 18:15:10 handlers.go:141: [附件处理] 开始处理附件 1/1，邮件ID: 59348, 文件名: Rachel052325.xls, 大小: 36.27 KB, 类型: application/octet-stream
+2025/05/23 18:15:10 handlers.go:156: [附件处理] 开始上传附件到OSS，邮件ID: 59348, 文件名: Rachel052325.xls
+2025/05/23 18:15:11 handlers.go:166: [附件处理] 成功上传附件到OSS，邮件ID: 59348, 文件名: Rachel052325.xls, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/198344d78d3d4af685161df76f156c41.xls
+2025/05/23 18:15:11 handlers.go:188: [附件处理] 准备批量保存 1 个附件记录到数据库，邮件ID: 59348
+2025/05/23 18:15:11 prime_email_content_attachment.go:52: [附件批量保存] 准备保存附件 1/1: 邮件ID=59348, 文件名=Rachel052325.xls, 大小=36.27 KB, 类型=application/octet-stream
+2025/05/23 18:15:11 handlers.go:90: [邮件处理] 发生异常，事务回滚: reflect: call of reflect.Value.Interface on zero Value
+{"level":"INFO","timestamp":"2025-05-23 18:15:11.317","file":"middleware/logger.go:32","msg":"| 200 | 10.769508075s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 18:19:26 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 18:19:36 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 18:19:39 handlers.go:91: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/23 18:19:39 handlers.go:105: [邮件处理] 正在处理邮件 ID: 59348
+2025/05/23 18:19:43 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59348_20250523_181943.eml
+2025/05/23 18:19:43 handlers.go:116: [邮件处理] 成功获取邮件内容，邮件ID: 59348, 主题: MY SHIPMENTS, 发件人: rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 18:19:43 string_utils.go:19: [字符集处理] 检测到非法UTF-8字符，进行清洗
+2025/05/23 18:19:43 string_utils.go:19: [字符集处理] 检测到非法UTF-8字符，进行清洗
+2025/05/23 18:19:43 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59348, 主题=MY SHIPMENTS, 发件人=rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 18:19:43 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59348
+2025/05/23 18:19:43 handlers.go:144: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59348
+2025/05/23 18:19:43 handlers.go:149: [邮件处理] 邮件含有 1 个附件，邮件ID: 59348
+2025/05/23 18:19:43 handlers.go:154: [附件处理] 开始处理附件 1/1，邮件ID: 59348, 文件名: Rachel052325.xls, 大小: 36.27 KB, 类型: application/octet-stream
+2025/05/23 18:19:43 handlers.go:169: [附件处理] 开始上传附件到OSS，邮件ID: 59348, 文件名: Rachel052325.xls
+2025/05/23 18:19:43 handlers.go:179: [附件处理] 成功上传附件到OSS，邮件ID: 59348, 文件名: Rachel052325.xls, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/6ec97c4413f84a7fa4865e7a5b8c6813.xls
+2025/05/23 18:19:43 handlers.go:205: [附件处理] 准备批量保存 1 个附件记录到数据库，邮件ID: 59348
+2025/05/23 18:19:43 prime_email_content_attachment.go:52: [附件批量保存] 准备保存附件 1/1: 邮件ID=59348, 文件名=Rachel052325.xls, 大小=36.27 KB, 类型=application/octet-stream
+2025/05/23 18:19:43 handlers.go:99: [邮件处理] 发生异常，事务回滚: reflect: call of reflect.Value.Interface on zero Value
+{"level":"INFO","timestamp":"2025-05-23 18:19:43.950","file":"middleware/logger.go:32","msg":"| 200 |  4.900800063s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 18:20:56 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 18:21:16 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 18:21:19 handlers.go:91: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/23 18:21:19 handlers.go:105: [邮件处理] 正在处理邮件 ID: 59348
+2025/05/23 18:21:27 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59348_20250523_182127.eml
+2025/05/23 18:21:28 handlers.go:116: [邮件处理] 成功获取邮件内容，邮件ID: 59348, 主题: MY SHIPMENTS, 发件人: rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 18:21:28 string_utils.go:19: [字符集处理] 检测到非法UTF-8字符，进行清洗
+2025/05/23 18:21:28 string_utils.go:19: [字符集处理] 检测到非法UTF-8字符，进行清洗
+2025/05/23 18:21:28 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59348, 主题=MY SHIPMENTS, 发件人=rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 18:21:28 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59348
+2025/05/23 18:21:28 handlers.go:144: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59348
+2025/05/23 18:21:28 handlers.go:149: [邮件处理] 邮件含有 1 个附件，邮件ID: 59348
+2025/05/23 18:21:28 handlers.go:154: [附件处理] 开始处理附件 1/1，邮件ID: 59348, 文件名: Rachel052325.xls, 大小: 36.27 KB, 类型: application/octet-stream
+2025/05/23 18:21:28 handlers.go:169: [附件处理] 开始上传附件到OSS，邮件ID: 59348, 文件名: Rachel052325.xls
+2025/05/23 18:21:29 handlers.go:179: [附件处理] 成功上传附件到OSS，邮件ID: 59348, 文件名: Rachel052325.xls, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/fea1f246f3ef425bb7b9031bdd6d739d.xls
+2025/05/23 18:21:29 handlers.go:205: [附件处理] 准备批量保存 1 个附件记录到数据库，邮件ID: 59348
+2025/05/23 18:21:29 prime_email_content_attachment.go:61: [附件批量保存] 准备保存附件 1/1: 邮件ID=59348, 文件名=Rachel052325.xls, 大小=36.27 KB, 类型=application/octet-stream
+2025/05/23 18:21:29 prime_email_content_attachment.go:68: [附件批量保存] 保存附件失败: 邮件ID=59348, 文件名=Rachel052325.xls, 错误=Error 1054: Unknown column 'email_id' in 'field list'
+2025/05/23 18:21:29 handlers.go:208: [附件处理] 保存附件记录到数据库失败，邮件ID: 59348, 错误: Error 1054: Unknown column 'email_id' in 'field list'
+{"level":"INFO","timestamp":"2025-05-23 18:21:29.663","file":"middleware/logger.go:32","msg":"| 200 | 10.468271313s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/23 18:22:39 handlers.go:91: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/23 18:22:39 handlers.go:105: [邮件处理] 正在处理邮件 ID: 59348
+2025/05/23 18:22:45 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59348_20250523_182245.eml
+2025/05/23 18:22:45 handlers.go:116: [邮件处理] 成功获取邮件内容，邮件ID: 59348, 主题: MY SHIPMENTS, 发件人: rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 18:22:45 string_utils.go:19: [字符集处理] 检测到非法UTF-8字符，进行清洗
+2025/05/23 18:22:45 string_utils.go:19: [字符集处理] 检测到非法UTF-8字符，进行清洗
+2025/05/23 18:22:45 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59348, 主题=MY SHIPMENTS, 发件人=rachel@usaprimeagency.com <rachel@usaprimeagency.com>
+2025/05/23 18:22:45 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59348
+2025/05/23 18:22:45 handlers.go:144: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59348
+2025/05/23 18:22:45 handlers.go:149: [邮件处理] 邮件含有 1 个附件，邮件ID: 59348
+2025/05/23 18:22:45 handlers.go:154: [附件处理] 开始处理附件 1/1，邮件ID: 59348, 文件名: Rachel052325.xls, 大小: 36.27 KB, 类型: application/octet-stream
+2025/05/23 18:22:45 handlers.go:169: [附件处理] 开始上传附件到OSS，邮件ID: 59348, 文件名: Rachel052325.xls
+2025/05/23 18:22:46 handlers.go:179: [附件处理] 成功上传附件到OSS，邮件ID: 59348, 文件名: Rachel052325.xls, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/2046ea3bcd424fcf922f140a632fa698.xls
+2025/05/23 18:22:46 handlers.go:205: [附件处理] 准备批量保存 1 个附件记录到数据库，邮件ID: 59348
+2025/05/23 18:22:46 prime_email_content_attachment.go:61: [附件批量保存] 准备保存附件 1/1: 邮件ID=59348, 文件名=Rachel052325.xls, 大小=36.27 KB, 类型=application/octet-stream
+2025/05/23 18:22:46 prime_email_content_attachment.go:74: [附件批量保存] 成功批量保存 1 个附件
+2025/05/23 18:22:46 handlers.go:214: [附件处理] 成功保存 1 个附件记录到数据库，邮件ID: 59348
+2025/05/23 18:22:46 handlers.go:223: [邮件处理] 更新邮件状态为已处理，邮件ID: 59348
+2025/05/23 18:22:46 handlers.go:232: [邮件处理] 成功更新邮件状态为已处理，邮件ID: 59348
+2025/05/23 18:22:46 handlers.go:105: [邮件处理] 正在处理邮件 ID: 59347
+2025/05/23 18:22:50 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59347_20250523_182250.eml
+2025/05/23 18:22:50 handlers.go:116: [邮件处理] 成功获取邮件内容，邮件ID: 59347, 主题: Fw: COSCO Arrival Notice with Invoice COSU9502008500 | COSCO SHIPPING CAMELLIA - 027E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/23 18:22:50 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59347, 主题=Fw: COSCO Arrival Notice with Invoice COSU9502008500 | COSCO SHIPPING CAMELLIA - 027E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/23 18:22:50 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59347
+2025/05/23 18:22:50 handlers.go:144: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59347
+2025/05/23 18:22:50 handlers.go:149: [邮件处理] 邮件含有 1 个附件，邮件ID: 59347
+2025/05/23 18:22:50 handlers.go:154: [附件处理] 开始处理附件 1/1，邮件ID: 59347, 文件名: BL9502008500.PDF, 大小: 123.74 KB, 类型: application/octet-stream
+2025/05/23 18:22:50 handlers.go:169: [附件处理] 开始上传附件到OSS，邮件ID: 59347, 文件名: BL9502008500.PDF
+2025/05/23 18:22:51 handlers.go:179: [附件处理] 成功上传附件到OSS，邮件ID: 59347, 文件名: BL9502008500.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/4dd7c5c0e84247eb879f6e0754a8bcc0.PDF
+2025/05/23 18:22:51 handlers.go:205: [附件处理] 准备批量保存 1 个附件记录到数据库，邮件ID: 59347
+2025/05/23 18:22:51 prime_email_content_attachment.go:61: [附件批量保存] 准备保存附件 1/1: 邮件ID=59347, 文件名=BL9502008500.PDF, 大小=123.74 KB, 类型=application/octet-stream
+2025/05/23 18:22:51 prime_email_content_attachment.go:74: [附件批量保存] 成功批量保存 1 个附件
+2025/05/23 18:22:51 handlers.go:214: [附件处理] 成功保存 1 个附件记录到数据库，邮件ID: 59347
+2025/05/23 18:22:51 handlers.go:223: [邮件处理] 更新邮件状态为已处理，邮件ID: 59347
+2025/05/23 18:22:51 handlers.go:232: [邮件处理] 成功更新邮件状态为已处理，邮件ID: 59347
+2025/05/23 18:22:51 handlers.go:105: [邮件处理] 正在处理邮件 ID: 59346
+2025/05/23 18:22:54 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59346_20250523_182254.eml
+2025/05/23 18:22:54 handlers.go:116: [邮件处理] 成功获取邮件内容，邮件ID: 59346, 主题: Fw: Maersk Container Off-Rail Notification, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/23 18:22:54 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59346, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/23 18:22:54 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59346
+2025/05/23 18:22:54 handlers.go:144: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59346
+2025/05/23 18:22:54 handlers.go:218: [邮件处理] 邮件没有附件，邮件ID: 59346
+2025/05/23 18:22:54 handlers.go:223: [邮件处理] 更新邮件状态为已处理，邮件ID: 59346
+2025/05/23 18:22:54 handlers.go:232: [邮件处理] 成功更新邮件状态为已处理，邮件ID: 59346
+2025/05/23 18:22:54 handlers.go:105: [邮件处理] 正在处理邮件 ID: 59345
+2025/05/23 18:22:56 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59345_20250523_182256.eml
+2025/05/23 18:22:57 handlers.go:116: [邮件处理] 成功获取邮件内容，邮件ID: 59345, 主题: Fw: Load on Rail Notice Ref-no: <<A1_DB5NBVLN.CNT>>, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/23 18:22:57 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59345, 主题=Fw: Load on Rail Notice Ref-no: <<A1_DB5NBVLN.CNT>>, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/23 18:22:57 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59345
+2025/05/23 18:22:57 handlers.go:144: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59345
+2025/05/23 18:22:57 handlers.go:149: [邮件处理] 邮件含有 1 个附件，邮件ID: 59345
+2025/05/23 18:22:57 handlers.go:154: [附件处理] 开始处理附件 1/1，邮件ID: 59345, 文件名: DB5NBVLN1.PDF, 大小: 7.15 KB, 类型: application/octet-stream
+2025/05/23 18:22:57 handlers.go:169: [附件处理] 开始上传附件到OSS，邮件ID: 59345, 文件名: DB5NBVLN1.PDF
+2025/05/23 18:22:57 handlers.go:179: [附件处理] 成功上传附件到OSS，邮件ID: 59345, 文件名: DB5NBVLN1.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/19d872bdea624671b011d51d0b31b42e.PDF
+2025/05/23 18:22:57 handlers.go:205: [附件处理] 准备批量保存 1 个附件记录到数据库，邮件ID: 59345
+2025/05/23 18:22:57 prime_email_content_attachment.go:61: [附件批量保存] 准备保存附件 1/1: 邮件ID=59345, 文件名=DB5NBVLN1.PDF, 大小=7.15 KB, 类型=application/octet-stream
+2025/05/23 18:22:57 prime_email_content_attachment.go:74: [附件批量保存] 成功批量保存 1 个附件
+2025/05/23 18:22:57 handlers.go:214: [附件处理] 成功保存 1 个附件记录到数据库，邮件ID: 59345
+2025/05/23 18:22:57 handlers.go:223: [邮件处理] 更新邮件状态为已处理，邮件ID: 59345
+2025/05/23 18:22:57 handlers.go:232: [邮件处理] 成功更新邮件状态为已处理，邮件ID: 59345
+2025/05/23 18:22:57 handlers.go:105: [邮件处理] 正在处理邮件 ID: 59344
+2025/05/23 18:23:01 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59344_20250523_182301.eml
+2025/05/23 18:23:01 handlers.go:116: [邮件处理] 成功获取邮件内容，邮件ID: 59344, 主题: Fw: OOCL Arrival Notice OOLU2307552650 | COSCO SHIPPING CAMELLIA - 027E, 发件人: operator . <operator@amglbl.com>
+2025/05/23 18:23:01 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59344, 主题=Fw: OOCL Arrival Notice OOLU2307552650 | COSCO SHIPPING CAMELLIA - 027E, 发件人=operator . <operator@amglbl.com>
+2025/05/23 18:23:01 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59344
+2025/05/23 18:23:01 handlers.go:144: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59344
+2025/05/23 18:23:01 handlers.go:149: [邮件处理] 邮件含有 1 个附件，邮件ID: 59344
+2025/05/23 18:23:01 handlers.go:154: [附件处理] 开始处理附件 1/1，邮件ID: 59344, 文件名: BL2307552650.PDF, 大小: 14.88 KB, 类型: application/octet-stream
+2025/05/23 18:23:01 handlers.go:169: [附件处理] 开始上传附件到OSS，邮件ID: 59344, 文件名: BL2307552650.PDF
+2025/05/23 18:23:01 handlers.go:179: [附件处理] 成功上传附件到OSS，邮件ID: 59344, 文件名: BL2307552650.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/90547fa66732487999214ef49ed30423.PDF
+2025/05/23 18:23:01 handlers.go:205: [附件处理] 准备批量保存 1 个附件记录到数据库，邮件ID: 59344
+2025/05/23 18:23:01 prime_email_content_attachment.go:61: [附件批量保存] 准备保存附件 1/1: 邮件ID=59344, 文件名=BL2307552650.PDF, 大小=14.88 KB, 类型=application/octet-stream
+2025/05/23 18:23:01 prime_email_content_attachment.go:74: [附件批量保存] 成功批量保存 1 个附件
+2025/05/23 18:23:01 handlers.go:214: [附件处理] 成功保存 1 个附件记录到数据库，邮件ID: 59344
+2025/05/23 18:23:01 handlers.go:223: [邮件处理] 更新邮件状态为已处理，邮件ID: 59344
+2025/05/23 18:23:01 handlers.go:232: [邮件处理] 成功更新邮件状态为已处理，邮件ID: 59344
+2025/05/23 18:23:01 handlers.go:105: [邮件处理] 正在处理邮件 ID: 59343
+2025/05/23 18:23:06 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59343_20250523_182306.eml
+2025/05/23 18:23:06 handlers.go:116: [邮件处理] 成功获取邮件内容，邮件ID: 59343, 主题: Fw: OOCL Arrival Notice OOLU2307553000 | COSCO SHIPPING CAMELLIA - 027E, 发件人: operator . <operator@amglbl.com>
+2025/05/23 18:23:06 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59343, 主题=Fw: OOCL Arrival Notice OOLU2307553000 | COSCO SHIPPING CAMELLIA - 027E, 发件人=operator . <operator@amglbl.com>
+2025/05/23 18:23:06 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59343
+2025/05/23 18:23:06 handlers.go:144: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59343
+2025/05/23 18:23:06 handlers.go:149: [邮件处理] 邮件含有 1 个附件，邮件ID: 59343
+2025/05/23 18:23:06 handlers.go:154: [附件处理] 开始处理附件 1/1，邮件ID: 59343, 文件名: BL2307553000.PDF, 大小: 14.90 KB, 类型: application/octet-stream
+2025/05/23 18:23:06 handlers.go:169: [附件处理] 开始上传附件到OSS，邮件ID: 59343, 文件名: BL2307553000.PDF
+2025/05/23 18:23:06 handlers.go:179: [附件处理] 成功上传附件到OSS，邮件ID: 59343, 文件名: BL2307553000.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/8d8da3e0fd17453e9c94a13a7d9ea425.PDF
+2025/05/23 18:23:06 handlers.go:205: [附件处理] 准备批量保存 1 个附件记录到数据库，邮件ID: 59343
+2025/05/23 18:23:06 prime_email_content_attachment.go:61: [附件批量保存] 准备保存附件 1/1: 邮件ID=59343, 文件名=BL2307553000.PDF, 大小=14.90 KB, 类型=application/octet-stream
+2025/05/23 18:23:06 prime_email_content_attachment.go:74: [附件批量保存] 成功批量保存 1 个附件
+2025/05/23 18:23:06 handlers.go:214: [附件处理] 成功保存 1 个附件记录到数据库，邮件ID: 59343
+2025/05/23 18:23:06 handlers.go:223: [邮件处理] 更新邮件状态为已处理，邮件ID: 59343
+2025/05/23 18:23:06 handlers.go:232: [邮件处理] 成功更新邮件状态为已处理，邮件ID: 59343
+2025/05/23 18:23:06 handlers.go:105: [邮件处理] 正在处理邮件 ID: 59342
+2025/05/23 18:23:10 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59342_20250523_182310.eml
+2025/05/23 18:23:10 handlers.go:116: [邮件处理] 成功获取邮件内容，邮件ID: 59342, 主题: Fw: OOCL Arrival Notice OOLU2157998350 | CSCL BOHAI SEA - 069E, 发件人: neway . <neway@800firms.com>
+2025/05/23 18:23:10 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59342, 主题=Fw: OOCL Arrival Notice OOLU2157998350 | CSCL BOHAI SEA - 069E, 发件人=neway . <neway@800firms.com>
+2025/05/23 18:23:10 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59342
+2025/05/23 18:23:10 handlers.go:144: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59342
+2025/05/23 18:23:10 handlers.go:149: [邮件处理] 邮件含有 1 个附件，邮件ID: 59342
+2025/05/23 18:23:10 handlers.go:154: [附件处理] 开始处理附件 1/1，邮件ID: 59342, 文件名: BL2157998350.PDF, 大小: 14.78 KB, 类型: application/octet-stream
+2025/05/23 18:23:10 handlers.go:169: [附件处理] 开始上传附件到OSS，邮件ID: 59342, 文件名: BL2157998350.PDF
+2025/05/23 18:23:10 handlers.go:179: [附件处理] 成功上传附件到OSS，邮件ID: 59342, 文件名: BL2157998350.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/201799b5f3c24408badd72dbacf1d15c.PDF
+2025/05/23 18:23:10 handlers.go:205: [附件处理] 准备批量保存 1 个附件记录到数据库，邮件ID: 59342
+2025/05/23 18:23:10 prime_email_content_attachment.go:61: [附件批量保存] 准备保存附件 1/1: 邮件ID=59342, 文件名=BL2157998350.PDF, 大小=14.78 KB, 类型=application/octet-stream
+2025/05/23 18:23:10 prime_email_content_attachment.go:74: [附件批量保存] 成功批量保存 1 个附件
+2025/05/23 18:23:10 handlers.go:214: [附件处理] 成功保存 1 个附件记录到数据库，邮件ID: 59342
+2025/05/23 18:23:10 handlers.go:223: [邮件处理] 更新邮件状态为已处理，邮件ID: 59342
+2025/05/23 18:23:10 handlers.go:232: [邮件处理] 成功更新邮件状态为已处理，邮件ID: 59342
+2025/05/23 18:23:10 handlers.go:105: [邮件处理] 正在处理邮件 ID: 59341
+2025/05/23 18:23:13 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59341_20250523_182313.eml
+2025/05/23 18:23:14 handlers.go:116: [邮件处理] 成功获取邮件内容，邮件ID: 59341, 主题: Fw: OOCL Arrival Notice OOLU8811119260 | COSCO SHIPPING CAMELLIA - 027E, 发件人: neway . <neway@800firms.com>
+2025/05/23 18:23:14 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59341, 主题=Fw: OOCL Arrival Notice OOLU8811119260 | COSCO SHIPPING CAMELLIA - 027E, 发件人=neway . <neway@800firms.com>
+2025/05/23 18:23:14 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59341
+2025/05/23 18:23:14 handlers.go:144: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59341
+2025/05/23 18:23:14 handlers.go:149: [邮件处理] 邮件含有 1 个附件，邮件ID: 59341
+2025/05/23 18:23:14 handlers.go:154: [附件处理] 开始处理附件 1/1，邮件ID: 59341, 文件名: BL8811119260.PDF, 大小: 14.89 KB, 类型: application/octet-stream
+2025/05/23 18:23:14 handlers.go:169: [附件处理] 开始上传附件到OSS，邮件ID: 59341, 文件名: BL8811119260.PDF
+2025/05/23 18:23:14 handlers.go:179: [附件处理] 成功上传附件到OSS，邮件ID: 59341, 文件名: BL8811119260.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/c8e9b896e6ef45b3bc62f7dc838d6a67.PDF
+2025/05/23 18:23:14 handlers.go:205: [附件处理] 准备批量保存 1 个附件记录到数据库，邮件ID: 59341
+2025/05/23 18:23:14 prime_email_content_attachment.go:61: [附件批量保存] 准备保存附件 1/1: 邮件ID=59341, 文件名=BL8811119260.PDF, 大小=14.89 KB, 类型=application/octet-stream
+2025/05/23 18:23:14 prime_email_content_attachment.go:74: [附件批量保存] 成功批量保存 1 个附件
+2025/05/23 18:23:14 handlers.go:214: [附件处理] 成功保存 1 个附件记录到数据库，邮件ID: 59341
+2025/05/23 18:23:14 handlers.go:223: [邮件处理] 更新邮件状态为已处理，邮件ID: 59341
+2025/05/23 18:23:14 handlers.go:232: [邮件处理] 成功更新邮件状态为已处理，邮件ID: 59341
+2025/05/23 18:23:14 handlers.go:105: [邮件处理] 正在处理邮件 ID: 59340
+2025/05/23 18:23:26 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59340_20250523_182326.eml
+2025/05/23 18:23:26 handlers.go:116: [邮件处理] 成功获取邮件内容，邮件ID: 59340, 主题: Fw: 2157998350 VCS-HCK-069 E amend request, 发件人: neway . <neway@800firms.com>
+2025/05/23 18:23:26 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59340, 主题=Fw: 2157998350 VCS-HCK-069 E amend request, 发件人=neway . <neway@800firms.com>
+2025/05/23 18:23:26 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59340
+2025/05/23 18:23:26 handlers.go:144: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59340
+2025/05/23 18:23:26 handlers.go:218: [邮件处理] 邮件没有附件，邮件ID: 59340
+2025/05/23 18:23:26 handlers.go:223: [邮件处理] 更新邮件状态为已处理，邮件ID: 59340
+2025/05/23 18:23:26 handlers.go:232: [邮件处理] 成功更新邮件状态为已处理，邮件ID: 59340
+2025/05/23 18:23:26 handlers.go:105: [邮件处理] 正在处理邮件 ID: 59339
+2025/05/23 18:23:31 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59339_20250523_182331.eml
+2025/05/23 18:23:32 handlers.go:116: [邮件处理] 成功获取邮件内容，邮件ID: 59339, 主题: Fw: IQAX eBL – eBL# OOLU2158550180 Transferred to you (DO NOT REPLY), 发件人: neway . <neway@800firms.com>
+2025/05/23 18:23:32 prime_email_content.go:72: [邮件内容保存] 准备保存邮件内容: ID=59339, 主题=Fw: IQAX eBL – eBL# OOLU2158550180 Transferred to you (DO NOT REPLY), 发件人=neway . <neway@800firms.com>
+2025/05/23 18:23:32 prime_email_content.go:88: [邮件内容保存] 成功保存邮件内容: ID=59339
+2025/05/23 18:23:32 handlers.go:144: [邮件处理] 成功保存邮件内容到数据库，邮件ID: 59339
+2025/05/23 18:23:32 handlers.go:218: [邮件处理] 邮件没有附件，邮件ID: 59339
+2025/05/23 18:23:32 handlers.go:223: [邮件处理] 更新邮件状态为已处理，邮件ID: 59339
+2025/05/23 18:23:32 handlers.go:232: [邮件处理] 成功更新邮件状态为已处理，邮件ID: 59339
+2025/05/23 18:23:32 handlers.go:246: [邮件处理] 成功提交事务，完成处理 10 封邮件
+{"level":"INFO","timestamp":"2025-05-23 18:23:32.125","file":"middleware/logger.go:32","msg":"| 200 | 53.110787695s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}

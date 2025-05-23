@@ -3,6 +3,9 @@ package model
 import (
 	"go_email/db"
 	"go_email/pkg/utils"
+	"log"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/jinzhu/gorm"
 )
@@ -34,7 +37,54 @@ func GetContentByEmailID(emailID int) (*PrimeEmailContent, error) {
 	return &content, err
 }
 
+// 清理非法UTF-8字符
+func sanitizeUTF8(input string) string {
+	if utf8.ValidString(input) {
+		return input
+	}
+
+	log.Printf("[字符集处理] 检测到非法UTF-8字符，进行清洗")
+
+	// 将非法UTF-8字符替换为空格
+	result := strings.Map(func(r rune) rune {
+		if r == utf8.RuneError {
+			return ' '
+		}
+		return r
+	}, input)
+
+	// 如果仍然有非法字符，使用更激进的方式：只保留ASCII字符
+	if !utf8.ValidString(result) {
+		log.Printf("[字符集处理] 第一次清洗后仍有非法字符，只保留ASCII字符")
+		result = strings.Map(func(r rune) rune {
+			if r <= 127 {
+				return r
+			}
+			return ' '
+		}, input)
+	}
+
+	return result
+}
+
 // CreateWithTransaction 使用事务创建邮件内容
 func (e *PrimeEmailContent) CreateWithTransaction(tx *gorm.DB) error {
-	return tx.Create(e).Error
+	log.Printf("[邮件内容保存] 准备保存邮件内容: ID=%d, 主题=%s, 发件人=%s", e.EmailID, e.Subject, e.FromEmail)
+
+	// 清理所有文本字段，确保它们是有效的UTF-8字符串
+	e.Subject = utils.SanitizeUTF8(e.Subject)
+	e.FromEmail = utils.SanitizeUTF8(e.FromEmail)
+	e.ToEmail = utils.SanitizeUTF8(e.ToEmail)
+	e.Date = utils.SanitizeUTF8(e.Date)
+	e.Content = utils.SanitizeUTF8(e.Content)
+	e.HTMLContent = utils.SanitizeUTF8(e.HTMLContent)
+
+	err := tx.Create(e).Error
+	if err != nil {
+		log.Printf("[邮件内容保存] 保存邮件内容失败: ID=%d, 错误=%v", e.EmailID, err)
+		return err
+	}
+
+	log.Printf("[邮件内容保存] 成功保存邮件内容: ID=%d", e.EmailID)
+	return nil
 }
