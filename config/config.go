@@ -7,35 +7,6 @@ import (
 	"strings"
 )
 
-// Config 应用配置结构体
-type EmailConfig struct {
-	Email struct {
-		IMAPServer   string `yaml:"imap_server"`
-		SMTPServer   string `yaml:"smtp_server"`
-		EmailAddress string `yaml:"email_address"`
-		Password     string `yaml:"password"`
-		IMAPPort     int    `yaml:"imap_port"`
-		SMTPPort     int    `yaml:"smtp_port"`
-		UseSSL       bool   `yaml:"use_ssl"`
-	} `yaml:"email"`
-
-	Server struct {
-		Port int    `yaml:"port"`
-		Host string `yaml:"host"`
-	} `yaml:"server"`
-}
-
-// EmailConfig 邮箱配置
-type EmailConfigInfo struct {
-	IMAPServer   string
-	SMTPServer   string
-	EmailAddress string
-	Password     string
-	IMAPPort     int
-	SMTPPort     int
-	UseSSL       bool
-}
-
 type Config struct {
 	Name string
 }
@@ -73,20 +44,6 @@ func (c *Config) initConfig() error {
 	}
 
 	return nil
-}
-
-// GetEmailConfig 获取邮箱配置
-func GetEmailConfig() (*EmailConfigInfo, error) {
-
-	return &EmailConfigInfo{
-		IMAPServer:   "imap.ipage.com",
-		SMTPServer:   "smtp.ipage.com",
-		EmailAddress: "aiteam@primeagencygroup.com",
-		password: REDACTED,
-		IMAPPort:     993,
-		SMTPPort:     587,
-		UseSSL:       true,
-	}, nil
 }
 
 // 监控配置文件变化并热加载程序

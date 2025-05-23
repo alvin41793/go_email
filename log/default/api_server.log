@@ -1,2 +1,11 @@
 2025/05/22 17:33:35 main.go:43: 标准日志已重定向到 log/default/api_server.log
 2025/05/22 17:34:31 main.go:43: 标准日志已重定向到 log/default/api_server.log
+2025/05/22 17:35:04 main.go:43: 标准日志已重定向到 log/default/api_server.log
+2025/05/22 17:45:15 main.go:44: 标准日志已重定向到 log/default/api_server.log
+2025/05/22 17:46:19 main.go:44: 标准日志已重定向到 log/default/api_server.log
+2025/05/22 18:14:36 main.go:44: 标准日志已重定向到 log/default/api_server.log
+2025/05/22 18:15:20 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_57285_20250522_181520.eml
+2025/05/22 18:23:21 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_57206_20250522_182321.eml
+2025/05/23 09:44:54 main.go:44: 标准日志已重定向到 log/default/api_server.log
+2025/05/23 09:46:22 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59111_20250523_094622.eml
+2025/05/23 10:25:28 mailcontent.go:273: 已保存原始邮件内容到文件: email_raw_content/email_59116_20250523_102528.eml

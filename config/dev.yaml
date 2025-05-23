@@ -13,9 +13,9 @@ log:
   log_rotate_size: 1
   log_backup_count: 7
 db:
-  name: ----
-  addr: rm-uf6nak40yp68119m8.mysql.rds.aliyuncs.com
-  username: root
+  addr: dev-mysql.geekyum.com
+  database: primeai_dev
+  username: primeai
   password: REDACTED
 docker_db:
   name: db_apiserver
@@ -27,9 +27,3 @@ redis:
   password: REDACTED 30
   maxActive: 30
   idleTimeout: 200
-oss:
-  endpoint: oss-cn-shanghai.aliyuncs.com
-  access_key_id: REDACTED
-  access_key_secret: REDACTED
-  bucketName: xueba-upload
-  domain: https://xueba-upload.oss-cn-shanghai.aliyuncs.com/

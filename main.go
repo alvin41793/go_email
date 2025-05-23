@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 	"go_email/api"
 	"go_email/config"
+	"go_email/pkg/mailclient"
 	"log"
 	"os"
 	"path/filepath"
@@ -44,7 +45,7 @@ func initStdLog() {
 }
 func main() {
 	// 获取邮箱配置
-	emailConfig, err := config.GetEmailConfig()
+	emailConfig, err := mailclient.GetEmailConfig()
 	if err != nil {
 		log.Fatalf("无法加载邮箱配置: %v", err)
 	}

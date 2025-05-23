@@ -2,9 +2,9 @@ package api
 
 import (
 	"fmt"
-	"go_email/api/oss"
 	"go_email/pkg/mailclient"
 	"go_email/pkg/utils"
+	"go_email/pkg/utils/oss"
 	"strconv"
 	"strings"
 
