@@ -2,11 +2,13 @@ package api
 
 import (
 	"fmt"
+	"go_email/model"
 	"go_email/pkg/mailclient"
 	"go_email/pkg/utils"
 	"go_email/pkg/utils/oss"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,6 +31,7 @@ func InitMailClient(imapServer, smtpServer, emailAddress, password string, imapP
 
 // 获取邮件列表
 func ListEmails(c *gin.Context) {
+	fmt.Println("请求邮箱列表")
 	folder := c.DefaultQuery("folder", "INBOX")
 	limitStr := c.DefaultQuery("limit", "200")
 	limit, err := strconv.Atoi(limitStr)
@@ -41,8 +44,28 @@ func ListEmails(c *gin.Context) {
 		utils.SendResponse(c, err, nil)
 		return
 	}
+	var emailList []*model.PrimeEmail
+	for _, email := range emails {
+		var emailInfo model.PrimeEmail
+		emailInfo.EmailID, _ = strconv.Atoi(email.EmailID)
+		emailInfo.FromEmail = email.From
+		emailInfo.Subject = email.Subject
+		emailInfo.Date = email.Date
+		emailInfo.HasAttachment = 0
+		if email.HasAttachments == true {
+			emailInfo.HasAttachment = 1
+		}
+		emailInfo.CreatedAt = utils.JsonTime{Time: time.Now()}
 
-	utils.SendResponse(c, err, emails)
+		emailList = append(emailList, &emailInfo)
+
+	}
+	err = model.BatchCreateEmails(emailList)
+	if err != nil {
+		utils.SendResponse(c, err, nil)
+		return
+	}
+	utils.SendResponse(c, err, "存入邮件列表成功")
 }
 
 // 获取邮件内容

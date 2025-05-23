@@ -1,0 +1,557 @@
+Return-Path: <fax@usprimeagency.com>
+Delivered-To: operator@primeagencygroup.com
+Received: from bospopproxy18.eigbox.net ([10.20.15.1])
+	by bospop33.eigbox.net with LMTP
+	id yNSWITzcL2hBdgAA4ayZ1w
+	(envelope-from <fax@usprimeagency.com>)
+	for <operator@primeagencygroup.com>; Thu, 22 May 2025 22:23:56 -0400
+Received: from bosmailscan01.eigbox.net ([10.20.15.1])
+	by bospopproxy18.eigbox.net with LMTP
+	id 2Md1ITzcL2jvGQAA82u4aA
+	(envelope-from <fax@usprimeagency.com>)
+	for <operator@primeagencygroup.com>; Thu, 22 May 2025 22:23:56 -0400
+Return-path: <fax@usprimeagency.com>
+Envelope-to: operator@primeagencygroup.com
+Delivery-date: Thu, 22 May 2025 22:23:56 -0400
+Received: from [10.115.3.1] (helo=bosimpinc01)
+	by bosmailscan01.eigbox.net with esmtp (Exim)
+	id 1uII4i-0000Rt-Ah
+	for operator@primeagencygroup.com; Thu, 22 May 2025 22:23:56 -0400
+Received: from sonic320-27.consmr.mail.ne1.yahoo.com ([66.163.191.89])
+	by bizsmtp with ESMTP
+	id II4fuzMQ6iEM0II4huCA3D; Thu, 22 May 2025 22:23:56 -0400
+X-EN-OrigIP: 66.163.191.89
+X-EN-IMPSID: II4fuzMQ6iEM0II4huCA3D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1747967033; bh=1EDPX80epA+K8ycgD8XK+iEfuluc+XY+adrRv1meql8=; h=Date:From:To:In-Reply-To:References:Subject:From:Subject:Reply-To; b=oIyamhaUbxagefSDOr+7YH1ZFLLIUz28v+J03+hpZ+pv2phX7AkDzJh3WZ5FcHFeTpJ3fKWF1NX0Vsw8cG5IoZCCG3rXKRWbKWm1zdEFnlUASQdqvvYnjM0w2/j3dY0+8+7F4TrV5PlCsA4i7e0XwQpLRorUfsa08o7VO42XHPsthgYtBR5Q2ayxzuiOLM/huFbXOOEjS3x2NN3YwUqe9UoeHOfFT23usl/qlGvwJXue/E/noEpyf4dYC4tJldPgC+6SjqfMUrIPN+J2gscLvu1t/+Re5rFof1uFKVBQ6EjKdwC8xx/SJ1JI5Y0KXk/r8GvPN/FYrylxFiOZoQiJtQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1747967033; bh=Zgz9pG9E60fxCS40ys4SQdrysY1D6uO4F5Evyc4QhA1=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=NPow9Wx1ga3Zap5MGjVTS6VrjVBZTQeiFAcYoGqzgS6YuAUztDkpACzpwZY1fMZEPVZrzPsxmK03hY9/Tf/5eO21gNP2eY0n6fKdtN+yavabgkCpn2twLN51jvgsrBmd884q462+R4pTUMlrMlduk/JQlFELBTbx5XPPqFg4udfJeTy0gaSJnK7h0hdEToi4CmbuepAOlCFbx/+6nUv5W/0pb027JJxXGJZe+VAqv/d1Jdf6d0K4FlsmNoAlokGv2mQ/DP7OG/qfx+KVOTXMZk3EW8vGNv/5OVDPgUTQtHZsKCdYF6FbvJX6L51f1JSOjQEpvW0vLXQIZ2OTe2qAOA==
+X-YMail-OSG: S2h1cmwVM1kMwxaweEa8f.gxvyepYNNUaJv9KOIBATW2Hbh_fchRxqmVxNtiwLy
+ MV5phaqVG1UJu51hIThuwJB.h9mEBeSIbNUnICmFipCntVz61BXH5nEmKT0K5fWED4QQ9d6OLu9z
+ 6vtrA3xne_ag9BPncQvhjoK.7hiak3J2AnFXN.W0KyPEvUR_p.GrWbJVm8OcpFA7z9x7U2HTZWyy
+ dl3B2YUAV1Pwa0dmlfvHHO0n2PXX6KkynRkfERu6E3X5II5SuxjFcdwhsMLS2lN9jQUGhNMGtg0d
+ gpG9eZ7h8Yp4Du1ZmEeyxXmHDn4_mkx7I0hUO5R.llMCUGwTjQASpfTGo1JbBrPpMmuJxFqBvcpb
+ linyHIyU0UhIjyAnIvB3CHHVFRDzEWZzFeqo56i7dvbmRWmqNFBPi4S5fZajhmQxiKsziolUf4vK
+ LI0Bipr.Di26jjTtevrzdVJZhFV_8fHfZvjcmKx.L1r.tQarYLXHeR78Eygz2m4enqOXJ7FksUaP
+ wA4mdBZFjKtzijD4BzNcaqocSqvo3_V5WKwMGq7Qoult2FquTi0IFcQaNfeR7MsAzI07MKrtJYV_
+ _haV6QrE4PyvFlxZJGmquAOr8ifU4vMoc_SoDym1vN8zUQ2lPlY0dvbxh9iNBpSrYAXT2OYBfKvo
+ XQOC9hTJIP4moF7cTnV0mMVS0LTym1Huqxo2Lux9sPoXKjVgXL1D4b_iKAFKwaYReCAx0b59QaEq
+ mpM2dOe7J6zfSSKhr9d0VRoz2V7NjaEvgsratRV7hNAGaBegYhOlYLXDhXfQDFCCtjekxDe1cJkT
+ U7Wv0qUqzmYuz9LSnawnqWSu8ebHfjDrAEfwO27zW6Mxz6NqK5W220VLVzn0PwIXzsHY.kg153da
+ Gu9tWmRvG5wSpzn9RxK7yoGOfdaBpt7FpRDEgSCCtav.zpGsAdwtcArHCpWb4uIXPpaqbFS0CgC.
+ 5Lspv4VaXDPIe3TcjqOE5B9evYndJHd_1IwTDiSAExqneRjM42kbKST4pRCaTUooFghM8BV6GuCG
+ a_cAZRjidyedYgDXkF8v0P0zuBd6ilXWcJLVaJewtGHWL1KdEHAwdcETRP6TpXpnumff6OmKdLe6
+ jWHbAdT_d4sJQ2ny8gN0G8KXGMTTcxp8o.IW5fH8OF6IfFfAzYDdMEZfLLaxnCULa8DdczO7TRUG
+ rBton18Wq2FUvFGpKMqeTER1D7f_QagC7mAvu3BMzbX_1rMSYk6UxVjZxgT3y3H93qzyzW.ZNO06
+ wZourJG1yrJKjw5gPz0UsUa.cz8FvQbT8RibcAC98CCKi5m2lMuMKXPpp349QwB5SdFYAIzRZaId
+ ASGPKu1dM26nNChxx29VT2.5qGwbmuQ1Qej2wH25CJ7iv_0qHZ0yrzND5NocNwgVLR1TMN0rHMn.
+ LOIGCKaQoBUlP_QqA4qNlmk3I8J1GgtCUb4QVPmUbE1w1RbzmumDGPI1Iaf69g5X1a2YCN62u6Y4
+ O4szuAcoVXX0OQroEfDHa.uyVgm_zFKfhbWuW7pa3AULa9doScBCF1PmhK23tCrme21RYoYk_8hC
+ nj87Wxr1dAzYVQ.v3m8sYS1s1gZ81gvsDa7vwdZacxYQ3DLBW8w5S9a8a2TxdtuW.fvUWCwoIc_4
+ Gh8AsEEzN2gfnEHeQZRTF4.jH1pdDflo8g1l1697i2a8G6XlADACwnkk741N6GeUN_oRIgjwDwLJ
+ PYb4qlHViWL5stpQrKUM5zy7dzVJgIV4QSnc9HcqrSyTkQ1GlR0taf.YC8ZxjnmmQex27Ty0tELE
+ 4mm8NXxUmVnztS5AfuA4d5pJ.yuCpCOLHzP6mbUlzsF.fzzagF_fiWSVpovrMRjlPOqaGSh5npIE
+ jZOUopPjslAWVIEX9FVnJo025TfvWGwb_afMFvUxtka3As0NoQTF3HP2Ot4N_InzwtvttAyJIO4Q
+ ypKKTT8A9ErgG.vijGRrRk33ZAeAkk8JEDidOqSzXoTfb4d..9tFGQwU0AeXo0AFwTvFIlmcQIa5
+ V7NIrr_xFvRn9rDr5ZvIAOzWP8Kp5DW5XvUhwPhoR7xtSLI8iQwm5yxOgmBiGPM41MUPmMfLL6Hw
+ Wqi2t.mbD2rsFCPCO9X2J7QmJ.uS4.lfvbbXQexJ3zi.VQVl1VWJ1Oszd5p3P.8h8z1_Mk0B0oks
+ hne4aeIX2fOqdjcmn6kko38aiEszB6yXZMdi0CsIHwTEmHdXb3yJ4TIxgVdrCvK8ihqimJyUlEpw
+ YLCZowini9Ddq8owFarxOTull2xldfX1JTKxvr7tBql_sjjtAyQtKYGVcXbS9aUX3ZKvdipvhpqu
+ 88.g-
+X-Sonic-MF: <fax@usprimeagency.com>
+X-Sonic-ID: 039220ae-71d8-4fbb-bd3c-e9e680681b48
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic320.consmr.mail.ne1.yahoo.com with HTTP; Fri, 23 May 2025 02:23:53 +0000
+Date: Fri, 23 May 2025 02:23:48 +0000 (UTC)
+From: "fax ." <fax@usprimeagency.com>
+To: Joey <joey@usaprimeagency.com>, Flora <flora@usprimeagency.com>, 
+	Luke Yang <luke@usprimeagency.com>, Dave <dave@usprimeagency.com>, 
+	"operator@primeagencygroup.com" <operator@primeagencygroup.com>
+Message-ID: <858808254.569357.1747967028579@mail.yahoo.com>
+In-Reply-To: <2025052203473956760567@usprimeagency.com>
+References: <2025052203473956760567.ref@usprimeagency.com> <2025052203473956760567@usprimeagency.com>
+Subject: Fw: Wan Hai Detention-SAV (2025-05-21)
+MIME-Version: 1.0
+Content-Type: multipart/mixed; 
+	boundary="----=_Part_569356_1741782715.1747967028578"
+X-Mailer: WebService/1.1.23884 YMailNorrin
+Content-Length: 27157
+X-CMAE-Envelope: MS4wfLyR8+6ABZuodCiGaczwYXdToER0sVVS9QQ+TdnFgTM7rpzetTgostd+8UltItrBOsxkU28SycTUE/tiU8dcjxtkc4/yoqANao3+Pzg8C9YFO+UipB/7
+ 5S7qeJTLVCgGFkz3lH8EbhpBjeL9tuDr0PqZr+UGySoVsD/CEoNE24pTsAxEYcdOibLRQxntmU61sA5aMx8srvzV17otdy2tMEtjhQTJ86O0USlCvT2+1o0X
+
+------=_Part_569356_1741782715.1747967028578
+Content-Type: multipart/alternative; 
+	boundary="----=_Part_569355_947476643.1747967028531"
+
+------=_Part_569355_947476643.1747967028531
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+ WHSU6254210=C2=A0 PRIMECAKS250300173=C2=A0 =C2=A0JOEY
+WHSU6910339=C2=A0=C2=A0PRIMXH25031902=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0FLOR=
+A
+WHSU5149293=C2=A0=C2=A0PRIMXH25031901=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0FLOR=
+A
+WHSU5879265=C2=A0 PRIMXH25030504=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 L=
+UKEWHSU5706510=C2=A0 PRIM9HYFSE25020228=C2=A0 =C2=A0DAVE=C2=A0=C2=A0
+
+
+   ----- Forwarded Message ----- From: lynn@usprimeagency.com <lynn@usprime=
+agency.com>To: fax@usprimeagency.com <fax@usprimeagency.com>Sent: Thursday,=
+ May 22, 2025 at 03:47:47 AM EDTSubject: Fw: Wan Hai Detention-SAV (2025-05=
+-21)
+  Dears,
+Please check and forward to OPs, thanks.
+
+Best regards,
+
+=C2=A0
+
+Lynn Zhao
+
+Prime Agency
+
+www.usprimeagency.net=C2=A0
+
+Tel:=C2=A0626-563-0699
+
+Email:
+
+lynn@usprimeagency.com=C2=A0
+
+lynn@primeagencymail.com=C2=A0
+
+Office hours: 8:45am-5:45pm EST, MON-FRI
+
+
+
+***Our account information WON'T be changed frequently. Whenever you are to=
+ld to pay to a new company or a new account, please be very careful of frau=
+d. Thank you for safe banking!***
+
+=C2=A0
+
+**NEED WAREHOUSE SERVICE IN LOS ANGELES, NEW YORK, OAKLAND, ATLANTA? YOU AR=
+E VERY WELCOME TO CHECK WITH ME!**
+
+=C2=A0From:=C2=A0NoReplyDate:=C2=A02025-05-22=C2=A003:14To:=C2=A0lynnSubjec=
+t:=C2=A0Wan Hai Detention-SAV (2025-05-21)      Dear PRIME AGENCY,=20
+=20
+  You are receiving this notification as your organization was identified a=
+s the responsible party for the empty return of Wan Hai containers.=20
+=20
+=20
+In the tables below, we have listed the containers where the Detention Last=
+ Free day is approaching, and those that are past with Detention Fees due.
+=20
+ =20
+ Last Free Day Expiring=20
+| LFD | Container | Size Type | Outgate Facility |
+| 2025-05-25 | WHSU6254210 |  | Garden City Terminal |
+| 2025-05-29 | WHSU6910339 | 40VH | Garden City Terminal |
+| 2025-05-29 | WHSU5149293 | 40VH | Garden City Terminal |
+
+=20
+ Last Free Day Expired=20
+| LFD | Container | Size Type | Outgate Facility |
+| 2025-05-15 | WHSU5879265 | 40VH | Garden City Terminal |
+| 2025-05-18 | WHSU5706510 | 40VH | Garden City Terminal |
+
+ =20
+=20
+  For more information and to settle any outstanding Detention Fees, please=
+ visit  www.emodal.com. =20
+=20
+ IMPORTANT: This email was sent from a notification-only address that canno=
+t accept incoming email. Please do not reply to this message.  =20
+ =20
+------=_Part_569355_947476643.1747967028531
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<html><head></head><body><div class=3D"ydp920dda85yahoo-style-wrap" style=
+=3D"font-family:Helvetica Neue, Helvetica, Arial, sans-serif;font-size:16px=
+;"><div></div>
+        <div dir=3D"ltr" data-setdir=3D"false"><div><div dir=3D"ltr"><span =
+style=3D"color: rgb(0, 0, 0); font-family: Helvetica Neue, Helvetica, Arial=
+, sans-serif; font-size: 16px;">WHSU6254210&nbsp; PRIMECAKS250300173&nbsp; =
+&nbsp;JOEY</span><br clear=3D"none"></div><div dir=3D"ltr"><span style=3D"c=
+olor: rgb(0, 0, 0); font-family: Microsoft YaHei; font-size: medium; backgr=
+ound-color: rgb(255, 255, 240);">WHSU6910339&nbsp;&nbsp;PRIMXH25031902&nbsp=
+; &nbsp; &nbsp; &nbsp; &nbsp;FLORA</span><br clear=3D"none"></div><div dir=
+=3D"ltr"><span style=3D"color: rgb(0, 0, 0); font-family: Microsoft YaHei; =
+font-size: medium; background-color: rgb(255, 255, 240);">WHSU5149293&nbsp;=
+&nbsp;PRIMXH25031901&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;FLORA<br clear=3D"non=
+e"></span></div><div dir=3D"ltr">WHSU5879265&nbsp; PRIMXH25030504&nbsp; &nb=
+sp; &nbsp; &nbsp; &nbsp; &nbsp; LUKE</div><div dir=3D"ltr">WHSU5706510&nbsp=
+; PRIM9HYFSE25020228&nbsp; &nbsp;DAVE&nbsp;&nbsp;</div><div dir=3D"ltr"><br=
+ clear=3D"none" style=3D"font-family: Helvetica Neue, Helvetica, Arial, san=
+s-serif; font-size: 16px;"></div></div><br></div><div><br></div>
+       =20
+        </div><div id=3D"ydpd45dee19yahoo_quoted_8258809666" class=3D"ydpd4=
+5dee19yahoo_quoted">
+            <div style=3D"font-family:'Helvetica Neue', Helvetica, Arial, s=
+ans-serif;font-size:13px;color:#26282a;">
+                <div>----- Forwarded Message -----</div>
+                <div><b>From:</b> lynn@usprimeagency.com &lt;lynn@usprimeag=
+ency.com&gt;</div><div><b>To:</b> fax@usprimeagency.com &lt;fax@usprimeagen=
+cy.com&gt;</div><div><b>Sent:</b> Thursday, May 22, 2025 at 03:47:47 AM EDT=
+</div><div><b>Subject:</b> Fw: Wan Hai Detention-SAV (2025-05-21)</div><div=
+><br></div>
+               =20
+               =20
+                <div><div id=3D"ydpd45dee19yiv7794281006"><div>
+   =20
+   =20
+ =20
+<div><span></span><div>Dears,</div><div><br></div><div>Please check and for=
+ward to OPs, thanks.</div></div>
+<div><br></div><hr style=3D"width:210px;min-height:1px;" color=3D"#b5c4df" =
+size=3D"1" align=3D"left">
+<div><span><div style=3D"MARGIN:10px;FONT-FAMILY:verdana;FONT-SIZE:10pt;"><=
+div style=3D"font-family:'Microsoft YaHei UI', Tahoma;font-size:14px;line-h=
+eight:normal;"><p style=3D"margin:0cm 0cm 0.0001pt;font-size:12pt;font-fami=
+ly:=E5=AE=8B=E4=BD=93;line-height:14.65pt;" class=3D"ydpd45dee19yiv77942810=
+06MsoNormal"><span lang=3D"EN-US" style=3D"font-size:10pt;font-family:Arial=
+, sans-serif;background-image:initial;background-attachment:initial;backgro=
+und-size:initial;background-position:initial;background-repeat:initial;">Be=
+st regards,</span><span lang=3D"EN-US" style=3D"font-size:10pt;font-family:=
+Arial, sans-serif;"></span></p></div><div style=3D"font-family:'Microsoft Y=
+aHei UI', Tahoma;font-size:14px;line-height:normal;"><div><p style=3D"margi=
+n:0cm 0cm 0.0001pt;font-size:12pt;font-family:=E5=AE=8B=E4=BD=93;line-heigh=
+t:14.65pt;" class=3D"ydpd45dee19yiv7794281006MsoNormal"><span lang=3D"EN-US=
+" style=3D"font-size:10pt;font-family:Arial, sans-serif;">&nbsp;</span></p>=
+</div><div><p style=3D"margin:0cm 0cm 0.0001pt;font-size:12pt;font-family:=
+=E5=AE=8B=E4=BD=93;line-height:14.65pt;" class=3D"ydpd45dee19yiv7794281006M=
+soNormal"><span lang=3D"EN-US" style=3D"font-size:10pt;font-family:Arial, s=
+ans-serif;">Lynn Zhao</span></p></div><div><p style=3D"margin:0cm 0cm 0.000=
+1pt;font-size:12pt;font-family:=E5=AE=8B=E4=BD=93;line-height:14.65pt;" cla=
+ss=3D"ydpd45dee19yiv7794281006MsoNormal"><span lang=3D"EN-US" style=3D"font=
+-size:10pt;font-family:Arial, sans-serif;">Prime Agency</span></p></div><di=
+v><p style=3D"margin:0cm 0cm 0.0001pt;font-size:12pt;font-family:=E5=AE=8B=
+=E4=BD=93;line-height:14.65pt;" class=3D"ydpd45dee19yiv7794281006MsoNormal"=
+><span lang=3D"EN-US" style=3D"font-size:10pt;font-family:Arial, sans-serif=
+;"><a href=3D"http://www.usprimeagency.net/" style=3D"color:purple;" target=
+=3D"_blank" rel=3D"noreferrer noopener">www.usprimeagency.net</a>&nbsp;</sp=
+an></p></div><div><p style=3D"margin:0cm 0cm 0.0001pt;font-size:12pt;font-f=
+amily:=E5=AE=8B=E4=BD=93;line-height:14.65pt;" class=3D"ydpd45dee19yiv77942=
+81006MsoNormal"><span lang=3D"EN-US" style=3D"font-size:10pt;font-family:Ar=
+ial, sans-serif;">Tel:&nbsp;</span><span style=3D"font-family:Arial, sans-s=
+erif;font-size:13.3333px;line-height:19.5333px;background-color:transparent=
+;">626-563-0699</span></p></div><div><p style=3D"margin:0cm 0cm 0.0001pt;fo=
+nt-size:12pt;font-family:=E5=AE=8B=E4=BD=93;line-height:14.65pt;" class=3D"=
+ydpd45dee19yiv7794281006MsoNormal"><span lang=3D"EN-US" style=3D"font-size:=
+10pt;font-family:Arial, sans-serif;">Email:</span></p></div><div><p style=
+=3D"margin:0cm 0cm 0.0001pt;font-size:12pt;font-family:=E5=AE=8B=E4=BD=93;l=
+ine-height:14.65pt;" class=3D"ydpd45dee19yiv7794281006MsoNormal"><span lang=
+=3D"EN-US" style=3D"font-size:10pt;font-family:Arial, sans-serif;"><a href=
+=3D"mailto:lynn@usprimeagency.com" style=3D"color:purple;" target=3D"_blank=
+" rel=3D"noreferrer noopener">lynn@usprimeagency.com</a>&nbsp;</span></p></=
+div><div><p style=3D"margin:0cm 0cm 0.0001pt;font-size:12pt;font-family:=E5=
+=AE=8B=E4=BD=93;line-height:14.65pt;" class=3D"ydpd45dee19yiv7794281006MsoN=
+ormal"><span lang=3D"EN-US" style=3D"font-size:10pt;font-family:Arial, sans=
+-serif;"><a href=3D"mailto:lynn@usaprimeagency.com" style=3D"color:purple;"=
+ target=3D"_blank" rel=3D"noreferrer noopener">lynn@primeagencymail.com</a>=
+&nbsp;</span></p></div><div><p style=3D"margin:0cm 0cm 0.0001pt;font-size:1=
+2pt;font-family:=E5=AE=8B=E4=BD=93;line-height:14.65pt;" class=3D"ydpd45dee=
+19yiv7794281006MsoNormal"><span lang=3D"EN-US" style=3D"font-size:10pt;font=
+-family:Arial, sans-serif;">Office hours: 8:45am-5:45pm EST, MON-FRI<br><br=
+></span></p></div><div><p style=3D"margin:0cm 0cm 0.0001pt;font-size:12pt;f=
+ont-family:=E5=AE=8B=E4=BD=93;line-height:14.65pt;" class=3D"ydpd45dee19yiv=
+7794281006MsoNormal"><b><span lang=3D"EN-US" style=3D"font-size:10pt;font-f=
+amily:Arial, sans-serif;color:red;">***Our account information WON'T be cha=
+nged frequently. Whenever you are told to pay to a new company or a new acc=
+ount, please be very careful of fraud. Thank you for safe banking!***</span=
+></b><span lang=3D"EN-US" style=3D"font-size:10pt;font-family:Arial, sans-s=
+erif;"></span></p></div><div><p style=3D"margin:0cm 0cm 0.0001pt;font-size:=
+12pt;font-family:=E5=AE=8B=E4=BD=93;line-height:14.65pt;" class=3D"ydpd45de=
+e19yiv7794281006MsoNormal"><span lang=3D"EN-US" style=3D"font-size:10pt;fon=
+t-family:Arial, sans-serif;">&nbsp;</span></p></div><div><div><p style=3D"m=
+argin:0cm 0cm 0.0001pt;font-size:12pt;font-family:=E5=AE=8B=E4=BD=93;line-h=
+eight:18pt;" class=3D"ydpd45dee19yiv7794281006MsoNormal"><span lang=3D"EN-U=
+S" style=3D"font-size:10pt;font-family:Verdana, sans-serif;background:yello=
+w;">**</span><span lang=3D"EN-US" style=3D"font-family:Calibri, sans-serif;=
+background:yellow;">NEED WAREHOUSE SERVICE IN LOS ANGELES, NEW YORK, OAKLAN=
+D, ATLANTA? YOU ARE VERY WELCOME TO CHECK WITH ME!**</span></p></div></div>=
+</div></div></span></div>
+<blockquote style=3D"margin-Top:0px;margin-Bottom:0px;margin-Left:0.5em;mar=
+gin-Right:inherit;"><div>&nbsp;</div><div style=3D"border:none;border-top:s=
+olid #B5C4DF 1.0pt;padding:3.0pt 0cm 0cm 0cm;"><div style=3D"PADDING-RIGHT:=
+8px;PADDING-LEFT:8px;FONT-SIZE:12px;FONT-FAMILY:tahoma;COLOR:#000000;BACKGR=
+OUND:#efefef;PADDING-BOTTOM:8px;PADDING-TOP:8px;"><div><b>From:</b>&nbsp;<a=
+ href=3D"mailto:NoReply@emodal.com" target=3D"_blank" rel=3D"noreferrer noo=
+pener">NoReply</a></div><div><b>Date:</b>&nbsp;2025-05-22&nbsp;03:14</div><=
+div><b>To:</b>&nbsp;<a href=3D"mailto:lynn@usprimeagency.com" target=3D"_bl=
+ank" rel=3D"noreferrer noopener">lynn</a></div><div><b>Subject:</b>&nbsp;Wa=
+n Hai Detention-SAV (2025-05-21)</div></div></div><div><div class=3D"ydpd45=
+dee19yiv7794281006FoxDiv20250522034732502613">
+ =20
+   =20
+   =20
+ =20
+ =20
+   =20
+   =20
+   =20
+   =20
+    <div style=3D"text-align:right;width:75%;" class=3D"ydpd45dee19yiv77942=
+81006text-right-align ydpd45dee19yiv7794281006log-container">
+        <img src=3D"" alt=3D"eModal Logo" data-inlineimagemanipulating=3D"t=
+rue" class=3D"yahoo-inline-image" data-id=3D"1747966990939">
+        <hr>
+    </div>
+    <div style=3D"padding:20px;font-size:16px;font-style:normal;" class=3D"=
+ydpd45dee19yiv7794281006email-container">
+        <span style=3D"font-size:16px;font-weight:700;" class=3D"ydpd45dee1=
+9yiv7794281006strong-label">Dear PRIME AGENCY,</span> =20
+        <br>      =20
+        <br>    =20
+        <span class=3D"ydpd45dee19yiv7794281006normal-label">      =20
+            You are receiving this notification as your organization was id=
+entified as the responsible party for the empty return of Wan Hai container=
+s.        =20
+            <br>
+            <br>
+                <p>In the tables below, we have listed the containers where=
+ the Detention Last Free day is approaching, and those that are past with D=
+etention Fees due.</p>    =20
+                <br>
+        </span>    =20
+            <br>                 <span style=3D"font-size:16px;font-weight:=
+700;" class=3D"ydpd45dee19yiv7794281006strong-label">Last Free Day Expiring=
+</span>
+            <table border=3D"1" style=3D"border-collapse:collapse;border:1p=
+x solid rgb(0, 0, 0);padding:5px;min-width:500px;" class=3D"ydpd45dee19yiv7=
+794281006table-border">
+                <thead>
+                    <tr>
+                        <th style=3D"text-align: left; padding: 5px 6px; bo=
+rder-collapse: collapse; border: 1px solid rgb(0, 0, 0); background-color: =
+rgb(237, 239, 242); font-weight: 700; min-width: 50px;" class=3D"ydpd45dee1=
+9yiv7794281006min-w-50">LFD</th>
+                        <th style=3D"text-align: left; padding: 5px 6px; bo=
+rder-collapse: collapse; border: 1px solid rgb(0, 0, 0); background-color: =
+rgb(237, 239, 242); font-weight: 700; min-width: 150px;" class=3D"ydpd45dee=
+19yiv7794281006min-w-150">Container</th>
+                            <th style=3D"text-align: left; padding: 5px 6px=
+; border-collapse: collapse; border: 1px solid rgb(0, 0, 0); background-col=
+or: rgb(237, 239, 242); font-weight: 700; min-width: 50px;" class=3D"ydpd45=
+dee19yiv7794281006min-w-50">Size Type</th>
+                        <th style=3D"text-align: left; padding: 5px 6px; bo=
+rder-collapse: collapse; border: 1px solid rgb(0, 0, 0); background-color: =
+rgb(237, 239, 242); font-weight: 700; min-width: 250px;" class=3D"ydpd45dee=
+19yiv7794281006min-w-250">Outgate Facility</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        <tr>
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">2025-05-25</td>
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">WHSU6254210</td>
+                                <td style=3D"padding:2px 6px;text-align:lef=
+t;border-collapse:collapse;border:1px solid rgb(0, 0, 0);"></td>
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">Garden City Terminal=
+</td>
+                        </tr>
+                        <tr style=3D"background-color:rgb(245, 245, 245);">
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">2025-05-29</td>
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">WHSU6910339</td>
+                                <td style=3D"padding:2px 6px;text-align:lef=
+t;border-collapse:collapse;border:1px solid rgb(0, 0, 0);">40VH</td>
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">Garden City Terminal=
+</td>
+                        </tr>
+                        <tr>
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">2025-05-29</td>
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">WHSU5149293</td>
+                                <td style=3D"padding:2px 6px;text-align:lef=
+t;border-collapse:collapse;border:1px solid rgb(0, 0, 0);">40VH</td>
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">Garden City Terminal=
+</td>
+                        </tr>
+                </tbody>
+            </table>
+            <br>                 <span style=3D"font-size:16px;font-weight:=
+700;" class=3D"ydpd45dee19yiv7794281006strong-label">Last Free Day Expired<=
+/span>
+            <table border=3D"1" style=3D"border-collapse:collapse;border:1p=
+x solid rgb(0, 0, 0);padding:5px;min-width:500px;" class=3D"ydpd45dee19yiv7=
+794281006table-border">
+                <thead>
+                    <tr>
+                        <th style=3D"text-align: left; padding: 5px 6px; bo=
+rder-collapse: collapse; border: 1px solid rgb(0, 0, 0); background-color: =
+rgb(237, 239, 242); font-weight: 700; min-width: 50px;" class=3D"ydpd45dee1=
+9yiv7794281006min-w-50">LFD</th>
+                        <th style=3D"text-align: left; padding: 5px 6px; bo=
+rder-collapse: collapse; border: 1px solid rgb(0, 0, 0); background-color: =
+rgb(237, 239, 242); font-weight: 700; min-width: 150px;" class=3D"ydpd45dee=
+19yiv7794281006min-w-150">Container</th>
+                            <th style=3D"text-align: left; padding: 5px 6px=
+; border-collapse: collapse; border: 1px solid rgb(0, 0, 0); background-col=
+or: rgb(237, 239, 242); font-weight: 700; min-width: 50px;" class=3D"ydpd45=
+dee19yiv7794281006min-w-50">Size Type</th>
+                        <th style=3D"text-align: left; padding: 5px 6px; bo=
+rder-collapse: collapse; border: 1px solid rgb(0, 0, 0); background-color: =
+rgb(237, 239, 242); font-weight: 700; min-width: 250px;" class=3D"ydpd45dee=
+19yiv7794281006min-w-250">Outgate Facility</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        <tr>
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">2025-05-15</td>
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">WHSU5879265</td>
+                                <td style=3D"padding:2px 6px;text-align:lef=
+t;border-collapse:collapse;border:1px solid rgb(0, 0, 0);">40VH</td>
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">Garden City Terminal=
+</td>
+                        </tr>
+                        <tr style=3D"background-color:rgb(245, 245, 245);">
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">2025-05-18</td>
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">WHSU5706510</td>
+                                <td style=3D"padding:2px 6px;text-align:lef=
+t;border-collapse:collapse;border:1px solid rgb(0, 0, 0);">40VH</td>
+                            <td style=3D"padding:2px 6px;text-align:left;bo=
+rder-collapse:collapse;border:1px solid rgb(0, 0, 0);">Garden City Terminal=
+</td>
+                        </tr>
+                </tbody>
+            </table>
+       =20
+    </div>
+    <br>
+    <br>
+    <div>      =20
+    <span class=3D"ydpd45dee19yiv7794281006normal-label">For more informati=
+on and to settle any outstanding Detention Fees, please visit <a href=3D"ht=
+tps://u13702294.ct.sendgrid.net/ls/click?upn=3Du001.C-2F7dvRiFTpRkRaxrPoHKU=
+QPEgzg0Tx840d-2FiLkXO-2Bjy-2BGMkV0ZuhWmXyQtzQdWSpyYAb_ICqGeSvIppwzj6EwWoALo=
+I5CgaQdYRpFmnHB2JxyOdsf5VJbQqNIKW2Opmi78GHbYg42vmd4qAL3vWCPQ05DWZkOOEoHRWUq=
+2-2FgjDPjo1ZslvFPLJRh1vpdvvLzsK1FTqWAl4d-2F-2B0zfa70yD3-2BFeS7FsP4DEqmcz3QB=
+PQ2C-2F6EqKL3cYIi82t6Se5mK9KM5mTfcxfpayO-2B12870doB0KKvSP3Iqm5CHylTk7DW0k8i=
+wwaBVhLtzAmS90uhjSNBwQFDTu7-2BKJOfvy9e2jSYDxqWZhkhutUbFtdqljVYRxCXo6E-2FF4v=
+Qs3Z8r-2Bv8dm4Zhmzm-2BWhYYzprqe-2Bx3gklv3Og-3D-3D" target=3D"_blank" rel=3D=
+"noreferrer noopener">  www.emodal.com</a>. </span>      =20
+    <br>        =20
+    <br>    =20
+    <span style=3D"font-size:16px;font-weight:700;" class=3D"ydpd45dee19yiv=
+7794281006strong-label">IMPORTANT: This email was sent from a notification-=
+only address that cannot accept incoming email. Please do not reply to this=
+ message.</span>        </div>
+  <img src=3D"https://u13702294.ct.sendgrid.net/wf/open?upn=3Du001.BkHl65pm=
+h7zFozG9lYt3-2BvP5893-2FExdUmoj6FWjan6qTGbP9c5Bq5ZMNhxBn35s9iZwI9pIPLEuOBSm=
+ZHWf17qOZulrcIw-2BSkxSvCGi1UL698c-2FQvE5ZedK7xll436vVLd2bUOTv2GF5HCk8OYSRnb=
+8TPBR0J9xsxxNSnSnMsZNEsWk60-2FXdQTPoaFxFSicoEooHWqz4h6HT8iZFqABzrHjdoH-2FN9=
+tfCmV1-2FgfteDIq3EMS1DulnLqvODgfGLrU4xklwqZHzCjR3vBq-2F95Z-2F-2BDde4OqN7YHD=
+el80Y7Qcp-2BD7AfPmagzK9iQA8mNNlFd4yiGd9CH2pxdQcWFNmcXm-2Bg-3D-3D" alt=3D"" =
+width=3D"1" height=3D"1" border=3D"0" style=3D"min-height:1px !important;wi=
+dth:1px !important;border-width:0 !important;margin-top:0 !important;margin=
+-bottom:0 !important;margin-right:0 !important;margin-left:0 !important;pad=
+ding-top:0 !important;padding-bottom:0 !important;padding-right:0 !importan=
+t;padding-left:0 !important;" data-inlineimagemanipulating=3D"true" class=
+=3D"">
+  </div></div></blockquote>
+</div></div></div>
+            </div>
+        </div></body></html>
+------=_Part_569355_947476643.1747967028531--
+
+------=_Part_569356_1741782715.1747967028578
+Content-Type: image/jpeg
+Content-Transfer-Encoding: base64
+Content-Disposition: inline; filename="dataURI-1747966993658"
+Content-ID: <0eea5dfe-74c7-1e07-2471-e83f85fdc9eb@yahoo.com>
+
+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
+96tE/FzP7OCL/9k=
+
+------=_Part_569356_1741782715.1747967028578--

@@ -3,14 +3,15 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"go_email/api"
 	"go_email/config"
 	"go_email/pkg/mailclient"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 func initStdLog() {

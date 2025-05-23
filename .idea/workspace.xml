@@ -5,24 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a282b92f-b990-4f59-8643-e6793cdebe48" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/api/model/prime_email.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/db/db.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/db/redis.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/mailclient/mailcontent.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/utils/time.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pkg/utils/timeFormat.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/handlers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/oss/oss_upload.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/utils/oss/oss_upload.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/model/prime_email.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/model/prime_email_content.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/model/prime_email_content_attachment.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/config/dev.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/dev.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/log/default/api_server.log" beforeDir="false" afterPath="$PROJECT_DIR$/log/default/api_server.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pkg/mailclient/mailclient.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/mailclient/mailclient.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/python_email/MailClient.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/python_email/mail_api.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/api_test.sh" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +49,7 @@
     "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
     "git-widget-placeholder": "master",
     "go.import.settings.migrated": "true",
-    "last_opened_file_path": "/Users/savoki/Desktop/goproject/go_email",
+    "last_opened_file_path": "/Users/savoki/Desktop/goproject/go_email/pkg/utils",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
@@ -67,6 +58,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/pkg/utils" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/pkg" />
       <recent name="$PROJECT_DIR$/api" />
