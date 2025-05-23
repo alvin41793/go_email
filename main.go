@@ -6,7 +6,7 @@ import (
 	"go_email/api"
 	"go_email/config"
 	"go_email/pkg/mailclient"
-	"log"
+	stdlog "log"
 	"os"
 	"path/filepath"
 
@@ -40,15 +40,16 @@ func initStdLog() {
 	}
 
 	// 设置标准日志输出到文件
-	log.SetOutput(f)
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	log.Printf("标准日志已重定向到 %s", logFile)
+	stdlog.SetOutput(f)
+	stdlog.SetFlags(stdlog.LstdFlags | stdlog.Lshortfile)
+	stdlog.Printf("标准日志已重定向到 %s", logFile)
 }
+
 func main() {
 	// 获取邮箱配置
 	emailConfig, err := mailclient.GetEmailConfig()
 	if err != nil {
-		log.Fatalf("无法加载邮箱配置: %v", err)
+		stdlog.Fatalf("无法加载邮箱配置: %v", err)
 	}
 
 	// 初始化邮件客户端
@@ -67,7 +68,7 @@ func main() {
 
 	// 根据环境名称读取配置文件
 	if *env == "" {
-		log.Fatal("必须指定环境参数 -env")
+		stdlog.Fatal("必须指定环境参数 -env")
 	}
 
 	if err := config.Init(*env); err != nil {

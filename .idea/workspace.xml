@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a282b92f-b990-4f59-8643-e6793cdebe48" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/pkg/utils/time.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pkg/utils/timeFormat.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/handlers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/model/prime_email.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/model/prime_email_content.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/model/prime_email_content_attachment.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/config/dev.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/dev.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/insert_demo.go" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/log/default/api_server.log" beforeDir="false" afterPath="$PROJECT_DIR$/log/default/api_server.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
