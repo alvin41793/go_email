@@ -30,13 +30,13 @@ func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		emails := v1.Group("/emails")
 		{
 			// 获取邮件列表
-			emails.GET("/list", ListEmails)
+			emails.POST("/list", ListEmails)
 
 			// 通过指定uid获取邮件列表
-			emails.GET("/list_by_uid", ListEmailsByUid)
+			emails.POST("/list_by_uid", ListEmailsByUid)
 
 			// 获取邮件内容
-			emails.GET("/content", GetEmailContent)
+			emails.POST("/content", GetEmailContent)
 
 			// 获取附件列表
 			//emails.GET("/attachments/:uid", ListAttachments)

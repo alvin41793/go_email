@@ -910,3 +910,207 @@
 2025/05/26 18:48:19 main.go:45: 标准日志已重定向到 log/default/api_server.log
 {"level":"INFO","timestamp":"2025-05-26 18:48:21.589","file":"middleware/auth.go:51","msg":"Auth Failed /api/v1/emails/list map[Accept:[*/*] Accept-Encoding:[gzip, deflate, br] Cache-Control:[no-cache] Connection:[keep-alive] User-Agent:[PostmanRuntime-ApipostRuntime/1.1.0]]"}
 {"level":"INFO","timestamp":"2025-05-26 18:48:21.589","file":"middleware/logger.go:32","msg":"| 200 |     312.906µs |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 18:53:42 main.go:45: 标准日志已重定向到 log/default/api_server.log
+{"level":"INFO","timestamp":"2025-05-26 18:53:43.829","file":"middleware/auth.go:52","msg":"Auth Failed /api/v1/emails/list map[Accept:[*/*] Accept-Encoding:[gzip, deflate, br] Cache-Control:[no-cache] Connection:[keep-alive] Content-Length:[0] User-Agent:[PostmanRuntime-ApipostRuntime/1.1.0]]"}
+{"level":"INFO","timestamp":"2025-05-26 18:53:43.830","file":"middleware/logger.go:32","msg":"| 200 |     260.466µs |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 18:59:19 main.go:45: 标准日志已重定向到 log/default/api_server.log
+{"level":"INFO","timestamp":"2025-05-26 18:59:23.348","file":"middleware/logger.go:32","msg":"| 200 |     290.248µs |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 19:00:05 main.go:45: 标准日志已重定向到 log/default/api_server.log
+{"level":"INFO","timestamp":"2025-05-26 19:00:07.669","file":"middleware/logger.go:32","msg":"| 200 |     194.345µs |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 19:01:22 prime_email.go:50: [邮件列表] 开始批量处理 1 封邮件
+2025/05/26 19:01:22 prime_email.go:60: [邮件列表] 处理邮件 1/1: ID=62155, 主题=Fw: [SM Line America] PickUp Notice - B/L No.:NJED5F175300, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:01:22 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=62155
+2025/05/26 19:01:22 prime_email.go:93: [邮件列表] 成功完成批量处理: 创建=0, 跳过=1, 总计=1
+{"level":"INFO","timestamp":"2025-05-26 19:01:22.890","file":"middleware/logger.go:32","msg":"| 200 |  3.757016579s |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+{"level":"INFO","timestamp":"2025-05-26 19:01:31.905","file":"middleware/auth.go:52","msg":"Auth Failed /api/v1/emails/list map[Accept:[*/*] Accept-Encoding:[gzip, deflate, br] Cache-Control:[no-cache] Connection:[keep-alive] Content-Length:[30] Content-Type:[application/json] Token:[eyJhbciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2NjYsImV4cCI6MjEwODI1NzE2MywiaXNzIjoiZ2luLWJsb2cifQ.6gyUwAAjObhSlseb5E84MFS1HWmeD8LaYuh1lFkEVvQ] User-Agent:[PostmanRuntime-ApipostRuntime/1.1.0]]"}
+{"level":"INFO","timestamp":"2025-05-26 19:01:31.905","file":"middleware/logger.go:32","msg":"| 200 |     213.723µs |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 19:01:43 prime_email.go:50: [邮件列表] 开始批量处理 1 封邮件
+2025/05/26 19:01:43 prime_email.go:60: [邮件列表] 处理邮件 1/1: ID=62155, 主题=Fw: [SM Line America] PickUp Notice - B/L No.:NJED5F175300, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:01:43 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=62155
+2025/05/26 19:01:43 prime_email.go:93: [邮件列表] 成功完成批量处理: 创建=0, 跳过=1, 总计=1
+{"level":"INFO","timestamp":"2025-05-26 19:01:43.719","file":"middleware/logger.go:32","msg":"| 200 |  4.113312693s |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 19:05:57 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/26 19:06:40 handlers.go:197: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/26 19:06:40 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62039
+2025/05/26 19:06:45 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62039, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM54777200 (VSL : YM UNIFORMITY V#0078E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:06:45 handlers.go:294: [邮件处理] 邮件没有附件，邮件ID: 62039
+2025/05/26 19:06:45 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62038
+2025/05/26 19:06:54 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62038, 主题: Fw: [HMM] Payment Reminder List - USR250424037, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:06:54 handlers.go:243: [邮件处理] 邮件含有 1 个附件，邮件ID: 62038
+2025/05/26 19:06:54 handlers.go:248: [附件处理] 开始处理附件 1/1，邮件ID: 62038, 文件名: USPMAG00.xls
+2025/05/26 19:06:54 handlers.go:264: [附件处理] 开始上传附件到OSS，邮件ID: 62038, 文件名: USPMAG00.xls
+2025/05/26 19:06:56 handlers.go:272: [附件处理] 成功上传附件到OSS，邮件ID: 62038, 文件名: USPMAG00.xls, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/28a83e4814e34a81ab4f8322d613d93f.xls
+2025/05/26 19:06:56 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62037
+2025/05/26 19:06:59 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62037, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM15934400 (VSL : YM UNIFORMITY V#0078E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:06:59 handlers.go:294: [邮件处理] 邮件没有附件，邮件ID: 62037
+2025/05/26 19:06:59 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62036
+2025/05/26 19:07:50 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62036, 主题: Fw: NEED AN FOR ZIMUSNH7748370 TGBU5413717, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:07:50 handlers.go:243: [邮件处理] 邮件含有 1 个附件，邮件ID: 62036
+2025/05/26 19:07:50 handlers.go:248: [附件处理] 开始处理附件 1/1，邮件ID: 62036, 文件名: =?UTF-8?Q?ZIMUSNH77483?= =?UTF-8?Q?70__=E4=BB=A3=E7=90=86=E7=94=B5=E6=94=BE=E4=BB=B6.pdf?=
+2025/05/26 19:07:50 handlers.go:264: [附件处理] 开始上传附件到OSS，邮件ID: 62036, 文件名: =?UTF-8?Q?ZIMUSNH77483?= =?UTF-8?Q?70__=E4=BB=A3=E7=90=86=E7=94=B5=E6=94=BE=E4=BB=B6.pdf?=
+2025/05/26 19:07:51 handlers.go:272: [附件处理] 成功上传附件到OSS，邮件ID: 62036, 文件名: =?UTF-8?Q?ZIMUSNH77483?= =?UTF-8?Q?70__=E4=BB=A3=E7=90=86=E7=94=B5=E6=94=BE=E4=BB=B6.pdf?=, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/87a8ca2ee17849f6a576a988fc5d213b.pdf?=
+2025/05/26 19:07:51 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62035
+2025/05/26 19:07:58 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62035, 主题: Fw: [Tanera Transport LLC] Container Return Reminder, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:07:58 handlers.go:294: [邮件处理] 邮件没有附件，邮件ID: 62035
+2025/05/26 19:07:58 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62065
+2025/05/26 19:08:01 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62065, 主题: Fw: [Tanera Transport LLC] Container Return Reminder, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 19:08:01 handlers.go:294: [邮件处理] 邮件没有附件，邮件ID: 62065
+2025/05/26 19:08:01 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62064
+2025/05/26 19:08:06 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62064, 主题: Fw: Cargo Pickup & Return Notice, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 19:08:06 handlers.go:294: [邮件处理] 邮件没有附件，邮件ID: 62064
+2025/05/26 19:08:06 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62063
+2025/05/26 19:08:09 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62063, 主题: Fw: PickUp Notice(BL#: SHAF57994900), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 19:08:09 handlers.go:243: [邮件处理] 邮件含有 1 个附件，邮件ID: 62063
+2025/05/26 19:08:09 handlers.go:248: [附件处理] 开始处理附件 1/1，邮件ID: 62063, 文件名: PickupNotice_SHAF57994900.pdf
+2025/05/26 19:08:09 handlers.go:264: [附件处理] 开始上传附件到OSS，邮件ID: 62063, 文件名: PickupNotice_SHAF57994900.pdf
+2025/05/26 19:08:09 handlers.go:272: [附件处理] 成功上传附件到OSS，邮件ID: 62063, 文件名: PickupNotice_SHAF57994900.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/d42c98a21274469387e26e2f7c586066.pdf
+2025/05/26 19:08:09 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62062
+2025/05/26 19:08:26 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62062, 主题: Fw: PickUp Notice(BL#: SHAF57994900), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 19:08:26 handlers.go:243: [邮件处理] 邮件含有 1 个附件，邮件ID: 62062
+2025/05/26 19:08:26 handlers.go:248: [附件处理] 开始处理附件 1/1，邮件ID: 62062, 文件名: PickupNotice_SHAF57994900.pdf
+2025/05/26 19:08:26 handlers.go:264: [附件处理] 开始上传附件到OSS，邮件ID: 62062, 文件名: PickupNotice_SHAF57994900.pdf
+2025/05/26 19:08:26 handlers.go:272: [附件处理] 成功上传附件到OSS，邮件ID: 62062, 文件名: PickupNotice_SHAF57994900.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/531fbe966d2c4d1390e791dff21eea4b.pdf
+2025/05/26 19:08:26 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62061
+2025/05/26 19:08:36 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62061, 主题: Fw: PickUp Notice(BL#: SHAF51577700), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 19:08:36 handlers.go:243: [邮件处理] 邮件含有 1 个附件，邮件ID: 62061
+2025/05/26 19:08:36 handlers.go:248: [附件处理] 开始处理附件 1/1，邮件ID: 62061, 文件名: PickupNotice_SHAF51577700.pdf
+2025/05/26 19:08:36 handlers.go:264: [附件处理] 开始上传附件到OSS，邮件ID: 62061, 文件名: PickupNotice_SHAF51577700.pdf
+2025/05/26 19:08:36 handlers.go:272: [附件处理] 成功上传附件到OSS，邮件ID: 62061, 文件名: PickupNotice_SHAF51577700.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/ed5679cb2e4b4eccb3b08b92c54c1c33.pdf
+2025/05/26 19:08:36 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62039, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM54777200 (VSL : YM UNIFORMITY V#0078E)
+2025/05/26 19:08:36 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62039, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM54777200 (VSL : YM UNIFORMITY V#0078E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:08:36 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62039
+2025/05/26 19:08:36 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62039
+2025/05/26 19:08:37 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62038, 主题: Fw: [HMM] Payment Reminder List - USR250424037
+2025/05/26 19:08:37 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62038, 主题=Fw: [HMM] Payment Reminder List - USR250424037, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:08:37 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62038
+2025/05/26 19:08:37 handlers.go:337: [邮件处理] 保存 1 个附件记录，邮件ID: 62038
+2025/05/26 19:08:37 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62038
+2025/05/26 19:08:37 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62037, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM15934400 (VSL : YM UNIFORMITY V#0078E)
+2025/05/26 19:08:37 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62037, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM15934400 (VSL : YM UNIFORMITY V#0078E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:08:37 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62037
+2025/05/26 19:08:37 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62037
+2025/05/26 19:08:37 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62036, 主题: Fw: NEED AN FOR ZIMUSNH7748370 TGBU5413717
+2025/05/26 19:08:37 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62036, 主题=Fw: NEED AN FOR ZIMUSNH7748370 TGBU5413717, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:08:37 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62036
+2025/05/26 19:08:37 handlers.go:337: [邮件处理] 保存 1 个附件记录，邮件ID: 62036
+2025/05/26 19:08:37 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62036
+2025/05/26 19:08:37 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62035, 主题: Fw: [Tanera Transport LLC] Container Return Reminder
+2025/05/26 19:08:37 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62035, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:08:37 prime_email_content.go:85: [邮件内容保存] 保存邮件内容失败: ID=62035, 错误=Error 1406: Data too long for column 'html_content' at row 1
+2025/05/26 19:08:37 handlers.go:326: [邮件处理] 保存邮件内容失败，ID: 62035, 错误: Error 1406: Data too long for column 'html_content' at row 1
+{"level":"INFO","timestamp":"2025-05-26 19:08:37.160","file":"middleware/logger.go:32","msg":"| 200 | 1m56.507347546s |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 19:14:01 handlers.go:197: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/26 19:14:01 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62039
+2025/05/26 19:14:07 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62039, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM54777200 (VSL : YM UNIFORMITY V#0078E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:14:07 handlers.go:294: [邮件处理] 邮件没有附件，邮件ID: 62039
+2025/05/26 19:14:07 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62038
+{"level":"INFO","timestamp":"2025-05-26 19:14:08.287","file":"middleware/auth.go:52","msg":"Auth Failed /api/v1/emails/list map[Accept:[*/*] Accept-Encoding:[gzip, deflate, br] Cache-Control:[no-cache] Connection:[keep-alive] Content-Length:[30] Content-Type:[application/json] Token:[eyJbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2NjYsImV4cCI6MjEwODI1NzE2MywiaXNzIjoiZ2luLWJsb2cifQ.6gyUwAAjObhSlseb5E84MFS1HWmeD8LaYuh1lFkEVvQ] User-Agent:[PostmanRuntime-ApipostRuntime/1.1.0]]"}
+{"level":"INFO","timestamp":"2025-05-26 19:14:08.287","file":"middleware/logger.go:32","msg":"| 200 |     250.769µs |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 19:14:11 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62038, 主题: Fw: [HMM] Payment Reminder List - USR250424037, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:14:11 handlers.go:243: [邮件处理] 邮件含有 1 个附件，邮件ID: 62038
+2025/05/26 19:14:11 handlers.go:248: [附件处理] 开始处理附件 1/1，邮件ID: 62038, 文件名: USPMAG00.xls
+2025/05/26 19:14:11 handlers.go:264: [附件处理] 开始上传附件到OSS，邮件ID: 62038, 文件名: USPMAG00.xls
+2025/05/26 19:14:12 handlers.go:272: [附件处理] 成功上传附件到OSS，邮件ID: 62038, 文件名: USPMAG00.xls, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/bd2b3553482b41b0b0f2dec88ec8fc19.xls
+2025/05/26 19:14:12 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62037
+2025/05/26 19:14:15 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62037, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM15934400 (VSL : YM UNIFORMITY V#0078E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:14:15 handlers.go:294: [邮件处理] 邮件没有附件，邮件ID: 62037
+2025/05/26 19:14:15 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62036
+2025/05/26 19:15:42 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62036, 主题: Fw: NEED AN FOR ZIMUSNH7748370 TGBU5413717, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:15:42 handlers.go:243: [邮件处理] 邮件含有 1 个附件，邮件ID: 62036
+2025/05/26 19:15:42 handlers.go:248: [附件处理] 开始处理附件 1/1，邮件ID: 62036, 文件名: =?UTF-8?Q?ZIMUSNH77483?= =?UTF-8?Q?70__=E4=BB=A3=E7=90=86=E7=94=B5=E6=94=BE=E4=BB=B6.pdf?=
+2025/05/26 19:15:42 handlers.go:264: [附件处理] 开始上传附件到OSS，邮件ID: 62036, 文件名: =?UTF-8?Q?ZIMUSNH77483?= =?UTF-8?Q?70__=E4=BB=A3=E7=90=86=E7=94=B5=E6=94=BE=E4=BB=B6.pdf?=
+2025/05/26 19:15:43 handlers.go:272: [附件处理] 成功上传附件到OSS，邮件ID: 62036, 文件名: =?UTF-8?Q?ZIMUSNH77483?= =?UTF-8?Q?70__=E4=BB=A3=E7=90=86=E7=94=B5=E6=94=BE=E4=BB=B6.pdf?=, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/2b175bca92cb4d4baf842e74f4c04924.pdf?=
+2025/05/26 19:15:43 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62035
+2025/05/26 19:15:52 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62035, 主题: Fw: [Tanera Transport LLC] Container Return Reminder, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:15:52 handlers.go:294: [邮件处理] 邮件没有附件，邮件ID: 62035
+2025/05/26 19:15:52 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62065
+2025/05/26 19:15:59 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62065, 主题: Fw: [Tanera Transport LLC] Container Return Reminder, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 19:15:59 handlers.go:294: [邮件处理] 邮件没有附件，邮件ID: 62065
+2025/05/26 19:15:59 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62064
+2025/05/26 19:16:05 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62064, 主题: Fw: Cargo Pickup & Return Notice, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 19:16:05 handlers.go:294: [邮件处理] 邮件没有附件，邮件ID: 62064
+2025/05/26 19:16:05 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62063
+2025/05/26 19:16:12 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62063, 主题: Fw: PickUp Notice(BL#: SHAF57994900), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 19:16:12 handlers.go:243: [邮件处理] 邮件含有 1 个附件，邮件ID: 62063
+2025/05/26 19:16:12 handlers.go:248: [附件处理] 开始处理附件 1/1，邮件ID: 62063, 文件名: PickupNotice_SHAF57994900.pdf
+2025/05/26 19:16:12 handlers.go:264: [附件处理] 开始上传附件到OSS，邮件ID: 62063, 文件名: PickupNotice_SHAF57994900.pdf
+2025/05/26 19:16:12 handlers.go:272: [附件处理] 成功上传附件到OSS，邮件ID: 62063, 文件名: PickupNotice_SHAF57994900.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/a09b68a5ea1b4f2aa8d23ff480675b36.pdf
+2025/05/26 19:16:12 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62062
+2025/05/26 19:16:18 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62062, 主题: Fw: PickUp Notice(BL#: SHAF57994900), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 19:16:18 handlers.go:243: [邮件处理] 邮件含有 1 个附件，邮件ID: 62062
+2025/05/26 19:16:18 handlers.go:248: [附件处理] 开始处理附件 1/1，邮件ID: 62062, 文件名: PickupNotice_SHAF57994900.pdf
+2025/05/26 19:16:18 handlers.go:264: [附件处理] 开始上传附件到OSS，邮件ID: 62062, 文件名: PickupNotice_SHAF57994900.pdf
+2025/05/26 19:16:18 handlers.go:272: [附件处理] 成功上传附件到OSS，邮件ID: 62062, 文件名: PickupNotice_SHAF57994900.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/3f588c53ca144601aaa038ef8489382e.pdf
+2025/05/26 19:16:18 handlers.go:212: [邮件处理] 正在获取邮件内容，ID: 62061
+2025/05/26 19:16:28 handlers.go:223: [邮件处理] 成功获取邮件内容，邮件ID: 62061, 主题: Fw: PickUp Notice(BL#: SHAF51577700), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 19:16:28 handlers.go:243: [邮件处理] 邮件含有 1 个附件，邮件ID: 62061
+2025/05/26 19:16:28 handlers.go:248: [附件处理] 开始处理附件 1/1，邮件ID: 62061, 文件名: PickupNotice_SHAF51577700.pdf
+2025/05/26 19:16:28 handlers.go:264: [附件处理] 开始上传附件到OSS，邮件ID: 62061, 文件名: PickupNotice_SHAF51577700.pdf
+2025/05/26 19:16:29 handlers.go:272: [附件处理] 成功上传附件到OSS，邮件ID: 62061, 文件名: PickupNotice_SHAF51577700.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/22fc0c8f62834c50b8ab6c63ca9dc99a.pdf
+2025/05/26 19:16:29 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62039, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM54777200 (VSL : YM UNIFORMITY V#0078E)
+2025/05/26 19:16:29 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62039, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM54777200 (VSL : YM UNIFORMITY V#0078E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:16:29 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62039
+2025/05/26 19:16:29 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62039
+2025/05/26 19:16:29 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62038, 主题: Fw: [HMM] Payment Reminder List - USR250424037
+2025/05/26 19:16:29 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62038, 主题=Fw: [HMM] Payment Reminder List - USR250424037, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:16:29 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62038
+2025/05/26 19:16:29 handlers.go:337: [邮件处理] 保存 1 个附件记录，邮件ID: 62038
+2025/05/26 19:16:29 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62038
+2025/05/26 19:16:29 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62037, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM15934400 (VSL : YM UNIFORMITY V#0078E)
+2025/05/26 19:16:29 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62037, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM15934400 (VSL : YM UNIFORMITY V#0078E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:16:29 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62037
+2025/05/26 19:16:29 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62037
+2025/05/26 19:16:29 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62036, 主题: Fw: NEED AN FOR ZIMUSNH7748370 TGBU5413717
+2025/05/26 19:16:29 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62036, 主题=Fw: NEED AN FOR ZIMUSNH7748370 TGBU5413717, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:16:29 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62036
+2025/05/26 19:16:29 handlers.go:337: [邮件处理] 保存 1 个附件记录，邮件ID: 62036
+2025/05/26 19:16:29 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62036
+2025/05/26 19:16:29 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62035, 主题: Fw: [Tanera Transport LLC] Container Return Reminder
+2025/05/26 19:16:29 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62035, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:16:29 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62035
+2025/05/26 19:16:29 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62035
+2025/05/26 19:16:29 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62065, 主题: Fw: [Tanera Transport LLC] Container Return Reminder
+2025/05/26 19:16:29 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62065, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 19:16:29 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62065
+2025/05/26 19:16:29 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62065
+2025/05/26 19:16:29 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62064, 主题: Fw: Cargo Pickup & Return Notice
+2025/05/26 19:16:29 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62064, 主题=Fw: Cargo Pickup & Return Notice, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 19:16:29 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62064
+2025/05/26 19:16:29 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62064
+2025/05/26 19:16:29 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62063, 主题: Fw: PickUp Notice(BL#: SHAF57994900)
+2025/05/26 19:16:29 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62063, 主题=Fw: PickUp Notice(BL#: SHAF57994900), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 19:16:29 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62063
+2025/05/26 19:16:29 handlers.go:337: [邮件处理] 保存 1 个附件记录，邮件ID: 62063
+2025/05/26 19:16:29 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62063
+2025/05/26 19:16:29 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62062, 主题: Fw: PickUp Notice(BL#: SHAF57994900)
+2025/05/26 19:16:29 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62062, 主题=Fw: PickUp Notice(BL#: SHAF57994900), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 19:16:29 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62062
+2025/05/26 19:16:29 handlers.go:337: [邮件处理] 保存 1 个附件记录，邮件ID: 62062
+2025/05/26 19:16:29 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62062
+2025/05/26 19:16:29 handlers.go:322: [邮件处理] 保存邮件内容，ID: 62061, 主题: Fw: PickUp Notice(BL#: SHAF51577700)
+2025/05/26 19:16:29 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62061, 主题=Fw: PickUp Notice(BL#: SHAF51577700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 19:16:29 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62061
+2025/05/26 19:16:29 handlers.go:337: [邮件处理] 保存 1 个附件记录，邮件ID: 62061
+2025/05/26 19:16:29 handlers.go:356: [邮件处理] 更新邮件状态为已处理，邮件ID: 62061
+2025/05/26 19:16:29 handlers.go:380: [邮件处理] 成功提交事务，完成处理 10 封邮件
+{"level":"INFO","timestamp":"2025-05-26 19:16:29.770","file":"middleware/logger.go:32","msg":"| 200 | 2m28.612797003s |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 19:16:54 prime_email.go:50: [邮件列表] 开始批量处理 5 封邮件
+2025/05/26 19:16:54 prime_email.go:60: [邮件列表] 处理邮件 1/5: ID=62159, 主题=Fw: CAIGJV00 - PRIME AGENCY VANCOUVER - Detention Outstanding Statement, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 19:16:54 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62159
+2025/05/26 19:16:54 prime_email.go:60: [邮件列表] 处理邮件 2/5: ID=62158, 主题=Fw: Arrival notice 252207090, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 19:16:54 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62158
+2025/05/26 19:16:54 prime_email.go:60: [邮件列表] 处理邮件 3/5: ID=62157, 主题=Fw: Arrival notice 252216611, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 19:16:54 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62157
+2025/05/26 19:16:54 prime_email.go:60: [邮件列表] 处理邮件 4/5: ID=62156, 主题=Fw: Arrival notice 252142935, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 19:16:54 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62156
+2025/05/26 19:16:54 prime_email.go:60: [邮件列表] 处理邮件 5/5: ID=62155, 主题=Fw: [SM Line America] PickUp Notice - B/L No.:NJED5F175300, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 19:16:54 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=62155
+2025/05/26 19:16:54 prime_email.go:93: [邮件列表] 成功完成批量处理: 创建=4, 跳过=1, 总计=5
+{"level":"INFO","timestamp":"2025-05-26 19:16:54.591","file":"middleware/logger.go:32","msg":"| 200 |  4.096146293s |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 19:17:14 prime_email.go:50: [邮件列表] 开始批量处理 1 封邮件
+2025/05/26 19:17:14 prime_email.go:60: [邮件列表] 处理邮件 1/1: ID=62159, 主题=Fw: CAIGJV00 - PRIME AGENCY VANCOUVER - Detention Outstanding Statement, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 19:17:14 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=62159
+2025/05/26 19:17:14 prime_email.go:93: [邮件列表] 成功完成批量处理: 创建=0, 跳过=1, 总计=1
+{"level":"INFO","timestamp":"2025-05-26 19:17:14.450","file":"middleware/logger.go:32","msg":"| 200 |  5.904423237s |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+{"level":"INFO","timestamp":"2025-05-26 19:17:15.168","file":"middleware/auth.go:52","msg":"Auth Failed /api/v1/emails/content map[Accept:[*/*] Accept-Encoding:[gzip, deflate, br] Cache-Control:[no-cache] Connection:[keep-alive] Content-Length:[29] Content-Type:[application/json] Token:[eyJhbGcOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2NjYsImV4cCI6MjEwODI1NzE2MywiaXNzIjoiZ2luLWJsb2cifQ.6gyUwAAjObhSlseb5E84MFS1HWmeD8LaYuh1lFkEVvQ] User-Agent:[PostmanRuntime-ApipostRuntime/1.1.0]]"}
+{"level":"INFO","timestamp":"2025-05-26 19:17:15.168","file":"middleware/logger.go:32","msg":"| 200 |     132.132µs |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}

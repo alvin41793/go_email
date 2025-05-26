@@ -2,12 +2,13 @@ package middleware
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/zxmrlc/log"
 	"go_email/pkg/errno"
 	"go_email/pkg/token"
 	"go_email/pkg/utils"
 	"regexp"
+
+	"github.com/gin-gonic/gin"
+	"github.com/zxmrlc/log"
 )
 
 var (
@@ -39,7 +40,7 @@ func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//tokenString, _ := token.GenerateToken(666)
 		//c.Request.Header.Set("token", tokenString)
-
+		//println("token:", tokenString)
 		// Parse the token.
 		UserId, err := ParseRequest(c)
 		if err != nil {

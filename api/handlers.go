@@ -3,8 +3,6 @@ package api
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"go_email/db"
 	"go_email/model"
 	"go_email/pkg/mailclient"
@@ -14,6 +12,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
 // 邮件服务器配置
@@ -56,12 +57,15 @@ func ListEmails(c *gin.Context) {
 	// 为每个请求创建独立的邮件客户端实例
 	mailClient := newMailClient()
 
-	folder := c.DefaultQuery("folder", "INBOX")
-	limitStr := c.DefaultQuery("limit", "100")
-	limit, err := strconv.Atoi(limitStr)
-	if err != nil {
-		limit = 100
+	var req ListEmailsRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.SendResponse(c, err, "无效的参数")
+		return
 	}
+
+	folder := req.Folder
+	limit := req.Limit
+
 	lastEmail, err := model.GetLatestEmail()
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -119,26 +123,19 @@ func ListEmailsByUid(c *gin.Context) {
 	// 为每个请求创建独立的邮件客户端实例
 	mailClient := newMailClient()
 
-	// 检查是否请求了UID范围
-	startUIDStr := c.Query("start_uid")
-	endUIDStr := c.Query("end_uid")
+	var req ListEmailsByUidRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.SendResponse(c, err, "无效的参数")
+		return
+	}
 
 	var emailsResult []mailclient.EmailInfo
-	// 如果指定了UID范围
-	startUID, err := strconv.ParseUint(startUIDStr, 10, 32)
-	if err != nil {
-		utils.SendResponse(c, fmt.Errorf("无效的起始UID: %v", err), nil)
-		return
-	}
+	startUID := req.StartUID
+	endUID := req.EndUID
 
-	endUID, err := strconv.ParseUint(endUIDStr, 10, 32)
-	if err != nil {
-		utils.SendResponse(c, fmt.Errorf("无效的结束UID: %v", err), nil)
-		return
-	}
 	count := int(endUID - startUID)
 	// 使用UID范围获取邮件
-	emailsResult, err = mailClient.ListEmails("INBOX", count, uint32(startUID), uint32(endUID))
+	emailsResult, err := mailClient.ListEmails("INBOX", count, uint32(startUID), uint32(endUID))
 
 	if err != nil {
 		utils.SendResponse(c, err, nil)
@@ -175,7 +172,15 @@ func GetEmailContent(c *gin.Context) {
 	// 为每个请求创建独立的邮件客户端实例
 	mailClient := newMailClient()
 
-	emailIDs, err := model.GetEmailByStatus(0, 10)
+	var req GetEmailContentRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.SendResponse(c, err, "无效的参数")
+		return
+	}
+
+	folder := req.Folder
+	limit := req.Limit
+	emailIDs, err := model.GetEmailByStatus(0, limit)
 	if err != nil {
 		utils.SendResponse(c, err, nil)
 		return
@@ -189,7 +194,6 @@ func GetEmailContent(c *gin.Context) {
 		return
 	}
 
-	folder := c.DefaultQuery("folder", "INBOX")
 	log.Printf("[邮件处理] 开始处理 %d 封邮件, 文件夹: %s", len(emailIDs), folder)
 	fmt.Printf("\n========== 开始处理 %d 封邮件，文件夹: %s ==========\n", len(emailIDs), folder)
 
@@ -418,6 +422,24 @@ func GetMaxEmailID(c *gin.Context) {
 
 	// 返回最大的email_id
 	utils.SendResponse(c, nil, map[string]int{"max_email_id": lastEmail.EmailID})
+}
+
+// ListEmailsRequest 获取邮件列表请求结构
+type ListEmailsRequest struct {
+	Folder string `json:"folder" binding:"required"`
+	Limit  int    `json:"limit" binding:"required"`
+}
+
+// ListEmailsByUidRequest 根据UID获取邮件列表请求结构
+type ListEmailsByUidRequest struct {
+	StartUID uint64 `json:"start_uid" binding:"required"`
+	EndUID   uint64 `json:"end_uid" binding:"required"`
+}
+
+// GetEmailContentRequest 获取邮件内容请求结构
+type GetEmailContentRequest struct {
+	Folder string `json:"folder" binding:"required"`
+	Limit  int    `json:"limit" binding:"required"`
 }
 
 // 发送邮件请求结构

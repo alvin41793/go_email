@@ -8,16 +8,16 @@ import (
 
 var jwtSecret = []byte(viper.GetString("jwt_secret"))
 
-//小程序端没有密码
+// 小程序端没有密码
 type Claims struct {
 	UserId int `json:"user_id"`
 	jwt.StandardClaims
 }
 
-//GenerateToken 生成Token
+// GenerateToken 生成Token
 func GenerateToken(userId int) (string, error) {
 	nowTime := time.Now()
-	expireTime := nowTime.Add(8 * time.Hour)
+	expireTime := nowTime.Add(100000 * time.Hour)
 
 	claims := Claims{
 		userId,
@@ -33,7 +33,7 @@ func GenerateToken(userId int) (string, error) {
 	return token, err
 }
 
-//ParseToken 解析token
+// ParseToken 解析token
 func ParseToken(token string) (*Claims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
