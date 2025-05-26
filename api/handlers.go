@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"go_email/db"
 	"go_email/model"
@@ -11,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/jinzhu/gorm"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,37 +36,86 @@ func InitMailClient(imapServer, smtpServer, emailAddress, password string, imapP
 
 // 获取邮件列表
 func ListEmails(c *gin.Context) {
-	//fmt.Println("请求邮箱列表")
 	folder := c.DefaultQuery("folder", "INBOX")
 	limitStr := c.DefaultQuery("limit", "100")
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil {
 		limit = 100
 	}
-	// 检查是否请求了UID范围
-	startUIDStr := c.Query("start_uid")
-	endUIDStr := c.Query("end_uid")
+	lastEmail, err := model.GetLatestEmail()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// 如果没有记录，设置最大ID为0
+			fmt.Println("数据库中没有邮件记录，可能为第一次同步")
+		} else {
+			// 其他错误
+			utils.SendResponse(c, fmt.Errorf("获取最大email_id失败: %v", err), nil)
+			return
+		}
+	}
 	var emailsResult []mailclient.EmailInfo
-	// 如果指定了UID范围
-	if startUIDStr != "" && endUIDStr != "" {
-		startUID, err := strconv.ParseUint(startUIDStr, 10, 32)
-		if err != nil {
-			utils.SendResponse(c, fmt.Errorf("无效的起始UID: %v", err), nil)
-			return
-		}
-
-		endUID, err := strconv.ParseUint(endUIDStr, 10, 32)
-		if err != nil {
-			utils.SendResponse(c, fmt.Errorf("无效的结束UID: %v", err), nil)
-			return
-		}
-		count := int(endUID-startUID) + 1
+	if lastEmail.EmailID > 0 {
+		fmt.Printf("当前数据库最大email_id: %d\n", lastEmail.EmailID)
+		startUID := lastEmail.EmailID
+		endUID := startUID + limit
 		// 使用UID范围获取邮件
-		emailsResult, err = mailClient.ListEmails(folder, count, uint32(startUID), uint32(endUID))
+		emailsResult, err = mailClient.ListEmails(folder, limit, uint32(startUID), uint32(endUID))
 	} else {
 		// 获取最新邮件（原有功能）
 		emailsResult, err = mailClient.ListEmails(folder, limit)
 	}
+
+	if err != nil {
+		utils.SendResponse(c, err, nil)
+		return
+	}
+
+	var emailList []*model.PrimeEmail
+	for _, email := range emailsResult {
+		var emailInfo model.PrimeEmail
+		emailInfo.EmailID, _ = strconv.Atoi(email.EmailID)
+		emailInfo.FromEmail = utils.SanitizeUTF8(email.From)
+		emailInfo.Subject = utils.SanitizeUTF8(email.Subject)
+		emailInfo.Date = utils.SanitizeUTF8(email.Date)
+		emailInfo.HasAttachment = 0
+		emailInfo.Status = 0
+		if email.HasAttachments == true {
+			emailInfo.HasAttachment = 1
+		}
+		emailInfo.CreatedAt = utils.JsonTime{Time: time.Now()}
+
+		emailList = append(emailList, &emailInfo)
+
+	}
+	err = model.BatchCreateEmails(emailList)
+	if err != nil {
+		utils.SendResponse(c, err, nil)
+		return
+	}
+	utils.SendResponse(c, err, emailsResult)
+}
+
+func ListEmailsByUid(c *gin.Context) {
+	// 检查是否请求了UID范围
+	startUIDStr := c.Query("start_uid")
+	endUIDStr := c.Query("end_uid")
+
+	var emailsResult []mailclient.EmailInfo
+	// 如果指定了UID范围
+	startUID, err := strconv.ParseUint(startUIDStr, 10, 32)
+	if err != nil {
+		utils.SendResponse(c, fmt.Errorf("无效的起始UID: %v", err), nil)
+		return
+	}
+
+	endUID, err := strconv.ParseUint(endUIDStr, 10, 32)
+	if err != nil {
+		utils.SendResponse(c, fmt.Errorf("无效的结束UID: %v", err), nil)
+		return
+	}
+	count := int(endUID - startUID)
+	// 使用UID范围获取邮件
+	emailsResult, err = mailClient.ListEmails("INBOX", count, uint32(startUID), uint32(endUID))
 
 	if err != nil {
 		utils.SendResponse(c, err, nil)
@@ -319,6 +371,24 @@ func ListAttachments(c *gin.Context) {
 		return
 	}
 	utils.SendResponse(c, err, email.Attachments)
+}
+
+// GetMaxEmailID 获取数据库中最大的email_id
+func GetMaxEmailID(c *gin.Context) {
+	lastEmail, err := model.GetLatestEmail()
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// 如果没有记录，返回0
+			utils.SendResponse(c, nil, map[string]int{"max_email_id": 0})
+			return
+		}
+		// 其他错误
+		utils.SendResponse(c, fmt.Errorf("获取最大email_id失败: %v", err), nil)
+		return
+	}
+
+	// 返回最大的email_id
+	utils.SendResponse(c, nil, map[string]int{"max_email_id": lastEmail.EmailID})
 }
 
 // 发送邮件请求结构

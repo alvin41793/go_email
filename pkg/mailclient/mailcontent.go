@@ -295,9 +295,9 @@ func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) 
 		//fmt.Println("邮件内容====================================", rawContent)
 
 		// 将原始邮件内容保存到文件
-		if err := saveRawContentToFile(uid, rawContent); err != nil {
-			log.Printf("保存原始邮件内容到文件失败: %v", err)
-		}
+		//if err := saveRawContentToFile(uid, rawContent); err != nil {
+		//	log.Printf("保存原始邮件内容到文件失败: %v", err)
+		//}
 
 		// 尝试获取原始邮件数据进行备用
 		// 这是为了保证在解析失败时，我们仍然有数据返回

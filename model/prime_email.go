@@ -101,6 +101,13 @@ func GetEmailByEmailID(emailId uint) (*PrimeEmail, error) {
 	return &email, err
 }
 
+// GetLatestEmail 获取email_id最大的一条记录
+func GetLatestEmail() (*PrimeEmail, error) {
+	var email PrimeEmail
+	err := db.DB().Order("email_id DESC").First(&email).Error
+	return &email, err
+}
+
 func GetEmailByStatus(status, limit int) ([]int, error) {
 	var emailIDs []int
 	err := db.DB().Model(&PrimeEmail{}).Where("status = ?", status).Limit(limit).Pluck("email_id", &emailIDs).Error

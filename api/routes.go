@@ -31,6 +31,9 @@ func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 			// 获取邮件列表
 			emails.GET("/list", ListEmails)
 
+			// 通过指定uid获取邮件列表
+			emails.GET("/list_by_uid", ListEmailsByUid)
+
 			// 获取邮件内容
 			emails.GET("/content", GetEmailContent)
 
