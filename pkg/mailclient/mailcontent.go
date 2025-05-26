@@ -24,7 +24,7 @@ import (
 )
 
 // ListEmails 获取指定文件夹中的邮件列表
-func (m *MailClient) ListEmails(folder string, limit int) ([]EmailInfo, error) {
+func (m *MailClient) ListEmails(folder string, limit int, fromUID ...uint32) ([]EmailInfo, error) {
 	if folder == "" {
 		folder = "INBOX"
 	}
@@ -45,9 +45,101 @@ func (m *MailClient) ListEmails(folder string, limit int) ([]EmailInfo, error) {
 		return nil, fmt.Errorf("选择邮箱失败: %w", err)
 	}
 
-	// 搜索所有邮件
+	// 搜索邮件
 	criteria := imap.NewSearchCriteria()
 	criteria.WithoutFlags = []string{imap.DeletedFlag}
+
+	// 如果指定了UID范围
+	if len(fromUID) >= 2 {
+		startUID := fromUID[0]
+		endUID := fromUID[1]
+
+		// 创建UID范围
+		uidRange := new(imap.SeqSet)
+		uidRange.AddRange(startUID, endUID)
+		criteria.Uid = uidRange
+
+		// 搜索指定UID范围的邮件
+		ids, err := c.UidSearch(criteria)
+		if err != nil {
+			return nil, fmt.Errorf("搜索邮件失败: %w", err)
+		}
+
+		// 如果没有邮件，返回空列表
+		if len(ids) == 0 {
+			return []EmailInfo{}, nil
+		}
+
+		// 限制查询数量
+		if len(ids) > limit {
+			ids = ids[len(ids)-limit:]
+		}
+
+		// 设置UID查询集合
+		seqSet := new(imap.SeqSet)
+		for _, id := range ids {
+			seqSet.AddNum(id)
+		}
+
+		// 获取邮件信息（只获取标题等信息，不获取内容）
+		messages := make(chan *imap.Message, 10)
+		done := make(chan error, 1)
+		go func() {
+			done <- c.UidFetch(seqSet, []imap.FetchItem{imap.FetchEnvelope, imap.FetchFlags, imap.FetchBodyStructure, imap.FetchUid}, messages)
+		}()
+
+		var emails []EmailInfo
+		for msg := range messages {
+			hasAttachments := false
+
+			// 检查是否有附件
+			if msg.BodyStructure != nil {
+				var checkAttachments func(parts []*imap.BodyStructure) bool
+				checkAttachments = func(parts []*imap.BodyStructure) bool {
+					for _, part := range parts {
+						if part.Disposition == "attachment" || part.Disposition == "inline" && part.Params["filename"] != "" {
+							return true
+						}
+						if part.MIMEType == "multipart" {
+							if checkAttachments(part.Parts) {
+								return true
+							}
+						}
+					}
+					return false
+				}
+
+				if msg.BodyStructure.MIMEType == "multipart" {
+					hasAttachments = checkAttachments(msg.BodyStructure.Parts)
+				} else if msg.BodyStructure.Disposition == "attachment" {
+					hasAttachments = true
+				}
+			}
+
+			info := EmailInfo{
+				EmailID:        fmt.Sprint(msg.SeqNum),
+				Subject:        msg.Envelope.Subject,
+				From:           parseAddressList(msg.Envelope.From),
+				Date:           msg.Envelope.Date.Format(time.RFC1123Z),
+				UID:            msg.Uid,
+				HasAttachments: hasAttachments,
+			}
+			emails = append(emails, info)
+		}
+
+		if err := <-done; err != nil {
+			return nil, fmt.Errorf("获取邮件失败: %w", err)
+		}
+
+		// 反转邮件列表，使最新的邮件在前面
+		for i, j := 0, len(emails)-1; i < j; i, j = i+1, j-1 {
+			emails[i], emails[j] = emails[j], emails[i]
+		}
+
+		return emails, nil
+	}
+
+	// 默认行为：搜索所有邮件
 	ids, err := c.Search(criteria)
 	if err != nil {
 		return nil, fmt.Errorf("搜索邮件失败: %w", err)

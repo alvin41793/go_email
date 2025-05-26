@@ -35,19 +35,43 @@ func InitMailClient(imapServer, smtpServer, emailAddress, password string, imapP
 func ListEmails(c *gin.Context) {
 	//fmt.Println("请求邮箱列表")
 	folder := c.DefaultQuery("folder", "INBOX")
-	limitStr := c.DefaultQuery("limit", "10")
+	limitStr := c.DefaultQuery("limit", "100")
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil {
-		limit = 10
+		limit = 100
+	}
+	// 检查是否请求了UID范围
+	startUIDStr := c.Query("start_uid")
+	endUIDStr := c.Query("end_uid")
+	var emailsResult []mailclient.EmailInfo
+	// 如果指定了UID范围
+	if startUIDStr != "" && endUIDStr != "" {
+		startUID, err := strconv.ParseUint(startUIDStr, 10, 32)
+		if err != nil {
+			utils.SendResponse(c, fmt.Errorf("无效的起始UID: %v", err), nil)
+			return
+		}
+
+		endUID, err := strconv.ParseUint(endUIDStr, 10, 32)
+		if err != nil {
+			utils.SendResponse(c, fmt.Errorf("无效的结束UID: %v", err), nil)
+			return
+		}
+		count := int(endUID-startUID) + 1
+		// 使用UID范围获取邮件
+		emailsResult, err = mailClient.ListEmails(folder, count, uint32(startUID), uint32(endUID))
+	} else {
+		// 获取最新邮件（原有功能）
+		emailsResult, err = mailClient.ListEmails(folder, limit)
 	}
 
-	emails, err := mailClient.ListEmails(folder, limit)
 	if err != nil {
 		utils.SendResponse(c, err, nil)
 		return
 	}
+
 	var emailList []*model.PrimeEmail
-	for _, email := range emails {
+	for _, email := range emailsResult {
 		var emailInfo model.PrimeEmail
 		emailInfo.EmailID, _ = strconv.Atoi(email.EmailID)
 		emailInfo.FromEmail = utils.SanitizeUTF8(email.From)
@@ -68,7 +92,7 @@ func ListEmails(c *gin.Context) {
 		utils.SendResponse(c, err, nil)
 		return
 	}
-	utils.SendResponse(c, err, emails)
+	utils.SendResponse(c, err, emailsResult)
 }
 
 // 获取邮件内容
