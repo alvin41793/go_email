@@ -21,6 +21,7 @@ type PrimeEmailContent struct {
 	Content     string         `gorm:"column:content;type:text" json:"content"`           // 正文
 	HTMLContent string         `gorm:"column:html_content;type:text" json:"html_content"` // html正文
 	Type        int            `gorm:"column:type" json:"type"`                           // 邮件类型
+	Status      int            `gorm:"column:status" json:"status"`
 	CreatedAt   utils.JsonTime `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt   utils.JsonTime `gorm:"column:updated_at" json:"updated_at"`
 }
@@ -78,7 +79,7 @@ func (e *PrimeEmailContent) CreateWithTransaction(tx *gorm.DB) error {
 	e.Date = utils.SanitizeUTF8(e.Date)
 	e.Content = utils.SanitizeUTF8(e.Content)
 	e.HTMLContent = utils.SanitizeUTF8(e.HTMLContent)
-
+	e.Status = -1
 	err := tx.Create(e).Error
 	if err != nil {
 		log.Printf("[邮件内容保存] 保存邮件内容失败: ID=%d, 错误=%v", e.EmailID, err)
