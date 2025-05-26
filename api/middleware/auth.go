@@ -37,7 +37,7 @@ func ParseRequest(c *gin.Context) (int, error) {
 
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		//tokenString, _ := token.GenerateToken(1)
+		//tokenString, _ := token.GenerateToken(666)
 		//c.Request.Header.Set("token", tokenString)
 
 		// Parse the token.
@@ -46,7 +46,7 @@ func Auth() gin.HandlerFunc {
 			//try login
 			path := c.Request.URL.Path
 			// if it's not login, return ErrTokenInvalid
-			reg := regexp.MustCompile("(/login|/review|/payWeChat|/test|/getVersion)")
+			reg := regexp.MustCompile("(/11111|/getVersion)")
 			if !reg.MatchString(path) {
 				log.Infof("Auth Failed %s %v", path, c.Request.Header)
 				utils.SendResponse(c, errno.ErrTokenInvalid, nil)

@@ -16,6 +16,7 @@ func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	g.Use(middleware.NoCache)
 	g.Use(middleware.Options)
 	g.Use(middleware.Secure)
+	g.Use(middleware.Auth()) // 启用Auth中间件进行token验证
 	g.Use(mw...)
 	//定时任务
 	//crontab.Cron()

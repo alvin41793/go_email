@@ -700,3 +700,213 @@
 2025/05/26 17:41:31 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62040
 2025/05/26 17:41:31 handlers.go:378: [邮件处理] 成功提交事务，完成处理 10 封邮件
 {"level":"INFO","timestamp":"2025-05-26 17:41:31.959","file":"middleware/logger.go:32","msg":"| 200 | 47.043764139s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 18:46:31 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/26 18:46:34 handlers.go:193: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/26 18:46:34 handlers.go:208: [邮件处理] 正在获取邮件内容，ID: 62039
+2025/05/26 18:46:37 handlers.go:219: [邮件处理] 成功获取邮件内容，邮件ID: 62039, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM54777200 (VSL : YM UNIFORMITY V#0078E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:46:37 handlers.go:290: [邮件处理] 邮件没有附件，邮件ID: 62039
+2025/05/26 18:46:37 handlers.go:208: [邮件处理] 正在获取邮件内容，ID: 62038
+2025/05/26 18:46:43 handlers.go:219: [邮件处理] 成功获取邮件内容，邮件ID: 62038, 主题: Fw: [HMM] Payment Reminder List - USR250424037, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:46:43 handlers.go:239: [邮件处理] 邮件含有 1 个附件，邮件ID: 62038
+2025/05/26 18:46:43 handlers.go:244: [附件处理] 开始处理附件 1/1，邮件ID: 62038, 文件名: USPMAG00.xls
+2025/05/26 18:46:43 handlers.go:260: [附件处理] 开始上传附件到OSS，邮件ID: 62038, 文件名: USPMAG00.xls
+2025/05/26 18:46:44 handlers.go:268: [附件处理] 成功上传附件到OSS，邮件ID: 62038, 文件名: USPMAG00.xls, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/0c1f20bf4fb245d79e41ac6d3187e6f2.xls
+2025/05/26 18:46:44 handlers.go:208: [邮件处理] 正在获取邮件内容，ID: 62037
+2025/05/26 18:46:47 handlers.go:219: [邮件处理] 成功获取邮件内容，邮件ID: 62037, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM15934400 (VSL : YM UNIFORMITY V#0078E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:46:47 handlers.go:290: [邮件处理] 邮件没有附件，邮件ID: 62037
+2025/05/26 18:46:47 handlers.go:208: [邮件处理] 正在获取邮件内容，ID: 62036
+2025/05/26 18:47:13 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/26 18:47:24 prime_email.go:50: [邮件列表] 开始批量处理 91 封邮件
+2025/05/26 18:47:24 prime_email.go:60: [邮件列表] 处理邮件 1/91: ID=62155, 主题=Fw: [SM Line America] PickUp Notice - B/L No.:NJED5F175300, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:24 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62155
+2025/05/26 18:47:24 prime_email.go:60: [邮件列表] 处理邮件 2/91: ID=62154, 主题=Fw: MRCO1398-002E - Import Cargo Discharge Notice Ref-no: <<A1_DB5Q0WCC.CNT>>, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:24 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62154
+2025/05/26 18:47:24 prime_email.go:60: [邮件列表] 处理邮件 3/91: ID=62153, 主题=Fw: XMEZ160E - Import Cargo Discharge Notice Ref-no: <<A1_DB5Q0QRL.CNT>>, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:24 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62153
+2025/05/26 18:47:24 prime_email.go:60: [邮件列表] 处理邮件 4/91: ID=62152, 主题=Fw: OCSG058E - Import Cargo Discharge Notice Ref-no: <<A1_DB5Q0NRP.CNT>>, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:24 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62152
+2025/05/26 18:47:24 prime_email.go:60: [邮件列表] 处理邮件 5/91: ID=62151, 主题=Fw: MILD1399-004E - Import Cargo Discharge Notice Ref-no: <<A1_DB5Q0LHP.CNT>>, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:24 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62151
+2025/05/26 18:47:24 prime_email.go:60: [邮件列表] 处理邮件 6/91: ID=62150, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : TAOM07026100 (VSL : HMM PEARL V#0006E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:24 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62150
+2025/05/26 18:47:24 prime_email.go:60: [邮件列表] 处理邮件 7/91: ID=62149, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : TAOZ20008400 (VSL : HMM PEARL V#0006E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:24 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62149
+2025/05/26 18:47:24 prime_email.go:60: [邮件列表] 处理邮件 8/91: ID=62148, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : TAOZ85475200 (VSL : HMM EMERALD V#0007E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62148
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 9/91: ID=62147, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : TAOZ86290700 (VSL : HMM VANCOUVER V#0298E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62147
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 10/91: ID=62146, 主题=Fw: [LFD/Reminder] PRIME AGENCY / CO1250387219 / TCLU6548772 / PO#, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62146
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 11/91: ID=62145, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOM15067900 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62145
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 12/91: ID=62144, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOM50022200 (VSL : HMM EMERALD V#0007E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62144
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 13/91: ID=62143, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZ0Y069500 (VSL : HMM EMERALD V#0007E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62143
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 14/91: ID=62142, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZ26968300 (VSL : MOL COURAGE V#0062E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62142
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 15/91: ID=62141, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZ35J70600 (VSL : MOL COURAGE V#0062E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62141
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 16/91: ID=62140, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#SHNYC2540816], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62140
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 17/91: ID=62139, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZ4GF06200 (VSL : MOL COURAGE V#0062E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62139
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 18/91: ID=62138, 主题=Fw: Credit Hold-ARRIVAL NOTICE [HBL#GFSSHA50510387][MBL#ZIMUSNH7794821], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62138
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 19/91: ID=62137, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZ8YH56200 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62137
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 20/91: ID=62136, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#ZSCHI2540227], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62136
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 21/91: ID=62135, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZP1409400 (VSL : MOL COURAGE V#0062E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62135
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 22/91: ID=62134, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZPAA72100 (VSL : MOL COURAGE V#0062E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62134
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 23/91: ID=62133, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZPXU10900 (VSL : YM UPWARD V#0093E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62133
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 24/91: ID=62132, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZR2L01500 (VSL : HMM EMERALD V#0007E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62132
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 25/91: ID=62131, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZS3319900 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62131
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 26/91: ID=62130, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZSNQ91800 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62130
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 27/91: ID=62129, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZSWQ56900 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62129
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 28/91: ID=62128, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZU4961800 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62128
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 29/91: ID=62127, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZV1G43100 (VSL : MOL COURAGE V#0062E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62127
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 30/91: ID=62126, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZW1112400 (VSL : HMM TURQUOISE V#0003E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62126
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 31/91: ID=62125, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZW8W54400 (VSL : YM UNIFORM V#0241E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62125
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 32/91: ID=62124, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZWEJ97400 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62124
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 33/91: ID=62123, 主题=Fw: COSCO Arrival Notice COSU6415816900 | APL ESPLANADE - 1TUCDW1MA, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62123
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 34/91: ID=62122, 主题=Fw: [PRIME AGENCY][Ocean-OI-25042606][ZIMUSNH22134114][Container#ZCSU7687331][ARRIVAL NOTICE FREIGHT INVOICE - SHSAV2541218], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62122
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 35/91: ID=62121, 主题=Fw: [PRIME AGENCY][Ocean-OI-25042607][ZIMUSNH22134115][Container#CAIU4702835][ARRIVAL NOTICE FREIGHT INVOICE - SHSAV2541217], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62121
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 36/91: ID=62120, 主题=Fw: [PRIME AGENCY][Ocean-OI-25042608][ZIMUSNH22134118][Container#CAIU4697003][ARRIVAL NOTICE FREIGHT INVOICE - SHSAV2541214], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62120
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 37/91: ID=62119, 主题=Fw: [PRIME AGENCY][Ocean-OI-25042609][ZIMUSNH22134119][Container#CAIU4696455][ARRIVAL NOTICE FREIGHT INVOICE - SHSAV2541212], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62119
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 38/91: ID=62118, 主题=Fw: [PRIME AGENCY][Ocean-OI-25042610][ZIMUSNH22134120][Container#CAIU4699752][ARRIVAL NOTICE FREIGHT INVOICE - SHSAV2541216], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62118
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 39/91: ID=62117, 主题=Fw: LFD NOTICE [HBL#:CGB250401295] [MBL#:ONEYNB5BH2211800] [LOT#:OI25052319] [CTNR#:TGBU9713667] [CNEE:PRIME AGENCY], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62117
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 40/91: ID=62116, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : SHAM08307700 (VSL : ONE FORWARD V#0004E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62116
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 41/91: ID=62115, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : SHAM23359700 (VSL : HMM EMERALD V#0007E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62115
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 42/91: ID=62114, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : SHAM28904500 (VSL : HMM EMERALD V#0007E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62114
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 43/91: ID=62113, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : SHAM43923500 (VSL : HMM EMERALD V#0007E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62113
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 44/91: ID=62112, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : SHAM45451300 (VSL : ONE FORWARD V#0004E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62112
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 45/91: ID=62111, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : SHAM50872100 (VSL : ONE FORWARD V#0004E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62111
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 46/91: ID=62110, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : SHAM67975100 (VSL : HMM EMERALD V#0007E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62110
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 47/91: ID=62109, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : SHAM69019900 (VSL : HMM EMERALD V#0007E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:25 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62109
+2025/05/26 18:47:25 prime_email.go:60: [邮件列表] 处理邮件 48/91: ID=62108, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : SHAM81793400 (VSL : HMM TOPAZ V#0005E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62108
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 49/91: ID=62107, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : SHAM82765900 (VSL : HMM TOPAZ V#0005E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62107
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 50/91: ID=62106, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : TAOM41591500 (VSL : HMM PEARL V#0006E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62106
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 51/91: ID=62105, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : TAOZ52952500 (VSL : HMM PEARL V#0006E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62105
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 52/91: ID=62104, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : TAOZ76552900 (VSL : HMM PEARL V#0006E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62104
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 53/91: ID=62103, 主题=Fw: PAN PACIFIC EXPRESS CORPORATION - Arrival Notice - [HB#NLAX25051572] [MB#EGLV143560915706], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62103
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 54/91: ID=62102, 主题=Fw: PAN PACIFIC EXPRESS CORPORATION - Arrival Notice - [HB#NLAX25051571] [MB#EGLV143560915722], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62102
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 55/91: ID=62101, 主题=Fw: EMPTY INTERCHANGE RECEIPT (EIR) REMINDER [HBL#:NNB250151228] [MBL#:ONEYNB4BHU572400] [LOT#:OI25050126] [CTNR#:CAIU9447856], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62101
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 56/91: ID=62100, 主题=Fw: EMPTY INTERCHANGE RECEIPT (EIR) REMINDER [HBL#:CGB250400973] [MBL#:ONEYNB5BH3227900] [LOT#:OI25051629] [CTNR#:ONEU5880369], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62100
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 57/91: ID=62099, 主题=Fw: EMPTY INTERCHANGE RECEIPT (EIR) REMINDER [HBL#:CGB250400974] [MBL#:ONEYNB5BH4139500] [LOT#:OI25051623] [CTNR#:ONEU5652142], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62099
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 58/91: ID=62098, 主题=Fw: EMPTY INTERCHANGE RECEIPT (EIR) REMINDER [HBL#:CGB250400975] [MBL#:ONEYNB5BH3228300] [LOT#:OI25051626] [CTNR#:CAAU5171474], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62098
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 59/91: ID=62097, 主题=Fw: HBL TELEX RELEASED[HBL# PPILGZDH250582][REFERENCE# OI25052845][MBL# CMDUGGZ2512622] CTNR# TGHU9274170, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62097
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 60/91: ID=62096, 主题=Fw: *** 2ND REMINDER ***EMPTY INTERCHANGE RECEIPT (EIR) REMINDER [HBL#:CGB250400976] [MBL#:ONEYNB5BH3226800] [LOT#:OI25051624] [CTNR#:ONEU1188537], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62096
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 61/91: ID=62095, 主题=Fw: *** 2ND REMINDER ***EMPTY INTERCHANGE RECEIPT (EIR) REMINDER [HBL#:CGB250400969] [MBL#:ONEYNB5BH4140400] [LOT#:OI25051635] [CTNR#:TGBU4260948], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62095
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 62/91: ID=62094, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOM06396600 (VSL : HMM TOPAZ V#0005E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62094
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 63/91: ID=62093, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZ17W52700 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62093
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 64/91: ID=62092, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZ27W07400 (VSL : MOL COURAGE V#0062E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62092
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 65/91: ID=62091, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZ48Z77900 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62091
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 66/91: ID=62090, 主题=Fw: *** 2ND REMINDER ***EMPTY INTERCHANGE RECEIPT (EIR) REMINDER [HBL#:CGB250400972] [MBL#:ONEYNB5BH4137300] [LOT#:OI25051632] [CTNR#:TLLU4612947], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62090
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 67/91: ID=62089, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZ5GT96900 (VSL : ONE CONTINUITY V#0072E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62089
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 68/91: ID=62088, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZ7L106400 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62088
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 69/91: ID=62087, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZ8JL54600 (VSL : HMM EMERALD V#0007E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62087
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 70/91: ID=62086, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZCAM69900 (VSL : ONE CONTINUITY V#0072E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62086
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 71/91: ID=62085, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZCLQ99800 (VSL : ONE CONTINUITY V#0072E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62085
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 72/91: ID=62084, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZFYJ34700 (VSL : ONE CONTINUITY V#0072E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62084
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 73/91: ID=62083, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZGS892700 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62083
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 74/91: ID=62082, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZHU339100 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62082
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 75/91: ID=62081, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZQSN95700 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62081
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 76/91: ID=62080, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZRS745400 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62080
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 77/91: ID=62079, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : NBOZW0Q40400 (VSL : HMM TURQUOISE V#0003E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62079
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 78/91: ID=62078, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : SHAM11013300 (VSL : HMM EMERALD V#0007E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62078
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 79/91: ID=62077, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : SHAM19690300 (VSL : HMM PEARL V#0006E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62077
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 80/91: ID=62076, 主题=Fw: [HMM] Notice : Cargo Pending Release - B/L : SHAM48052100 (VSL : HMM PEARL V#0006E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62076
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 81/91: ID=62075, 主题=Fw: [QR] NGP2284288/NGP2284288-NOA-CMACGM-OOCL TOKYO -0TYKIW1MA-CNNGB-USHOU-Notice of Arrival, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62075
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 82/91: ID=62074, 主题=Fw: Cargo Pickup & Return Notice, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62074
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 83/91: ID=62073, 主题=Fw: PickUp Notice(BL#: TAOF27389700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62073
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 84/91: ID=62072, 主题=Fw: PickUp Notice(BL#: TAOF27389700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 18:47:26 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62072
+2025/05/26 18:47:26 prime_email.go:60: [邮件列表] 处理邮件 85/91: ID=62071, 主题=Fw: PickUp Notice(BL#: DLCF01382900), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 18:47:27 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62071
+2025/05/26 18:47:27 prime_email.go:60: [邮件列表] 处理邮件 86/91: ID=62070, 主题=Fw: PickUp Notice(BL#: DLCF01382900), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 18:47:27 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62070
+2025/05/26 18:47:27 prime_email.go:60: [邮件列表] 处理邮件 87/91: ID=62069, 主题=Fw: PickUp Notice(BL#: SHAF23938700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 18:47:27 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62069
+2025/05/26 18:47:27 prime_email.go:60: [邮件列表] 处理邮件 88/91: ID=62068, 主题=Fw: PickUp Notice(BL#: SHAF23938700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 18:47:27 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62068
+2025/05/26 18:47:27 prime_email.go:60: [邮件列表] 处理邮件 89/91: ID=62067, 主题=Fw: [QR] NGP2286269/NGP2286269-NOA-CMACGM-COSCO OCEANIA -0YTE2W1MA-CNNGB-USLGB-Notice of Arrival, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 18:47:27 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62067
+2025/05/26 18:47:27 prime_email.go:60: [邮件列表] 处理邮件 90/91: ID=62066, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 18:47:27 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62066
+2025/05/26 18:47:27 prime_email.go:60: [邮件列表] 处理邮件 91/91: ID=62065, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 18:47:27 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=62065
+2025/05/26 18:47:27 prime_email.go:93: [邮件列表] 成功完成批量处理: 创建=90, 跳过=1, 总计=91
+{"level":"INFO","timestamp":"2025-05-26 18:47:27.158","file":"middleware/logger.go:32","msg":"| 200 |  7.135210005s |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 18:48:00 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/26 18:48:04 prime_email.go:50: [邮件列表] 开始批量处理 1 封邮件
+2025/05/26 18:48:04 prime_email.go:60: [邮件列表] 处理邮件 1/1: ID=62155, 主题=Fw: [SM Line America] PickUp Notice - B/L No.:NJED5F175300, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 18:48:04 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=62155
+2025/05/26 18:48:04 prime_email.go:93: [邮件列表] 成功完成批量处理: 创建=0, 跳过=1, 总计=1
+{"level":"INFO","timestamp":"2025-05-26 18:48:04.781","file":"middleware/logger.go:32","msg":"| 200 |  2.811989408s |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 18:48:19 main.go:45: 标准日志已重定向到 log/default/api_server.log
+{"level":"INFO","timestamp":"2025-05-26 18:48:21.589","file":"middleware/auth.go:51","msg":"Auth Failed /api/v1/emails/list map[Accept:[*/*] Accept-Encoding:[gzip, deflate, br] Cache-Control:[no-cache] Connection:[keep-alive] User-Agent:[PostmanRuntime-ApipostRuntime/1.1.0]]"}
+{"level":"INFO","timestamp":"2025-05-26 18:48:21.589","file":"middleware/logger.go:32","msg":"| 200 |     312.906µs |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
