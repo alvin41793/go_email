@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"go_email/api"
 	"go_email/config"
-	"go_email/db"
-	"go_email/model"
 	"go_email/pkg/mailclient"
 	stdlog "log"
 	"os"
@@ -90,10 +88,6 @@ func main() {
 	)
 
 	// 连接数据库
-	db.InitDB(config.DbHost, config.DbPort, config.DbUser, config.DbPassword, config.DbName)
-
-	// 添加数据库结构自动迁移，更新html_content字段类型
-	db.DB().AutoMigrate(&model.PrimeEmailContent{})
 
 	err = g.Run(viper.GetString("addr1"))
 	if err != nil {
