@@ -68,7 +68,7 @@ func ListEmails(c *gin.Context) {
 		utils.SendResponse(c, err, nil)
 		return
 	}
-	utils.SendResponse(c, err, "存入邮件列表成功")
+	utils.SendResponse(c, err, emails)
 }
 
 // 获取邮件内容

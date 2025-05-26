@@ -115,3 +115,231 @@
 2025/05/23 18:40:09 handlers.go:250: [邮件处理] 更新邮件状态为已处理，邮件ID: 59339
 2025/05/23 18:40:09 handlers.go:274: [邮件处理] 成功提交事务，完成处理 10 封邮件
 {"level":"INFO","timestamp":"2025-05-23 18:40:09.203","file":"middleware/logger.go:32","msg":"| 200 | 54.950149102s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 13:41:32 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/26 13:42:07 prime_email.go:50: [邮件列表] 开始批量处理 10 封邮件
+2025/05/26 13:42:07 prime_email.go:60: [邮件列表] 处理邮件 1/10: ID=61941, 主题=Fw: 【Empty Return Deadline】 CO1250392428/  HBL#SHA03924282 /40HQ*1/MEDU8802392, 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:42:07 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61941
+2025/05/26 13:42:07 prime_email.go:60: [邮件列表] 处理邮件 2/10: ID=61940, 主题=Fw: EMPTY INTERCHANGE RECEIPT (EIR) REMINDER [HBL#:NBQC25030929] [MBL#:EGLV143551618486] [LOT#:OI25041928] [CTNR#:EGHU9754719], 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:42:07 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61940
+2025/05/26 13:42:07 prime_email.go:60: [邮件列表] 处理邮件 3/10: ID=61939, 主题=Fw: Reminder 2 Please pick up ASAP : MBL#COSU9501940111 HBL#XS25040155 Container#CSNU2389524, 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:42:07 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61939
+2025/05/26 13:42:07 prime_email.go:60: [邮件列表] 处理邮件 4/10: ID=61938, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#GZLAX2541044], 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:42:07 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61938
+2025/05/26 13:42:07 prime_email.go:60: [邮件列表] 处理邮件 5/10: ID=61937, 主题=Fw: *** LFD REMINDER ***, 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:42:07 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61937
+2025/05/26 13:42:07 prime_email.go:60: [邮件列表] 处理邮件 6/10: ID=61936, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#SZPDX2541105], 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:42:07 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61936
+2025/05/26 13:42:07 prime_email.go:60: [邮件列表] 处理邮件 7/10: ID=61935, 主题=Fw: [Tanera Transport LLC][Alert] Potential Demurrage Reminder - FCL Containers, 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:42:07 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61935
+2025/05/26 13:42:07 prime_email.go:60: [邮件列表] 处理邮件 8/10: ID=61934, 主题=Fw: [Tanera Transport LLC][Alert] Potential Demurrage Reminder - FCL Containers, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:42:07 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61934
+2025/05/26 13:42:07 prime_email.go:60: [邮件列表] 处理邮件 9/10: ID=61933, 主题=Fw: [Tanera Transport LLC][Alert] Potential Demurrage Reminder - FCL Containers, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:42:07 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61933
+2025/05/26 13:42:07 prime_email.go:60: [邮件列表] 处理邮件 10/10: ID=61932, 主题=Fw: [Tanera Transport LLC][Alert] Potential Demurrage Reminder - FCL Containers, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:42:07 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61932
+2025/05/26 13:42:07 prime_email.go:93: [邮件列表] 成功完成批量处理: 创建=10, 跳过=0, 总计=10
+{"level":"INFO","timestamp":"2025-05-26 13:42:07.734","file":"middleware/logger.go:32","msg":"| 200 | 30.146321555s |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 13:43:26 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/26 13:44:13 prime_email.go:50: [邮件列表] 开始批量处理 100 封邮件
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 1/100: ID=61941, 主题=Fw: 【Empty Return Deadline】 CO1250392428/  HBL#SHA03924282 /40HQ*1/MEDU8802392, 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=61941
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 2/100: ID=61940, 主题=Fw: EMPTY INTERCHANGE RECEIPT (EIR) REMINDER [HBL#:NBQC25030929] [MBL#:EGLV143551618486] [LOT#:OI25041928] [CTNR#:EGHU9754719], 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=61940
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 3/100: ID=61939, 主题=Fw: Reminder 2 Please pick up ASAP : MBL#COSU9501940111 HBL#XS25040155 Container#CSNU2389524, 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=61939
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 4/100: ID=61938, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#GZLAX2541044], 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=61938
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 5/100: ID=61937, 主题=Fw: *** LFD REMINDER ***, 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=61937
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 6/100: ID=61936, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#SZPDX2541105], 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=61936
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 7/100: ID=61935, 主题=Fw: [Tanera Transport LLC][Alert] Potential Demurrage Reminder - FCL Containers, 发件人=office3 . <office3@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=61935
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 8/100: ID=61934, 主题=Fw: [Tanera Transport LLC][Alert] Potential Demurrage Reminder - FCL Containers, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=61934
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 9/100: ID=61933, 主题=Fw: [Tanera Transport LLC][Alert] Potential Demurrage Reminder - FCL Containers, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=61933
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 10/100: ID=61932, 主题=Fw: [Tanera Transport LLC][Alert] Potential Demurrage Reminder - FCL Containers, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=61932
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 11/100: ID=61931, 主题=Fw: [Tanera Transport LLC][Alert] Potential Demurrage Reminder - FCL Containers, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61931
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 12/100: ID=61930, 主题=Fw: [Tanera Transport LLC][Alert] Potential Demurrage Reminder - FCL Containers, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61930
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 13/100: ID=61929, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#GZNYC2540480], 发件人=operator . <operator@amglbl.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61929
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 14/100: ID=61928, 主题=Fw: CMA CGM Canada Invoice Status Report, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61928
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 15/100: ID=61927, 主题=Fw: CNRU Details attached for 252658817, 发件人=neway . <neway@800firms.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61927
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 16/100: ID=61926, 主题=Fw: [Tanera Transport LLC][Alert] Potential Demurrage Reminder - FCL Containers, 发件人=operator . <operator@amglbl.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61926
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 17/100: ID=61925, 主题=Fw: John S James Co Approved Payment: Invoice PRIMGWSQ25050173; USD 240.00, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61925
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 18/100: ID=61924, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6415769650 | COSCO NETHERLANDS - 070E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61924
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 19/100: ID=61923, 主题=Fw: LFD NOTICE [HBL#:NBF25041027] [MBL#:MEDUQY836643] [LOT#:OI25051055] [CTNR#:CAIU7569726] [CNEE:PRIME AGENCY], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61923
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 20/100: ID=61922, 主题=Fw: [PRIME AGENCY][Ocean-OI-25050240][SMLMSHFO5P206500][Container#SMCU1265155][ETA: 05-18-2025][REVISED ARRIVAL NOTICE FREIGHT INVOICE - SHMES2541111], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61922
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 21/100: ID=61921, 主题=Fw: [PRIME AGENCY][Ocean-OI-25050277][YMJAW237039546][Container#TEMU1102131,TTNU1221703][ARRIVAL NOTICE FREIGHT INVOICE - SHSTL2541275], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61921
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 22/100: ID=61920, 主题=Fw: MSC USA - Rail Arrival Notice for BL: MEDUQY674622, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61920
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 23/100: ID=61919, 主题=Fw: PickUp Notice(BL#: SHAF23938700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61919
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 24/100: ID=61918, 主题=Fw: Vessel Delay Update, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61918
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 25/100: ID=61917, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6415923220 | COSCO NETHERLANDS - 070E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61917
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 26/100: ID=61916, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#SHPDX2541093], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61916
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 27/100: ID=61915, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#SHPDX2541093], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61915
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 28/100: ID=61914, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#ZSELP2540253], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61914
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 29/100: ID=61913, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#ZSELP2540253], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61913
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 30/100: ID=61912, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#SZPDX2541105], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61912
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 31/100: ID=61911, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#ZSCHI2540265], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61911
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 32/100: ID=61910, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#ZSCHI2540265], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61910
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 33/100: ID=61909, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#ZSKCK2540269], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61909
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 34/100: ID=61908, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#ZSKCK2540269], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61908
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 35/100: ID=61907, 主题=Fw: OOCL Arrival Notice At Final Destination: OOLU8811098497 | OOCL SINGAPORE - 058E, 发件人=operator . <operator@amglbl.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61907
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 36/100: ID=61906, 主题=Fw: OOCL Arrival Notice At Final Destination: OOLU2758335510 | OOCL SINGAPORE - 058E, 发件人=operator . <operator@amglbl.com>
+2025/05/26 13:44:13 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61906
+2025/05/26 13:44:13 prime_email.go:60: [邮件列表] 处理邮件 37/100: ID=61905, 主题=Fw: OOCL Arrival Notice At Final Destination: OOLU2758335300 | OOCL SINGAPORE - 058E, 发件人=operator . <operator@amglbl.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61905
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 38/100: ID=61904, 主题=Fw: OOCL IB Demurrage Notice For Bill Of Lading: 8811112430 (LGB), 发件人=operator . <operator@amglbl.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61904
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 39/100: ID=61903, 主题=Fw: Great World Customs Service, Inc. Approved Payment: Invoice PRIMMGSZX25050005; USD 100.00, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61903
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 40/100: ID=61902, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#SHNYC2540811], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61902
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 41/100: ID=61901, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#SHNYC2540811], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61901
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 42/100: ID=61900, 主题=Fw: MSC USA - Rail Arrival Notice for BL: MEDUQY674622, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61900
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 43/100: ID=61899, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6414627400 | OOCL SINGAPORE - 058E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61899
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 44/100: ID=61898, 主题=Fw: COSCO Arrival Notice Intermodal In-Transit & BL Number: COSU6415303300 | COSCO SANTOS - 090N, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61898
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 45/100: ID=61897, 主题=Fw: COSCO Arrival Notice Intermodal In-Transit & BL Number: COSU6415303300 | COSCO SANTOS - 090N, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61897
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 46/100: ID=61896, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6416571930 | COSCO NETHERLANDS - 070E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61896
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 47/100: ID=61895, 主题=Fw: PickUp Notice(BL#: TSNF14467800), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61895
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 48/100: ID=61894, 主题=Fw: PickUp Notice(BL#: TSNF14467800), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61894
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 49/100: ID=61893, 主题=Fw: Backup Documents for Container# - CMAU9551755 | Shipment Reference# - PO#15976D, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61893
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 50/100: ID=61892, 主题=Fw: Backup Documents for Container# - CMAU9551755 | Shipment Reference# - PO#15976D, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61892
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 51/100: ID=61891, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61891
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 52/100: ID=61890, 主题=Fw: PickUp Notice(BL#: SHAF23938700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61890
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 53/100: ID=61889, 主题=Fw: PickUp Notice(BL#: SHAF23938700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61889
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 54/100: ID=61888, 主题=Fw: PickUp Notice(BL#: SHAF23938700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61888
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 55/100: ID=61887, 主题=Fw: CUSTOMS WARNING MESSAGE 149502151251 CNYYT/CNYYT/USLAX/USLAX Ref-no: <<A5_DC5PRB4O.CNT>>, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61887
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 56/100: ID=61886, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6415281070 | OOCL SINGAPORE - 058E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61886
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 57/100: ID=61885, 主题=Fw: PickUp Notice(BL#: DLCF01382900), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61885
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 58/100: ID=61884, 主题=Fw: PickUp Notice(BL#: DLCF01382900), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61884
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 59/100: ID=61883, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6414802990 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61883
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 60/100: ID=61882, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415407370 | CSCL BOHAI SEA - 069E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61882
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 61/100: ID=61881, 主题=Fw: NGP2302918/NGP2302918-NOA-CMACGM-EVER FAVOR -0VCKAW1MA-CNNGB-USSAV-Notice of Arrival, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61881
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 62/100: ID=61880, 主题=Fw: NGP2302918/NGP2302918-NOA-CMACGM-EVER FAVOR -0VCKAW1MA-CNNGB-USSAV-Notice of Arrival, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61880
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 63/100: ID=61879, 主题=Fw: NGP2302918/NGP2302918-NOA-CMACGM-EVER FAVOR -0VCKAW1MA-CNNGB-USSAV-Notice of Arrival, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61879
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 64/100: ID=61878, 主题=Fw: FVOR1209-019E - Import Cargo Discharge Notice Ref-no: <<A1_DB5PRF4I.CNT>>, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61878
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 65/100: ID=61877, 主题=Fw: CNLD070E - Import Cargo Discharge Notice Ref-no: <<A1_DB5PRDLL.CNT>>, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61877
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 66/100: ID=61876, 主题=Fw: OCSG058E - Import Cargo Discharge Notice Ref-no: <<A1_DB5PRD8Z.CNT>>, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61876
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 67/100: ID=61875, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61875
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 68/100: ID=61874, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#ZSLGB2540289], 发件人=operator . <operator@amglbl.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61874
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 69/100: ID=61873, 主题=Fw: OOCL Arrival Notice At Final Destination OOLU2758487986 | OOCL SUNFLOWER - 002E, 发件人=operator . <operator@amglbl.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61873
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 70/100: ID=61872, 主题=Fw: OOCL Arrival Notice At Final Destination: OOLU2307767180 | CSCL SUMMER - 067E, 发件人=operator . <operator@amglbl.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61872
+2025/05/26 13:44:14 prime_email.go:60: [邮件列表] 处理邮件 71/100: ID=61871, 主题=Fw: OOCL Arrival Notice At Final Destination: OOLU2307766990 | CSCL SUMMER - 067E, 发件人=operator . <operator@amglbl.com>
+2025/05/26 13:44:14 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61871
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 72/100: ID=61870, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6415923224 | COSCO NETHERLANDS - 070E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61870
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 73/100: ID=61869, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#ZSCHI2540266], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61869
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 74/100: ID=61868, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#ZSCHI2540266], 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61868
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 75/100: ID=61867, 主题=Fw: PickUp Notice(BL#: NBOF20318600), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61867
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 76/100: ID=61866, 主题=Fw: PickUp Notice(BL#: NBOF20318600), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61866
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 77/100: ID=61865, 主题=Fw: Auto Response: Fw: PickUp Notice(BL#: TA5PT4686400), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61865
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 78/100: ID=61864, 主题=Fw: OEC SHIPPING LOS ANGELES INC. - Vessel or ETA Update Notice - HBL# OERT201701Y02977, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61864
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 79/100: ID=61863, 主题=Fw: PickUp Notice(BL#: SH5SP1256400), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61863
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 80/100: ID=61862, 主题=Fw: PickUp Notice(BL#: SH5SP1256400), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61862
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 81/100: ID=61861, 主题=Fw: PickUp Notice(BL#: SHAF51577700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61861
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 82/100: ID=61860, 主题=Fw: PickUp Notice(BL#: SHAF51577700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61860
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 83/100: ID=61859, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6412959830 | OOCL SINGAPORE - 058E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61859
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 84/100: ID=61858, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6415923222 | COSCO NETHERLANDS - 070E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61858
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 85/100: ID=61857, 主题=Fw: PickUp Notice(BL#: NBOF15951600), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61857
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 86/100: ID=61856, 主题=Fw: PickUp Notice(BL#: NBOF15951600), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61856
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 87/100: ID=61855, 主题=Fw: 2nd Empty Return Deadline ：MBL：SMLMNJEB5A439600  Container: SMCU1216628, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61855
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 88/100: ID=61854, 主题=Fw: PICKUP# SHACHI54133X FXLU8092870, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61854
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 89/100: ID=61853, 主题=Fw: PREPU# SHACHI54135X - FXLU8092864, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61853
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 90/100: ID=61852, 主题=Fw: PREPU# / SHACHI54139X / COSU9501956170 /, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61852
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 91/100: ID=61851, 主题=Fw: PREPU# SHACHI54136X CSNU7945333, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61851
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 92/100: ID=61850, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6414729190 | EVER MILD - 1399E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61850
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 93/100: ID=61849, 主题=Fw: PICKUP# / SHACHI54122X / COSU6414472240 / TGBU8599610, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61849
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 94/100: ID=61848, 主题=Fw: PICKUP# / SHACHI54128X / COSU9501856980 / CSNU6018835, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61848
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 95/100: ID=61847, 主题=Fw: PickUp Notice(BL#: TS4TK7917700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61847
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 96/100: ID=61846, 主题=Fw: PickUp Notice(BL#: TS4TK7917700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61846
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 97/100: ID=61845, 主题=Fw: PickUp Notice(BL#: TS4TK7917700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61845
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 98/100: ID=61844, 主题=Fw: PickUp Notice(BL#: TS4TK7917700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61844
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 99/100: ID=61843, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6414729090 | EVER MILD - 1399E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61843
+2025/05/26 13:44:15 prime_email.go:60: [邮件列表] 处理邮件 100/100: ID=61842, 主题=Fw: PickUp Notice(BL#: TA5DK0734500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 13:44:15 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=61842
+2025/05/26 13:44:15 prime_email.go:93: [邮件列表] 成功完成批量处理: 创建=90, 跳过=10, 总计=100
+{"level":"INFO","timestamp":"2025-05-26 13:44:15.881","file":"middleware/logger.go:32","msg":"| 200 | 45.981882694s |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
