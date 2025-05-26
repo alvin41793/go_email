@@ -1114,3 +1114,19 @@
 {"level":"INFO","timestamp":"2025-05-26 19:17:14.450","file":"middleware/logger.go:32","msg":"| 200 |  5.904423237s |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
 {"level":"INFO","timestamp":"2025-05-26 19:17:15.168","file":"middleware/auth.go:52","msg":"Auth Failed /api/v1/emails/content map[Accept:[*/*] Accept-Encoding:[gzip, deflate, br] Cache-Control:[no-cache] Connection:[keep-alive] Content-Length:[29] Content-Type:[application/json] Token:[eyJhbGcOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo2NjYsImV4cCI6MjEwODI1NzE2MywiaXNzIjoiZ2luLWJsb2cifQ.6gyUwAAjObhSlseb5E84MFS1HWmeD8LaYuh1lFkEVvQ] User-Agent:[PostmanRuntime-ApipostRuntime/1.1.0]]"}
 {"level":"INFO","timestamp":"2025-05-26 19:17:15.168","file":"middleware/logger.go:32","msg":"| 200 |     132.132µs |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 19:18:55 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/26 19:19:15 prime_email.go:50: [邮件列表] 开始批量处理 1 封邮件
+2025/05/26 19:19:15 prime_email.go:60: [邮件列表] 处理邮件 1/1: ID=62159, 主题=Fw: CAIGJV00 - PRIME AGENCY VANCOUVER - Detention Outstanding Statement, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 19:19:15 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=62159
+2025/05/26 19:19:15 prime_email.go:93: [邮件列表] 成功完成批量处理: 创建=0, 跳过=1, 总计=1
+{"level":"INFO","timestamp":"2025-05-26 19:19:15.675","file":"middleware/logger.go:32","msg":"| 200 |  4.095913768s |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 19:19:28 prime_email.go:50: [邮件列表] 开始批量处理 1 封邮件
+2025/05/26 19:19:28 prime_email.go:60: [邮件列表] 处理邮件 1/1: ID=62159, 主题=Fw: CAIGJV00 - PRIME AGENCY VANCOUVER - Detention Outstanding Statement, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 19:19:28 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=62159
+2025/05/26 19:19:28 prime_email.go:93: [邮件列表] 成功完成批量处理: 创建=0, 跳过=1, 总计=1
+{"level":"INFO","timestamp":"2025-05-26 19:19:28.585","file":"middleware/logger.go:32","msg":"| 200 |  2.779659314s |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 19:19:34 prime_email.go:50: [邮件列表] 开始批量处理 1 封邮件
+2025/05/26 19:19:34 prime_email.go:60: [邮件列表] 处理邮件 1/1: ID=62159, 主题=Fw: CAIGJV00 - PRIME AGENCY VANCOUVER - Detention Outstanding Statement, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 19:19:34 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=62159
+2025/05/26 19:19:34 prime_email.go:93: [邮件列表] 成功完成批量处理: 创建=0, 跳过=1, 总计=1
+{"level":"INFO","timestamp":"2025-05-26 19:19:34.452","file":"middleware/logger.go:32","msg":"| 200 |  4.116648429s |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
