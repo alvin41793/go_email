@@ -3,6 +3,8 @@ package api
 import (
 	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"go_email/db"
 	"go_email/model"
 	"go_email/pkg/mailclient"
@@ -12,10 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/jinzhu/gorm"
-
-	"github.com/gin-gonic/gin"
 )
 
 // 邮件服务器配置
