@@ -43,3 +43,660 @@
 2025/05/26 16:48:45 handlers.go:326: [邮件处理] 更新邮件状态为已处理，邮件ID: 62029
 2025/05/26 16:48:45 handlers.go:350: [邮件处理] 成功提交事务，完成处理 6 封邮件
 {"level":"INFO","timestamp":"2025-05-26 16:48:45.271","file":"middleware/logger.go:32","msg":"| 200 |  48.61173146s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 17:02:12 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/26 17:02:48 prime_email.go:50: [邮件列表] 开始批量处理 26 封邮件
+2025/05/26 17:02:48 prime_email.go:60: [邮件列表] 处理邮件 1/26: ID=62059, 主题=Fw: PU3& LFD NOTICE/ RE: ARRIVAL NOTICE (REF# :OIN2505094PDG House# :PPILNB525040565 MASTER# :CMDUNGP2219639), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:02:48 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62059
+2025/05/26 17:02:48 prime_email.go:60: [邮件列表] 处理邮件 2/26: ID=62058, 主题=Fw: LFD Rail Notice For BL# MEDUQY674622, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:02:48 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62058
+2025/05/26 17:02:48 prime_email.go:60: [邮件列表] 处理邮件 3/26: ID=62057, 主题=Fw: PickUp Notice(BL#: TA5DK0734500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:02:48 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62057
+2025/05/26 17:02:48 prime_email.go:60: [邮件列表] 处理邮件 4/26: ID=62056, 主题=Fw: PickUp Notice(BL#: TA5DK0734500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:02:48 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62056
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 5/26: ID=62055, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6415263180 | OOCL SINGAPORE - 058E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62055
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 6/26: ID=62054, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62054
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 7/26: ID=62053, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415264850 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62053
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 8/26: ID=62052, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62052
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 9/26: ID=62051, 主题=Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62051
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 10/26: ID=62050, 主题=Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62050
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 11/26: ID=62049, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62049
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 12/26: ID=62048, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6414627370 | OOCL SINGAPORE - 058E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62048
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 13/26: ID=62047, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62047
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 14/26: ID=62046, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62046
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 15/26: ID=62045, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62045
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 16/26: ID=62044, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=operator . <operator@amglbl.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62044
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 17/26: ID=62043, 主题=BL#CMDUQGD1684034 / APHU7311464, 发件人=JackGong <jackgong@cityocean.net>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62043
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 18/26: ID=62042, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=operator . <operator@amglbl.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62042
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 19/26: ID=62041, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=neway . <neway@800firms.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62041
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 20/26: ID=62040, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=neway . <neway@800firms.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62040
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 21/26: ID=62039, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM54777200 (VSL : YM UNIFORMITY V#0078E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62039
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 22/26: ID=62038, 主题=Fw: [HMM] Payment Reminder List - USR250424037, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62038
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 23/26: ID=62037, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : HKGM15934400 (VSL : YM UNIFORMITY V#0078E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62037
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 24/26: ID=62036, 主题=Fw: NEED AN FOR ZIMUSNH7748370 TGBU5413717, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62036
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 25/26: ID=62035, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62035
+2025/05/26 17:02:49 prime_email.go:60: [邮件列表] 处理邮件 26/26: ID=62034, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/26 17:02:49 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=62034
+2025/05/26 17:02:49 prime_email.go:93: [邮件列表] 成功完成批量处理: 创建=25, 跳过=1, 总计=26
+{"level":"INFO","timestamp":"2025-05-26 17:02:49.581","file":"middleware/logger.go:32","msg":"| 200 |  4.236540108s |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 17:07:37 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/26 17:07:41 prime_email.go:50: [邮件列表] 开始批量处理 7 封邮件
+2025/05/26 17:07:41 prime_email.go:60: [邮件列表] 处理邮件 1/7: ID=62065, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:07:41 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62065
+2025/05/26 17:07:41 prime_email.go:60: [邮件列表] 处理邮件 2/7: ID=62064, 主题=Fw: Cargo Pickup & Return Notice, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:07:41 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62064
+2025/05/26 17:07:41 prime_email.go:60: [邮件列表] 处理邮件 3/7: ID=62063, 主题=Fw: PickUp Notice(BL#: SHAF57994900), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:07:41 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62063
+2025/05/26 17:07:41 prime_email.go:60: [邮件列表] 处理邮件 4/7: ID=62062, 主题=Fw: PickUp Notice(BL#: SHAF57994900), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:07:41 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62062
+2025/05/26 17:07:41 prime_email.go:60: [邮件列表] 处理邮件 5/7: ID=62061, 主题=Fw: PickUp Notice(BL#: SHAF51577700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:07:41 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62061
+2025/05/26 17:07:41 prime_email.go:60: [邮件列表] 处理邮件 6/7: ID=62060, 主题=Fw: PickUp Notice(BL#: SHAF51577700), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:07:41 prime_email.go:78: [邮件列表] 创建新邮件记录: ID=62060
+2025/05/26 17:07:41 prime_email.go:60: [邮件列表] 处理邮件 7/7: ID=62059, 主题=Fw: PU3& LFD NOTICE/ RE: ARRIVAL NOTICE (REF# :OIN2505094PDG House# :PPILNB525040565 MASTER# :CMDUNGP2219639), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:07:41 prime_email.go:67: [邮件列表] 邮件已存在，跳过: ID=62059
+2025/05/26 17:07:42 prime_email.go:93: [邮件列表] 成功完成批量处理: 创建=6, 跳过=1, 总计=7
+{"level":"INFO","timestamp":"2025-05-26 17:07:42.015","file":"middleware/logger.go:32","msg":"| 200 |  3.503784376s |             ::1 | GET | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 17:08:47 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/05/26 17:10:35 handlers.go:195: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/26 17:10:35 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62059
+2025/05/26 17:10:36 handlers.go:195: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/26 17:10:36 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62059
+2025/05/26 17:10:38 handlers.go:195: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/26 17:10:38 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62059
+2025/05/26 17:10:44 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62059, 主题: Fw: PU3& LFD NOTICE/ RE: ARRIVAL NOTICE (REF# :OIN2505094PDG House# :PPILNB525040565 MASTER# :CMDUNGP2219639), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:10:44 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62059
+2025/05/26 17:10:44 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62058
+2025/05/26 17:10:46 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62059, 主题: Fw: PU3& LFD NOTICE/ RE: ARRIVAL NOTICE (REF# :OIN2505094PDG House# :PPILNB525040565 MASTER# :CMDUNGP2219639), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:10:46 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62059
+2025/05/26 17:10:46 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62058
+2025/05/26 17:10:49 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62059, 主题: Fw: PU3& LFD NOTICE/ RE: ARRIVAL NOTICE (REF# :OIN2505094PDG House# :PPILNB525040565 MASTER# :CMDUNGP2219639), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:10:49 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62059
+2025/05/26 17:10:49 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62058
+2025/05/26 17:11:13 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62058, 主题: Fw: LFD Rail Notice For BL# MEDUQY674622, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:13 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62058
+2025/05/26 17:11:13 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62058, 文件名: LFD RAIL NOTICE FOR BL# MEDUQY674622.PDF
+2025/05/26 17:11:13 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62058, 文件名: LFD RAIL NOTICE FOR BL# MEDUQY674622.PDF
+2025/05/26 17:11:14 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62058, 主题: Fw: LFD Rail Notice For BL# MEDUQY674622, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:14 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62058
+2025/05/26 17:11:14 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62058, 文件名: LFD RAIL NOTICE FOR BL# MEDUQY674622.PDF
+2025/05/26 17:11:14 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62058, 文件名: LFD RAIL NOTICE FOR BL# MEDUQY674622.PDF
+2025/05/26 17:11:14 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62058, 文件名: LFD RAIL NOTICE FOR BL# MEDUQY674622.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/c9070d49b2934664bafecd13346f61a4.PDF
+2025/05/26 17:11:14 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62057
+2025/05/26 17:11:15 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62058, 文件名: LFD RAIL NOTICE FOR BL# MEDUQY674622.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/7e6fbe92c9154ca48694042fed6d5c05.PDF
+2025/05/26 17:11:15 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62057
+2025/05/26 17:11:17 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62058, 主题: Fw: LFD Rail Notice For BL# MEDUQY674622, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:17 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62058
+2025/05/26 17:11:17 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62058, 文件名: LFD RAIL NOTICE FOR BL# MEDUQY674622.PDF
+2025/05/26 17:11:17 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62058, 文件名: LFD RAIL NOTICE FOR BL# MEDUQY674622.PDF
+2025/05/26 17:11:17 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62058, 文件名: LFD RAIL NOTICE FOR BL# MEDUQY674622.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/c74d86ed94264d1fb4f777863ba21ed2.PDF
+2025/05/26 17:11:17 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62057
+2025/05/26 17:11:18 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62057, 主题: Fw: PickUp Notice(BL#: TA5DK0734500), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:18 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62057
+2025/05/26 17:11:18 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62057, 文件名: PickupNotice_TA5DK0734500.pdf
+2025/05/26 17:11:18 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62057, 文件名: PickupNotice_TA5DK0734500.pdf
+2025/05/26 17:11:18 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62057, 文件名: PickupNotice_TA5DK0734500.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/b553ba227b1d4de19b5ffbbd1b14197e.pdf
+2025/05/26 17:11:18 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62056
+2025/05/26 17:11:19 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62057, 主题: Fw: PickUp Notice(BL#: TA5DK0734500), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:19 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62057
+2025/05/26 17:11:19 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62057, 文件名: PickupNotice_TA5DK0734500.pdf
+2025/05/26 17:11:19 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62057, 文件名: PickupNotice_TA5DK0734500.pdf
+2025/05/26 17:11:19 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62057, 文件名: PickupNotice_TA5DK0734500.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/93e77e3c4ae240028d1feae31ef1d0b1.pdf
+2025/05/26 17:11:19 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62056
+2025/05/26 17:11:21 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62057, 主题: Fw: PickUp Notice(BL#: TA5DK0734500), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:21 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62057
+2025/05/26 17:11:21 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62057, 文件名: PickupNotice_TA5DK0734500.pdf
+2025/05/26 17:11:21 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62057, 文件名: PickupNotice_TA5DK0734500.pdf
+2025/05/26 17:11:22 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62057, 文件名: PickupNotice_TA5DK0734500.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/16713c6c2ba441a2a969ba4f4cc3f1f8.pdf
+2025/05/26 17:11:22 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62056
+2025/05/26 17:11:22 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62056, 主题: Fw: PickUp Notice(BL#: TA5DK0734500), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:22 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62056
+2025/05/26 17:11:22 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62056, 文件名: PickupNotice_TA5DK0734500.pdf
+2025/05/26 17:11:22 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62056, 文件名: PickupNotice_TA5DK0734500.pdf
+2025/05/26 17:11:23 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62056, 文件名: PickupNotice_TA5DK0734500.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/0cb9431dcffd458ba7e8de7b39c27ccf.pdf
+2025/05/26 17:11:23 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62055
+2025/05/26 17:11:25 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62055, 主题: Fw: COSCO Arrival Notice at Port & BL Number: COSU6415263180 | OOCL SINGAPORE - 058E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:25 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62055
+2025/05/26 17:11:25 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62055, 文件名: BL6415263180.PDF
+2025/05/26 17:11:25 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62055, 文件名: BL6415263180.PDF
+2025/05/26 17:11:25 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62056, 主题: Fw: PickUp Notice(BL#: TA5DK0734500), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:25 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62056
+2025/05/26 17:11:25 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62056, 文件名: PickupNotice_TA5DK0734500.pdf
+2025/05/26 17:11:25 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62056, 文件名: PickupNotice_TA5DK0734500.pdf
+2025/05/26 17:11:25 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62055, 文件名: BL6415263180.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/cf4642677a174eff9bbca9bb28acf678.PDF
+2025/05/26 17:11:25 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62054
+2025/05/26 17:11:26 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62056, 文件名: PickupNotice_TA5DK0734500.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/e40214d954314b05b46fd66f0180fd5b.pdf
+2025/05/26 17:11:26 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62055
+2025/05/26 17:11:28 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62056, 主题: Fw: PickUp Notice(BL#: TA5DK0734500), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:28 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62056
+2025/05/26 17:11:28 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62056, 文件名: PickupNotice_TA5DK0734500.pdf
+2025/05/26 17:11:28 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62056, 文件名: PickupNotice_TA5DK0734500.pdf
+2025/05/26 17:11:28 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62055, 主题: Fw: COSCO Arrival Notice at Port & BL Number: COSU6415263180 | OOCL SINGAPORE - 058E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:28 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62055
+2025/05/26 17:11:28 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62055, 文件名: BL6415263180.PDF
+2025/05/26 17:11:28 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62055, 文件名: BL6415263180.PDF
+2025/05/26 17:11:28 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62056, 文件名: PickupNotice_TA5DK0734500.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/9d2a980a003343f580439946146e002a.pdf
+2025/05/26 17:11:28 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62055
+2025/05/26 17:11:29 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62055, 文件名: BL6415263180.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/6f3886155c054b75a263a9ac650412f5.PDF
+2025/05/26 17:11:29 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62054
+2025/05/26 17:11:31 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62054, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:31 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62054
+2025/05/26 17:11:31 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62054, 文件名: BL6415225720.PDF
+2025/05/26 17:11:31 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62054, 文件名: BL6415225720.PDF
+2025/05/26 17:11:31 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62054, 文件名: BL6415225720.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/4c7db12b30f84cb5a48468982968065e.PDF
+2025/05/26 17:11:31 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62053
+2025/05/26 17:11:31 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62055, 主题: Fw: COSCO Arrival Notice at Port & BL Number: COSU6415263180 | OOCL SINGAPORE - 058E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:31 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62055
+2025/05/26 17:11:31 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62055, 文件名: BL6415263180.PDF
+2025/05/26 17:11:31 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62055, 文件名: BL6415263180.PDF
+2025/05/26 17:11:31 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62055, 文件名: BL6415263180.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/ecd4d692e9c84b7ba7a8cfbbd902eedf.PDF
+2025/05/26 17:11:31 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62054
+2025/05/26 17:11:39 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62054, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:39 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62054
+2025/05/26 17:11:39 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62054, 文件名: BL6415225720.PDF
+2025/05/26 17:11:39 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62054, 文件名: BL6415225720.PDF
+2025/05/26 17:11:39 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62054, 文件名: BL6415225720.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/0e70de4e1a4f4255a4749f3dbf1d9533.PDF
+2025/05/26 17:11:39 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62053
+2025/05/26 17:11:42 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62053, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415264850 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:42 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62053
+2025/05/26 17:11:42 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62053, 文件名: BL6415264850.PDF
+2025/05/26 17:11:42 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62053, 文件名: BL6415264850.PDF
+2025/05/26 17:11:42 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62053, 文件名: BL6415264850.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/8422b61c80df4d099c29dcb4ecc76148.PDF
+2025/05/26 17:11:42 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62052
+2025/05/26 17:11:44 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62053, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415264850 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:44 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62053
+2025/05/26 17:11:44 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62053, 文件名: BL6415264850.PDF
+2025/05/26 17:11:44 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62053, 文件名: BL6415264850.PDF
+2025/05/26 17:11:44 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62053, 文件名: BL6415264850.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/5f9b1628d1fe48168a52644bb08e2373.PDF
+2025/05/26 17:11:44 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62052
+2025/05/26 17:11:48 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62052, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:48 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62052
+2025/05/26 17:11:48 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62052, 文件名: BL6415225700.PDF
+2025/05/26 17:11:48 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62052, 文件名: BL6415225700.PDF
+2025/05/26 17:11:48 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62054, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:48 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62054
+2025/05/26 17:11:48 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62054, 文件名: BL6415225720.PDF
+2025/05/26 17:11:48 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62054, 文件名: BL6415225720.PDF
+2025/05/26 17:11:48 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62052, 文件名: BL6415225700.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/1ace2fd143434e75b093726b3d42abd8.PDF
+2025/05/26 17:11:48 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62051
+2025/05/26 17:11:49 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62054, 文件名: BL6415225720.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/d902c48eafe1415fa1e43775740c46f9.PDF
+2025/05/26 17:11:49 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62053
+2025/05/26 17:11:49 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62052, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:49 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62052
+2025/05/26 17:11:49 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62052, 文件名: BL6415225700.PDF
+2025/05/26 17:11:49 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62052, 文件名: BL6415225700.PDF
+2025/05/26 17:11:49 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62052, 文件名: BL6415225700.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/8daaba2196f44dd78a6ef8eea383c25a.PDF
+2025/05/26 17:11:49 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62051
+2025/05/26 17:11:53 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62053, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415264850 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:53 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62053
+2025/05/26 17:11:53 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62053, 文件名: BL6415264850.PDF
+2025/05/26 17:11:53 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62053, 文件名: BL6415264850.PDF
+2025/05/26 17:11:53 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62053, 文件名: BL6415264850.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/cea1a0ea204d42c19edcee55561ac42e.PDF
+2025/05/26 17:11:53 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62052
+2025/05/26 17:11:53 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62051, 主题: Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:53 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62051
+2025/05/26 17:11:53 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62051, 文件名: PickupNotice_DL5CZ0863500.pdf
+2025/05/26 17:11:53 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62051, 文件名: PickupNotice_DL5CZ0863500.pdf
+2025/05/26 17:11:54 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62051, 文件名: PickupNotice_DL5CZ0863500.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/646d990197824054a019815f4293aafa.pdf
+2025/05/26 17:11:54 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62050
+2025/05/26 17:11:55 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62051, 主题: Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:55 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62051
+2025/05/26 17:11:55 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62051, 文件名: PickupNotice_DL5CZ0863500.pdf
+2025/05/26 17:11:55 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62051, 文件名: PickupNotice_DL5CZ0863500.pdf
+2025/05/26 17:11:56 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62051, 文件名: PickupNotice_DL5CZ0863500.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/7eeffaed83e74a03a3a79b9f5c038a21.pdf
+2025/05/26 17:11:56 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62050
+2025/05/26 17:11:57 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62052, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:57 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62052
+2025/05/26 17:11:57 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62052, 文件名: BL6415225700.PDF
+2025/05/26 17:11:57 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62052, 文件名: BL6415225700.PDF
+2025/05/26 17:11:57 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62052, 文件名: BL6415225700.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/6df93750d47144fc97c868c85e07eaba.PDF
+2025/05/26 17:11:57 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62051
+2025/05/26 17:11:59 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62050, 主题: Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:11:59 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62050
+2025/05/26 17:11:59 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62050, 文件名: PickupNotice_DL5CZ0863500.pdf
+2025/05/26 17:11:59 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62050, 文件名: PickupNotice_DL5CZ0863500.pdf
+2025/05/26 17:11:59 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62050, 文件名: PickupNotice_DL5CZ0863500.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/1e5d370f39c44734bc2a2ede67b23b7d.pdf
+2025/05/26 17:11:59 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62059, 主题: Fw: PU3& LFD NOTICE/ RE: ARRIVAL NOTICE (REF# :OIN2505094PDG House# :PPILNB525040565 MASTER# :CMDUNGP2219639)
+2025/05/26 17:11:59 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62059, 主题=Fw: PU3& LFD NOTICE/ RE: ARRIVAL NOTICE (REF# :OIN2505094PDG House# :PPILNB525040565 MASTER# :CMDUNGP2219639), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:11:59 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62059
+2025/05/26 17:11:59 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62059
+2025/05/26 17:11:59 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62058, 主题: Fw: LFD Rail Notice For BL# MEDUQY674622
+2025/05/26 17:11:59 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62058, 主题=Fw: LFD Rail Notice For BL# MEDUQY674622, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:11:59 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62058
+2025/05/26 17:11:59 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62058
+2025/05/26 17:11:59 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62058
+2025/05/26 17:12:00 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62057, 主题: Fw: PickUp Notice(BL#: TA5DK0734500)
+2025/05/26 17:12:00 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62057, 主题=Fw: PickUp Notice(BL#: TA5DK0734500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:00 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62057
+2025/05/26 17:12:00 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62057
+2025/05/26 17:12:00 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62057
+2025/05/26 17:12:00 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62056, 主题: Fw: PickUp Notice(BL#: TA5DK0734500)
+2025/05/26 17:12:00 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62056, 主题=Fw: PickUp Notice(BL#: TA5DK0734500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:00 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62056
+2025/05/26 17:12:00 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62056
+2025/05/26 17:12:00 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62056
+2025/05/26 17:12:00 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62055, 主题: Fw: COSCO Arrival Notice at Port & BL Number: COSU6415263180 | OOCL SINGAPORE - 058E
+2025/05/26 17:12:00 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62055, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6415263180 | OOCL SINGAPORE - 058E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:00 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62055
+2025/05/26 17:12:00 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62055
+2025/05/26 17:12:00 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62055
+2025/05/26 17:12:00 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62054, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E
+2025/05/26 17:12:00 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62054, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:00 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62054
+2025/05/26 17:12:00 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62054
+2025/05/26 17:12:00 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62054
+2025/05/26 17:12:00 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62053, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415264850 | COSCO OCEANIA - 106E
+2025/05/26 17:12:00 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62053, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415264850 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:00 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62053
+2025/05/26 17:12:00 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62053
+2025/05/26 17:12:00 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62053
+2025/05/26 17:12:00 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62052, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E
+2025/05/26 17:12:00 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62052, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:00 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62052
+2025/05/26 17:12:00 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62052
+2025/05/26 17:12:00 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62052
+2025/05/26 17:12:00 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62051, 主题: Fw: PickUp Notice(BL#: DL5CZ0863500)
+2025/05/26 17:12:00 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62051, 主题=Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:00 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62051
+2025/05/26 17:12:00 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62051
+2025/05/26 17:12:00 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62051
+2025/05/26 17:12:00 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62050, 主题: Fw: PickUp Notice(BL#: DL5CZ0863500)
+2025/05/26 17:12:00 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62050, 主题=Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:00 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62050
+2025/05/26 17:12:00 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62050
+2025/05/26 17:12:00 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62050
+2025/05/26 17:12:00 handlers.go:378: [邮件处理] 成功提交事务，完成处理 10 封邮件
+{"level":"INFO","timestamp":"2025-05-26 17:12:00.541","file":"middleware/logger.go:32","msg":"| 200 | 1m21.9803133s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 17:12:05 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62051, 主题: Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:12:05 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62051
+2025/05/26 17:12:05 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62051, 文件名: PickupNotice_DL5CZ0863500.pdf
+2025/05/26 17:12:05 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62051, 文件名: PickupNotice_DL5CZ0863500.pdf
+2025/05/26 17:12:05 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62050, 主题: Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:12:05 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62050
+2025/05/26 17:12:05 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62050, 文件名: PickupNotice_DL5CZ0863500.pdf
+2025/05/26 17:12:05 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62050, 文件名: PickupNotice_DL5CZ0863500.pdf
+2025/05/26 17:12:05 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62051, 文件名: PickupNotice_DL5CZ0863500.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/1b530f4c7fc64899abbb8c9c26724652.pdf
+2025/05/26 17:12:05 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62050
+2025/05/26 17:12:06 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62050, 文件名: PickupNotice_DL5CZ0863500.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/ed8a55b420a84050babba454820a8c48.pdf
+2025/05/26 17:12:06 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62059, 主题: Fw: PU3& LFD NOTICE/ RE: ARRIVAL NOTICE (REF# :OIN2505094PDG House# :PPILNB525040565 MASTER# :CMDUNGP2219639)
+2025/05/26 17:12:06 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62059, 主题=Fw: PU3& LFD NOTICE/ RE: ARRIVAL NOTICE (REF# :OIN2505094PDG House# :PPILNB525040565 MASTER# :CMDUNGP2219639), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:06 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62059
+2025/05/26 17:12:06 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62059
+2025/05/26 17:12:06 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62058, 主题: Fw: LFD Rail Notice For BL# MEDUQY674622
+2025/05/26 17:12:06 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62058, 主题=Fw: LFD Rail Notice For BL# MEDUQY674622, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:06 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62058
+2025/05/26 17:12:06 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62058
+2025/05/26 17:12:06 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62058
+2025/05/26 17:12:06 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62057, 主题: Fw: PickUp Notice(BL#: TA5DK0734500)
+2025/05/26 17:12:06 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62057, 主题=Fw: PickUp Notice(BL#: TA5DK0734500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:06 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62057
+2025/05/26 17:12:06 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62057
+2025/05/26 17:12:06 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62057
+2025/05/26 17:12:06 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62056, 主题: Fw: PickUp Notice(BL#: TA5DK0734500)
+2025/05/26 17:12:06 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62056, 主题=Fw: PickUp Notice(BL#: TA5DK0734500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:06 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62056
+2025/05/26 17:12:06 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62056
+2025/05/26 17:12:06 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62056
+2025/05/26 17:12:06 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62055, 主题: Fw: COSCO Arrival Notice at Port & BL Number: COSU6415263180 | OOCL SINGAPORE - 058E
+2025/05/26 17:12:06 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62055, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6415263180 | OOCL SINGAPORE - 058E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:06 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62055
+2025/05/26 17:12:06 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62055
+2025/05/26 17:12:06 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62055
+2025/05/26 17:12:06 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62054, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E
+2025/05/26 17:12:06 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62054, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:06 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62054
+2025/05/26 17:12:06 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62054
+2025/05/26 17:12:06 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62054
+2025/05/26 17:12:06 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62053, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415264850 | COSCO OCEANIA - 106E
+2025/05/26 17:12:06 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62053, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415264850 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:06 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62053
+2025/05/26 17:12:06 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62053
+2025/05/26 17:12:06 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62053
+2025/05/26 17:12:06 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62052, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E
+2025/05/26 17:12:06 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62052, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:06 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62052
+2025/05/26 17:12:06 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62052
+2025/05/26 17:12:06 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62052
+2025/05/26 17:12:06 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62051, 主题: Fw: PickUp Notice(BL#: DL5CZ0863500)
+2025/05/26 17:12:06 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62051, 主题=Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:06 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62051
+2025/05/26 17:12:06 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62051
+2025/05/26 17:12:06 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62051
+2025/05/26 17:12:06 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62050, 主题: Fw: PickUp Notice(BL#: DL5CZ0863500)
+2025/05/26 17:12:06 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62050, 主题=Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:06 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62050
+2025/05/26 17:12:06 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62050
+2025/05/26 17:12:06 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62050
+2025/05/26 17:12:06 handlers.go:378: [邮件处理] 成功提交事务，完成处理 10 封邮件
+{"level":"INFO","timestamp":"2025-05-26 17:12:06.923","file":"middleware/logger.go:32","msg":"| 200 | 1m31.632242233s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 17:12:09 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62050, 主题: Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:12:09 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62050
+2025/05/26 17:12:09 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62050, 文件名: PickupNotice_DL5CZ0863500.pdf
+2025/05/26 17:12:09 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62050, 文件名: PickupNotice_DL5CZ0863500.pdf
+2025/05/26 17:12:09 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62050, 文件名: PickupNotice_DL5CZ0863500.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/a8b0b059b17043208ab441417f11944d.pdf
+2025/05/26 17:12:10 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62059, 主题: Fw: PU3& LFD NOTICE/ RE: ARRIVAL NOTICE (REF# :OIN2505094PDG House# :PPILNB525040565 MASTER# :CMDUNGP2219639)
+2025/05/26 17:12:10 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62059, 主题=Fw: PU3& LFD NOTICE/ RE: ARRIVAL NOTICE (REF# :OIN2505094PDG House# :PPILNB525040565 MASTER# :CMDUNGP2219639), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:10 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62059
+2025/05/26 17:12:10 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62059
+2025/05/26 17:12:10 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62058, 主题: Fw: LFD Rail Notice For BL# MEDUQY674622
+2025/05/26 17:12:10 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62058, 主题=Fw: LFD Rail Notice For BL# MEDUQY674622, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:10 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62058
+2025/05/26 17:12:10 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62058
+2025/05/26 17:12:10 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62058
+2025/05/26 17:12:10 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62057, 主题: Fw: PickUp Notice(BL#: TA5DK0734500)
+2025/05/26 17:12:10 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62057, 主题=Fw: PickUp Notice(BL#: TA5DK0734500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:10 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62057
+2025/05/26 17:12:10 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62057
+2025/05/26 17:12:10 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62057
+2025/05/26 17:12:10 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62056, 主题: Fw: PickUp Notice(BL#: TA5DK0734500)
+2025/05/26 17:12:10 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62056, 主题=Fw: PickUp Notice(BL#: TA5DK0734500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:10 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62056
+2025/05/26 17:12:10 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62056
+2025/05/26 17:12:10 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62056
+2025/05/26 17:12:10 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62055, 主题: Fw: COSCO Arrival Notice at Port & BL Number: COSU6415263180 | OOCL SINGAPORE - 058E
+2025/05/26 17:12:10 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62055, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6415263180 | OOCL SINGAPORE - 058E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:10 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62055
+2025/05/26 17:12:10 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62055
+2025/05/26 17:12:10 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62055
+2025/05/26 17:12:10 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62054, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E
+2025/05/26 17:12:10 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62054, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:10 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62054
+2025/05/26 17:12:10 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62054
+2025/05/26 17:12:10 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62054
+2025/05/26 17:12:10 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62053, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415264850 | COSCO OCEANIA - 106E
+2025/05/26 17:12:10 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62053, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415264850 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:10 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62053
+2025/05/26 17:12:10 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62053
+2025/05/26 17:12:10 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62053
+2025/05/26 17:12:10 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62052, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E
+2025/05/26 17:12:10 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62052, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:10 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62052
+2025/05/26 17:12:10 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62052
+2025/05/26 17:12:10 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62052
+2025/05/26 17:12:10 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62051, 主题: Fw: PickUp Notice(BL#: DL5CZ0863500)
+2025/05/26 17:12:10 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62051, 主题=Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:10 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62051
+2025/05/26 17:12:10 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62051
+2025/05/26 17:12:10 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62051
+2025/05/26 17:12:10 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62050, 主题: Fw: PickUp Notice(BL#: DL5CZ0863500)
+2025/05/26 17:12:10 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62050, 主题=Fw: PickUp Notice(BL#: DL5CZ0863500), 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:12:10 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62050
+2025/05/26 17:12:10 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62050
+2025/05/26 17:12:10 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62050
+2025/05/26 17:12:11 handlers.go:378: [邮件处理] 成功提交事务，完成处理 10 封邮件
+{"level":"INFO","timestamp":"2025-05-26 17:12:11.013","file":"middleware/logger.go:32","msg":"| 200 | 1m34.155537677s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 17:40:42 handlers.go:195: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/26 17:40:42 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62049
+2025/05/26 17:40:44 handlers.go:195: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/26 17:40:44 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62049
+2025/05/26 17:40:46 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62049, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:40:46 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62049
+2025/05/26 17:40:46 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62049, 文件名: BL6415225720.PDF
+2025/05/26 17:40:46 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62049, 文件名: BL6415225720.PDF
+2025/05/26 17:40:46 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62049, 文件名: BL6415225720.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/2f91b4e6c48f4bc591bb99b9a27816bb.PDF
+2025/05/26 17:40:46 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62048
+2025/05/26 17:40:47 handlers.go:195: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/26 17:40:47 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62049
+2025/05/26 17:40:49 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62048, 主题: Fw: COSCO Arrival Notice at Port & BL Number: COSU6414627370 | OOCL SINGAPORE - 058E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:40:49 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62048
+2025/05/26 17:40:49 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62048, 文件名: BL6414627370.PDF
+2025/05/26 17:40:49 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62048, 文件名: BL6414627370.PDF
+2025/05/26 17:40:49 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62048, 文件名: BL6414627370.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/7c4cb843135849f880c5aa9bf5f03276.PDF
+2025/05/26 17:40:49 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62047
+2025/05/26 17:40:51 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62049, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:40:51 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62049
+2025/05/26 17:40:51 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62049, 文件名: BL6415225720.PDF
+2025/05/26 17:40:51 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62049, 文件名: BL6415225720.PDF
+2025/05/26 17:40:52 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62049, 文件名: BL6415225720.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/dc992d9a22a94b46827521e3eff08a88.PDF
+2025/05/26 17:40:52 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62048
+2025/05/26 17:40:52 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62047, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:40:52 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62047
+2025/05/26 17:40:52 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62047, 文件名: BL6415225700.PDF
+2025/05/26 17:40:52 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62047, 文件名: BL6415225700.PDF
+2025/05/26 17:40:52 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62049, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:40:52 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62049
+2025/05/26 17:40:52 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62049, 文件名: BL6415225720.PDF
+2025/05/26 17:40:52 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62049, 文件名: BL6415225720.PDF
+2025/05/26 17:40:52 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62047, 文件名: BL6415225700.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/316c25bfbf454a9cb386600029595152.PDF
+2025/05/26 17:40:52 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62046
+2025/05/26 17:40:52 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62049, 文件名: BL6415225720.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/662cd7fde1b9440583684ff1d3082ce4.PDF
+2025/05/26 17:40:52 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62048
+2025/05/26 17:40:54 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62046, 主题: Fw: Maersk Container Off-Rail Notification, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:40:54 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62046
+2025/05/26 17:40:54 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62045
+2025/05/26 17:40:56 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62048, 主题: Fw: COSCO Arrival Notice at Port & BL Number: COSU6414627370 | OOCL SINGAPORE - 058E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:40:56 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62048
+2025/05/26 17:40:56 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62048, 文件名: BL6414627370.PDF
+2025/05/26 17:40:56 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62048, 文件名: BL6414627370.PDF
+2025/05/26 17:40:57 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62048, 文件名: BL6414627370.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/749c417276a24e26a7d314ef0191ee17.PDF
+2025/05/26 17:40:57 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62047
+2025/05/26 17:40:58 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62048, 主题: Fw: COSCO Arrival Notice at Port & BL Number: COSU6414627370 | OOCL SINGAPORE - 058E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:40:58 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62048
+2025/05/26 17:40:58 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62048, 文件名: BL6414627370.PDF
+2025/05/26 17:40:58 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62048, 文件名: BL6414627370.PDF
+2025/05/26 17:40:59 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62045, 主题: Fw: Maersk Container Off-Rail Notification, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:40:59 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62045
+2025/05/26 17:40:59 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62044
+2025/05/26 17:40:59 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62048, 文件名: BL6414627370.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/daede5f1abde454287e7ca08e2d859c9.PDF
+2025/05/26 17:40:59 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62047
+2025/05/26 17:41:02 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62047, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:41:02 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62047
+2025/05/26 17:41:02 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62047, 文件名: BL6415225700.PDF
+2025/05/26 17:41:02 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62047, 文件名: BL6415225700.PDF
+2025/05/26 17:41:02 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62047, 文件名: BL6415225700.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/5b426fd2d2274783a7acef36e0abaa57.PDF
+2025/05/26 17:41:02 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62046
+2025/05/26 17:41:03 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62044, 主题: Fw: [Tanera Transport LLC] Container Return Reminder, 发件人: operator . <operator@amglbl.com>
+2025/05/26 17:41:03 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62044
+2025/05/26 17:41:03 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62043
+2025/05/26 17:41:05 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62047, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人: fax . <fax@usprimeagency.com>
+2025/05/26 17:41:05 handlers.go:241: [邮件处理] 邮件含有 1 个附件，邮件ID: 62047
+2025/05/26 17:41:05 handlers.go:246: [附件处理] 开始处理附件 1/1，邮件ID: 62047, 文件名: BL6415225700.PDF
+2025/05/26 17:41:05 handlers.go:262: [附件处理] 开始上传附件到OSS，邮件ID: 62047, 文件名: BL6415225700.PDF
+2025/05/26 17:41:05 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62046, 主题: Fw: Maersk Container Off-Rail Notification, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:41:05 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62046
+2025/05/26 17:41:05 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62045
+2025/05/26 17:41:05 handlers.go:270: [附件处理] 成功上传附件到OSS，邮件ID: 62047, 文件名: BL6415225700.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/682631c0694048e781d8d54a90369e83.PDF
+2025/05/26 17:41:05 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62046
+2025/05/26 17:41:06 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62043, 主题: BL#CMDUQGD1684034 / APHU7311464, 发件人: JackGong <jackgong@cityocean.net>
+2025/05/26 17:41:06 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62043
+2025/05/26 17:41:06 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62042
+2025/05/26 17:41:07 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62045, 主题: Fw: Maersk Container Off-Rail Notification, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:41:07 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62045
+2025/05/26 17:41:07 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62044
+2025/05/26 17:41:09 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62042, 主题: Fw: [Tanera Transport LLC] Container Return Reminder, 发件人: operator . <operator@amglbl.com>
+2025/05/26 17:41:09 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62042
+2025/05/26 17:41:09 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62041
+2025/05/26 17:41:10 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62046, 主题: Fw: Maersk Container Off-Rail Notification, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:41:10 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62046
+2025/05/26 17:41:10 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62045
+2025/05/26 17:41:10 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62044, 主题: Fw: [Tanera Transport LLC] Container Return Reminder, 发件人: operator . <operator@amglbl.com>
+2025/05/26 17:41:10 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62044
+2025/05/26 17:41:10 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62043
+2025/05/26 17:41:12 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62041, 主题: Fw: Maersk Container Off-Rail Notification, 发件人: neway . <neway@800firms.com>
+2025/05/26 17:41:12 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62041
+2025/05/26 17:41:12 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62040
+2025/05/26 17:41:13 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62045, 主题: Fw: Maersk Container Off-Rail Notification, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:41:13 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62045
+2025/05/26 17:41:13 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62044
+2025/05/26 17:41:14 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62043, 主题: BL#CMDUQGD1684034 / APHU7311464, 发件人: JackGong <jackgong@cityocean.net>
+2025/05/26 17:41:14 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62043
+2025/05/26 17:41:14 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62042
+2025/05/26 17:41:15 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62040, 主题: Fw: Maersk Container Off-Rail Notification, 发件人: neway . <neway@800firms.com>
+2025/05/26 17:41:15 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62040
+2025/05/26 17:41:15 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62049, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E
+2025/05/26 17:41:15 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62049, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:41:15 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62049
+2025/05/26 17:41:15 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62049
+2025/05/26 17:41:15 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62049
+2025/05/26 17:41:15 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62048, 主题: Fw: COSCO Arrival Notice at Port & BL Number: COSU6414627370 | OOCL SINGAPORE - 058E
+2025/05/26 17:41:15 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62048, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6414627370 | OOCL SINGAPORE - 058E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:41:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62048
+2025/05/26 17:41:16 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62048
+2025/05/26 17:41:16 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62048
+2025/05/26 17:41:16 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62047, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E
+2025/05/26 17:41:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62047, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:41:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62047
+2025/05/26 17:41:16 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62047
+2025/05/26 17:41:16 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62047
+2025/05/26 17:41:16 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62046, 主题: Fw: Maersk Container Off-Rail Notification
+2025/05/26 17:41:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62046, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:41:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62046
+2025/05/26 17:41:16 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62046
+2025/05/26 17:41:16 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62045, 主题: Fw: Maersk Container Off-Rail Notification
+2025/05/26 17:41:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62045, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:41:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62045
+2025/05/26 17:41:16 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62045
+2025/05/26 17:41:16 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62044, 主题: Fw: [Tanera Transport LLC] Container Return Reminder
+2025/05/26 17:41:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62044, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=operator . <operator@amglbl.com>
+2025/05/26 17:41:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62044
+2025/05/26 17:41:16 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62044
+2025/05/26 17:41:16 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62043, 主题: BL#CMDUQGD1684034 / APHU7311464
+2025/05/26 17:41:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62043, 主题=BL#CMDUQGD1684034 / APHU7311464, 发件人=JackGong <jackgong@cityocean.net>
+2025/05/26 17:41:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62043
+2025/05/26 17:41:16 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62043
+2025/05/26 17:41:16 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62042, 主题: Fw: [Tanera Transport LLC] Container Return Reminder
+2025/05/26 17:41:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62042, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=operator . <operator@amglbl.com>
+2025/05/26 17:41:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62042
+2025/05/26 17:41:16 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62042
+2025/05/26 17:41:16 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62041, 主题: Fw: Maersk Container Off-Rail Notification
+2025/05/26 17:41:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62041, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=neway . <neway@800firms.com>
+2025/05/26 17:41:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62041
+2025/05/26 17:41:16 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62041
+2025/05/26 17:41:16 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62040, 主题: Fw: Maersk Container Off-Rail Notification
+2025/05/26 17:41:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62040, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=neway . <neway@800firms.com>
+2025/05/26 17:41:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62040
+2025/05/26 17:41:16 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62040
+2025/05/26 17:41:16 handlers.go:378: [邮件处理] 成功提交事务，完成处理 10 封邮件
+{"level":"INFO","timestamp":"2025-05-26 17:41:16.479","file":"middleware/logger.go:32","msg":"| 200 | 33.612822106s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 17:41:16 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62044, 主题: Fw: [Tanera Transport LLC] Container Return Reminder, 发件人: operator . <operator@amglbl.com>
+2025/05/26 17:41:16 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62044
+2025/05/26 17:41:16 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62043
+2025/05/26 17:41:16 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62042, 主题: Fw: [Tanera Transport LLC] Container Return Reminder, 发件人: operator . <operator@amglbl.com>
+2025/05/26 17:41:16 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62042
+2025/05/26 17:41:16 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62041
+2025/05/26 17:41:20 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62041, 主题: Fw: Maersk Container Off-Rail Notification, 发件人: neway . <neway@800firms.com>
+2025/05/26 17:41:20 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62041
+2025/05/26 17:41:20 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62040
+2025/05/26 17:41:21 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62043, 主题: BL#CMDUQGD1684034 / APHU7311464, 发件人: JackGong <jackgong@cityocean.net>
+2025/05/26 17:41:21 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62043
+2025/05/26 17:41:21 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62042
+2025/05/26 17:41:25 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62040, 主题: Fw: Maersk Container Off-Rail Notification, 发件人: neway . <neway@800firms.com>
+2025/05/26 17:41:25 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62040
+2025/05/26 17:41:25 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62049, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E
+2025/05/26 17:41:25 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62049, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:41:25 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62049
+2025/05/26 17:41:25 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62049
+2025/05/26 17:41:25 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62049
+2025/05/26 17:41:25 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62048, 主题: Fw: COSCO Arrival Notice at Port & BL Number: COSU6414627370 | OOCL SINGAPORE - 058E
+2025/05/26 17:41:25 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62048, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6414627370 | OOCL SINGAPORE - 058E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:41:25 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62048
+2025/05/26 17:41:25 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62048
+2025/05/26 17:41:25 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62048
+2025/05/26 17:41:25 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62047, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E
+2025/05/26 17:41:25 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62047, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:41:25 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62047
+2025/05/26 17:41:25 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62047
+2025/05/26 17:41:25 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62047
+2025/05/26 17:41:25 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62046, 主题: Fw: Maersk Container Off-Rail Notification
+2025/05/26 17:41:25 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62046, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:41:25 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62046
+2025/05/26 17:41:25 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62046
+2025/05/26 17:41:25 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62045, 主题: Fw: Maersk Container Off-Rail Notification
+2025/05/26 17:41:25 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62045, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:41:25 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62045
+2025/05/26 17:41:25 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62045
+2025/05/26 17:41:25 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62044, 主题: Fw: [Tanera Transport LLC] Container Return Reminder
+2025/05/26 17:41:25 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62044, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=operator . <operator@amglbl.com>
+2025/05/26 17:41:25 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62042, 主题: Fw: [Tanera Transport LLC] Container Return Reminder, 发件人: operator . <operator@amglbl.com>
+2025/05/26 17:41:25 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62042
+2025/05/26 17:41:25 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62041
+2025/05/26 17:41:25 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62044
+2025/05/26 17:41:25 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62044
+2025/05/26 17:41:25 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62043, 主题: BL#CMDUQGD1684034 / APHU7311464
+2025/05/26 17:41:25 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62043, 主题=BL#CMDUQGD1684034 / APHU7311464, 发件人=JackGong <jackgong@cityocean.net>
+2025/05/26 17:41:25 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62043
+2025/05/26 17:41:25 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62043
+2025/05/26 17:41:25 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62042, 主题: Fw: [Tanera Transport LLC] Container Return Reminder
+2025/05/26 17:41:25 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62042, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=operator . <operator@amglbl.com>
+2025/05/26 17:41:25 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62042
+2025/05/26 17:41:25 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62042
+2025/05/26 17:41:25 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62041, 主题: Fw: Maersk Container Off-Rail Notification
+2025/05/26 17:41:25 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62041, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=neway . <neway@800firms.com>
+2025/05/26 17:41:25 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62041
+2025/05/26 17:41:25 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62041
+2025/05/26 17:41:25 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62040, 主题: Fw: Maersk Container Off-Rail Notification
+2025/05/26 17:41:25 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62040, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=neway . <neway@800firms.com>
+2025/05/26 17:41:25 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62040
+2025/05/26 17:41:25 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62040
+2025/05/26 17:41:25 handlers.go:378: [邮件处理] 成功提交事务，完成处理 10 封邮件
+{"level":"INFO","timestamp":"2025-05-26 17:41:25.615","file":"middleware/logger.go:32","msg":"| 200 | 38.546117097s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/26 17:41:28 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62041, 主题: Fw: Maersk Container Off-Rail Notification, 发件人: neway . <neway@800firms.com>
+2025/05/26 17:41:28 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62041
+2025/05/26 17:41:28 handlers.go:210: [邮件处理] 正在获取邮件内容，ID: 62040
+2025/05/26 17:41:31 handlers.go:221: [邮件处理] 成功获取邮件内容，邮件ID: 62040, 主题: Fw: Maersk Container Off-Rail Notification, 发件人: neway . <neway@800firms.com>
+2025/05/26 17:41:31 handlers.go:292: [邮件处理] 邮件没有附件，邮件ID: 62040
+2025/05/26 17:41:31 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62049, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E
+2025/05/26 17:41:31 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62049, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225720 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:41:31 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62049
+2025/05/26 17:41:31 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62049
+2025/05/26 17:41:31 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62049
+2025/05/26 17:41:31 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62048, 主题: Fw: COSCO Arrival Notice at Port & BL Number: COSU6414627370 | OOCL SINGAPORE - 058E
+2025/05/26 17:41:31 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62048, 主题=Fw: COSCO Arrival Notice at Port & BL Number: COSU6414627370 | OOCL SINGAPORE - 058E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:41:31 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62048
+2025/05/26 17:41:31 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62048
+2025/05/26 17:41:31 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62048
+2025/05/26 17:41:31 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62047, 主题: Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E
+2025/05/26 17:41:31 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62047, 主题=Fw: COSCO Arrival Notice at Final Destination & BL Number: COSU6415225700 | COSCO OCEANIA - 106E, 发件人=fax . <fax@usprimeagency.com>
+2025/05/26 17:41:31 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62047
+2025/05/26 17:41:31 handlers.go:335: [邮件处理] 保存 1 个附件记录，邮件ID: 62047
+2025/05/26 17:41:31 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62047
+2025/05/26 17:41:31 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62046, 主题: Fw: Maersk Container Off-Rail Notification
+2025/05/26 17:41:31 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62046, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:41:31 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62046
+2025/05/26 17:41:31 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62046
+2025/05/26 17:41:31 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62045, 主题: Fw: Maersk Container Off-Rail Notification
+2025/05/26 17:41:31 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62045, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/26 17:41:31 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62045
+2025/05/26 17:41:31 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62045
+2025/05/26 17:41:31 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62044, 主题: Fw: [Tanera Transport LLC] Container Return Reminder
+2025/05/26 17:41:31 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62044, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=operator . <operator@amglbl.com>
+2025/05/26 17:41:31 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62044
+2025/05/26 17:41:31 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62044
+2025/05/26 17:41:31 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62043, 主题: BL#CMDUQGD1684034 / APHU7311464
+2025/05/26 17:41:31 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62043, 主题=BL#CMDUQGD1684034 / APHU7311464, 发件人=JackGong <jackgong@cityocean.net>
+2025/05/26 17:41:31 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62043
+2025/05/26 17:41:31 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62043
+2025/05/26 17:41:31 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62042, 主题: Fw: [Tanera Transport LLC] Container Return Reminder
+2025/05/26 17:41:31 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62042, 主题=Fw: [Tanera Transport LLC] Container Return Reminder, 发件人=operator . <operator@amglbl.com>
+2025/05/26 17:41:31 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62042
+2025/05/26 17:41:31 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62042
+2025/05/26 17:41:31 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62041, 主题: Fw: Maersk Container Off-Rail Notification
+2025/05/26 17:41:31 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62041, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=neway . <neway@800firms.com>
+2025/05/26 17:41:31 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62041
+2025/05/26 17:41:31 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62041
+2025/05/26 17:41:31 handlers.go:320: [邮件处理] 保存邮件内容，ID: 62040, 主题: Fw: Maersk Container Off-Rail Notification
+2025/05/26 17:41:31 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62040, 主题=Fw: Maersk Container Off-Rail Notification, 发件人=neway . <neway@800firms.com>
+2025/05/26 17:41:31 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62040
+2025/05/26 17:41:31 handlers.go:354: [邮件处理] 更新邮件状态为已处理，邮件ID: 62040
+2025/05/26 17:41:31 handlers.go:378: [邮件处理] 成功提交事务，完成处理 10 封邮件
+{"level":"INFO","timestamp":"2025-05-26 17:41:31.959","file":"middleware/logger.go:32","msg":"| 200 | 47.043764139s |             ::1 | GET | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}

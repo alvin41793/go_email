@@ -18,24 +18,46 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 邮件客户端实例
-var mailClient *mailclient.MailClient
+// 邮件服务器配置
+var mailConfig struct {
+	IMAPServer   string
+	SMTPServer   string
+	EmailAddress string
+	Password     string
+	IMAPPort     int
+	SMTPPort     int
+	UseSSL       bool
+}
 
-// 初始化邮件客户端
+// 初始化邮件配置
 func InitMailClient(imapServer, smtpServer, emailAddress, password string, imapPort, smtpPort int, useSSL bool) {
-	mailClient = mailclient.NewMailClient(
-		imapServer,
-		smtpServer,
-		emailAddress,
-		password,
-		imapPort,
-		smtpPort,
-		useSSL,
+	mailConfig.IMAPServer = imapServer
+	mailConfig.SMTPServer = smtpServer
+	mailConfig.EmailAddress = emailAddress
+	mailConfig.password: REDACTED
+	mailConfig.IMAPPort = imapPort
+	mailConfig.SMTPPort = smtpPort
+	mailConfig.UseSSL = useSSL
+}
+
+// 获取新的邮件客户端实例
+func newMailClient() *mailclient.MailClient {
+	return mailclient.NewMailClient(
+		mailConfig.IMAPServer,
+		mailConfig.SMTPServer,
+		mailConfig.EmailAddress,
+		mailConfig.Password,
+		mailConfig.IMAPPort,
+		mailConfig.SMTPPort,
+		mailConfig.UseSSL,
 	)
 }
 
 // 获取邮件列表
 func ListEmails(c *gin.Context) {
+	// 为每个请求创建独立的邮件客户端实例
+	mailClient := newMailClient()
+
 	folder := c.DefaultQuery("folder", "INBOX")
 	limitStr := c.DefaultQuery("limit", "100")
 	limit, err := strconv.Atoi(limitStr)
@@ -96,6 +118,9 @@ func ListEmails(c *gin.Context) {
 }
 
 func ListEmailsByUid(c *gin.Context) {
+	// 为每个请求创建独立的邮件客户端实例
+	mailClient := newMailClient()
+
 	// 检查是否请求了UID范围
 	startUIDStr := c.Query("start_uid")
 	endUIDStr := c.Query("end_uid")
@@ -149,6 +174,9 @@ func ListEmailsByUid(c *gin.Context) {
 
 // 获取邮件内容
 func GetEmailContent(c *gin.Context) {
+	// 为每个请求创建独立的邮件客户端实例
+	mailClient := newMailClient()
+
 	emailIDs, err := model.GetEmailByStatus(0, 10)
 	if err != nil {
 		utils.SendResponse(c, err, nil)
@@ -356,6 +384,9 @@ func GetEmailContent(c *gin.Context) {
 
 // 列出邮件附件
 func ListAttachments(c *gin.Context) {
+	// 为每个请求创建独立的邮件客户端实例
+	mailClient := newMailClient()
+
 	uidStr := c.Param("uid")
 	folder := c.DefaultQuery("folder", "INBOX")
 
@@ -401,6 +432,9 @@ type SendEmailRequest struct {
 
 // 发送邮件
 func SendEmail(c *gin.Context) {
+	// 为每个请求创建独立的邮件客户端实例
+	mailClient := newMailClient()
+
 	var req SendEmailRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.SendResponse(c, err, "无效的参数")
