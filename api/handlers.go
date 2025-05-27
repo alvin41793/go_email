@@ -231,6 +231,8 @@ func GetEmailContent(c *gin.Context) {
 
 	folder := req.Folder
 	limit := req.Limit
+
+	// 获取状态为0的邮件ID，并将其状态更新为2（处理中）
 	emailIDs, err := model.GetEmailByStatus(0, limit)
 	if err != nil {
 		utils.SendResponse(c, err, nil)
@@ -267,6 +269,11 @@ func GetEmailContent(c *gin.Context) {
 		if err != nil {
 			log.Printf("[邮件处理] 获取邮件内容失败，邮件ID: %d, 错误: %v", emailID, err)
 			fmt.Printf("❌ 失败: %v\n", err)
+			// 如果获取失败，将邮件状态重置为0，允许后续重试
+			resetErr := model.ResetEmailStatus(emailID, 0)
+			if resetErr != nil {
+				log.Printf("[邮件处理] 重置邮件状态失败，邮件ID: %d, 错误: %v", emailID, resetErr)
+			}
 			utils.SendResponse(c, err, nil)
 			return
 		}
