@@ -218,30 +218,29 @@ func ListEmailsByUid(c *gin.Context) {
 	utils.SendResponse(c, nil, emailsResult)
 }
 
-// GetEmailContent 获取邮件内容
-func GetEmailContent(c *gin.Context) {
+func GetEmailContentList(c *gin.Context) {
 	var req GetEmailContentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.SendResponse(c, err, "无效的参数")
 		return
 	}
 
-	folder := req.Folder
-	limit := req.Limit
+	GetEmailContent(req.Limit)
+}
 
+// GetEmailContent 获取邮件内容
+func GetEmailContent(limit int) error {
 	// 获取状态为-1的邮件ID，并将其状态更新为0（处理中）
 	emailIDs, err := model.GetEmailByStatus(-1, limit)
 	if err != nil {
-		utils.SendResponse(c, err, nil)
-		return
+		return err
 	}
-
+	folder := "INBOX"
 	// 检查是否有邮件需要处理
 	if len(emailIDs) == 0 {
 		log.Printf("[邮件处理] 没有需要处理的新邮件")
 		fmt.Println("没有需要处理的新邮件")
-		utils.SendResponse(c, nil, "没有需要处理的新邮件")
-		return
+		return nil
 	}
 	// 为每个请求创建独立的邮件客户端实例
 	mailClient := newMailClient()
@@ -272,8 +271,7 @@ func GetEmailContent(c *gin.Context) {
 			if resetErr != nil {
 				log.Printf("[邮件处理] 设置邮件状态失败，邮件ID: %d, 错误: %v", emailID, resetErr)
 			}
-			utils.SendResponse(c, err, nil)
-			return
+			return err
 		}
 
 		log.Printf("[邮件处理] 成功获取邮件内容，邮件ID: %d, 主题: %s, 发件人: %s", emailID, email.Subject, email.From)
@@ -413,8 +411,7 @@ func GetEmailContent(c *gin.Context) {
 			log.Printf("[邮件处理] 保存邮件内容失败，ID: %d, 错误: %v", data.EmailID, err)
 			fmt.Printf("❌ 失败: %v\n", err)
 			tx.Rollback()
-			utils.SendResponse(c, err, nil)
-			return
+			return err
 		}
 
 		fmt.Printf("✅ 成功\n")
@@ -431,8 +428,7 @@ func GetEmailContent(c *gin.Context) {
 						attachment.EmailID, attachment.FileName, err)
 					fmt.Printf("❌ 失败: %v\n", err)
 					tx.Rollback()
-					utils.SendResponse(c, err, nil)
-					return
+					return err
 				}
 			}
 
@@ -447,8 +443,7 @@ func GetEmailContent(c *gin.Context) {
 			log.Printf("[邮件处理] 更新邮件状态失败，邮件ID: %d, 错误: %v", data.EmailID, err)
 			fmt.Printf("❌ 失败: %v\n", err)
 			tx.Rollback()
-			utils.SendResponse(c, err, nil)
-			return
+			return err
 		}
 
 		fmt.Printf("✅ 成功\n")
@@ -460,15 +455,13 @@ func GetEmailContent(c *gin.Context) {
 		log.Printf("[邮件处理] 提交事务失败，错误: %v", err)
 		fmt.Printf("❌ 失败: %v\n", err)
 		tx.Rollback()
-		utils.SendResponse(c, err, nil)
-		return
+		return err
 	}
 
 	log.Printf("[邮件处理] 成功提交事务，完成处理 %d 封邮件", len(emailIDs))
 	fmt.Printf("✅ 成功\n")
 	fmt.Printf("========== 成功完成处理 %d 封邮件 ==========\n\n", len(allEmailData))
-
-	utils.SendResponse(c, nil, fmt.Sprintf("成功处理 %d 封邮件", len(allEmailData)))
+	return nil
 }
 
 // 列出邮件附件
@@ -525,8 +518,7 @@ type ListEmailsByUidRequest struct {
 
 // GetEmailContentRequest 获取邮件内容请求结构
 type GetEmailContentRequest struct {
-	Folder string `json:"folder" binding:"required"`
-	Limit  int    `json:"limit" binding:"required"`
+	Limit int `json:"limit" binding:"required"`
 }
 
 // 发送邮件请求结构

@@ -36,7 +36,7 @@ func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 			emails.POST("/list_by_uid", ListEmailsByUid)
 
 			// 获取邮件内容
-			emails.POST("/content", GetEmailContent)
+			emails.POST("/content", GetEmailContentList)
 
 			// 获取附件列表
 			//emails.GET("/attachments/:uid", ListAttachments)
