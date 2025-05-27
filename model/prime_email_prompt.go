@@ -7,7 +7,7 @@ import (
 
 // PrimeEmailPrompt 邮件提示词表结构
 type PrimeEmailPrompt struct {
-	ID          uint           `gorm:"primary_key;column:id" json:"id"`
+	ID          uint           `gorm:"primarykey;column:id" json:"id"`
 	EmailPrompt string         `gorm:"column:email_prompt;type:text" json:"email_prompt"`
 	PdfPrompt   string         `gorm:"column:pdf_prompt;type:text" json:"pdf_prompt"`
 	Type        int            `gorm:"column:type" json:"type"`

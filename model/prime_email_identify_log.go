@@ -7,7 +7,7 @@ import (
 
 // PrimeEmailIdentifyLog 邮件识别日志表结构
 type PrimeEmailIdentifyLog struct {
-	ID            uint           `gorm:"primary_key;column:id" json:"id"`
+	ID            uint           `gorm:"primarykey;column:id" json:"id"`
 	EmailID       int            `gorm:"column:email_id" json:"email_id"`
 	BeginTime     utils.JsonTime `gorm:"column:begin_time" json:"begin_time"`
 	EndTime       utils.JsonTime `gorm:"column:end_time" json:"end_time"`

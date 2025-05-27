@@ -4,11 +4,13 @@ import (
 	"go_email/db"
 	"go_email/pkg/utils"
 	"log"
+
+	"gorm.io/gorm"
 )
 
 // PrimeEmail 邮件基本信息表结构
 type PrimeEmail struct {
-	ID            uint           `gorm:"primary_key;column:id" json:"id"`
+	ID            uint           `gorm:"primarykey;column:id" json:"id"`
 	EmailID       int            `gorm:"column:email_id" json:"email_id"`
 	FromEmail     string         `gorm:"column:from_email;size:255" json:"from_email"` // 发送者
 	Subject       string         `gorm:"column:subject;size:255" json:"subject"`       // 主题
@@ -101,11 +103,32 @@ func GetEmailByEmailID(emailId uint) (*PrimeEmail, error) {
 	return &email, err
 }
 
-// GetLatestEmail 获取email_id最大的一条记录
-func GetLatestEmail() (*PrimeEmail, error) {
+// GetLatestEmail 获取最新的邮件记录
+func GetLatestEmail() (PrimeEmail, error) {
 	var email PrimeEmail
-	err := db.DB().Order("email_id DESC").First(&email).Error
-	return &email, err
+	err := db.DB().Order("email_id desc").First(&email).Error
+	return email, err
+}
+
+// GetLatestEmailWithTx 使用事务获取最新的邮件记录
+func GetLatestEmailWithTx(tx *gorm.DB) (PrimeEmail, error) {
+	var email PrimeEmail
+	err := tx.Order("email_id desc").First(&email).Error
+	return email, err
+}
+
+// BatchCreateEmailsWithTx 使用事务批量创建邮件记录
+func BatchCreateEmailsWithTx(emails []*PrimeEmail, tx *gorm.DB) error {
+	if len(emails) == 0 {
+		return nil
+	}
+
+	for _, email := range emails {
+		if err := tx.Create(email).Error; err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func GetEmailByStatus(status, limit int) ([]int, error) {

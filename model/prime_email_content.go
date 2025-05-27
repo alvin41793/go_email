@@ -7,12 +7,12 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // PrimeEmailContent 邮件内容表结构
 type PrimeEmailContent struct {
-	ID          uint           `gorm:"primary_key;column:id" json:"id"`
+	ID          uint           `gorm:"primarykey;column:id" json:"id"`
 	EmailID     int            `gorm:"column:email_id" json:"email_id"`
 	Subject     string         `gorm:"column:subject;size:255" json:"subject"`                // 主题
 	FromEmail   string         `gorm:"column:from_email;size:255" json:"from_email"`          // 发送者

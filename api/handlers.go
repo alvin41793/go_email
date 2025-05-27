@@ -11,10 +11,11 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // 邮件服务器配置
@@ -27,6 +28,12 @@ var mailConfig struct {
 	SMTPPort     int
 	UseSSL       bool
 }
+
+// 添加邮件列表操作的互斥锁
+var (
+	listEmailsMutex      sync.Mutex
+	listEmailsByUidMutex sync.Mutex
+)
 
 // 初始化邮件配置
 func InitMailClient(imapServer, smtpServer, emailAddress, password string, imapPort, smtpPort int, useSSL bool) {
@@ -54,6 +61,12 @@ func newMailClient() *mailclient.MailClient {
 
 // 获取邮件列表
 func ListEmails(c *gin.Context) {
+	// 使用互斥锁确保同一时间只有一个请求在处理邮件列表
+	// 注意：这种方式会阻塞所有请求，可能影响性能
+	// 如果需要更好的性能，可以考虑使用数据库事务和条件更新
+	listEmailsMutex.Lock()
+	defer listEmailsMutex.Unlock()
+
 	// 为每个请求创建独立的邮件客户端实例
 	mailClient := newMailClient()
 
@@ -66,17 +79,27 @@ func ListEmails(c *gin.Context) {
 	folder := req.Folder
 	limit := req.Limit
 
-	lastEmail, err := model.GetLatestEmail()
+	// 使用数据库事务获取最新邮件ID并处理邮件
+	tx := db.DB().Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	lastEmail, err := model.GetLatestEmailWithTx(tx)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// 如果没有记录，设置最大ID为0
 			fmt.Println("数据库中没有邮件记录，可能为第一次同步")
 		} else {
 			// 其他错误
+			tx.Rollback()
 			utils.SendResponse(c, fmt.Errorf("获取最大email_id失败: %v", err), nil)
 			return
 		}
 	}
+
 	var emailsResult []mailclient.EmailInfo
 	if lastEmail.EmailID > 0 {
 		fmt.Printf("当前数据库最大email_id: %d\n", lastEmail.EmailID)
@@ -90,6 +113,7 @@ func ListEmails(c *gin.Context) {
 	}
 
 	if err != nil {
+		tx.Rollback()
 		utils.SendResponse(c, err, nil)
 		return
 	}
@@ -109,17 +133,28 @@ func ListEmails(c *gin.Context) {
 		emailInfo.CreatedAt = utils.JsonTime{Time: time.Now()}
 
 		emailList = append(emailList, &emailInfo)
-
 	}
-	err = model.BatchCreateEmails(emailList)
+
+	err = model.BatchCreateEmailsWithTx(emailList, tx)
 	if err != nil {
+		tx.Rollback()
 		utils.SendResponse(c, err, nil)
 		return
 	}
-	utils.SendResponse(c, err, emailsResult)
+
+	if err := tx.Commit().Error; err != nil {
+		utils.SendResponse(c, err, nil)
+		return
+	}
+
+	utils.SendResponse(c, nil, emailsResult)
 }
 
 func ListEmailsByUid(c *gin.Context) {
+	// 使用互斥锁确保同一时间只有一个请求在处理邮件列表
+	listEmailsByUidMutex.Lock()
+	defer listEmailsByUidMutex.Unlock()
+
 	// 为每个请求创建独立的邮件客户端实例
 	mailClient := newMailClient()
 
@@ -128,6 +163,14 @@ func ListEmailsByUid(c *gin.Context) {
 		utils.SendResponse(c, err, "无效的参数")
 		return
 	}
+
+	// 使用数据库事务
+	tx := db.DB().Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 
 	var emailsResult []mailclient.EmailInfo
 	startUID := req.StartUID
@@ -138,6 +181,7 @@ func ListEmailsByUid(c *gin.Context) {
 	emailsResult, err := mailClient.ListEmails("INBOX", count, uint32(startUID), uint32(endUID))
 
 	if err != nil {
+		tx.Rollback()
 		utils.SendResponse(c, err, nil)
 		return
 	}
@@ -157,17 +201,24 @@ func ListEmailsByUid(c *gin.Context) {
 		emailInfo.CreatedAt = utils.JsonTime{Time: time.Now()}
 
 		emailList = append(emailList, &emailInfo)
-
 	}
-	err = model.BatchCreateEmails(emailList)
+
+	err = model.BatchCreateEmailsWithTx(emailList, tx)
 	if err != nil {
+		tx.Rollback()
 		utils.SendResponse(c, err, nil)
 		return
 	}
-	utils.SendResponse(c, err, emailsResult)
+
+	if err := tx.Commit().Error; err != nil {
+		utils.SendResponse(c, err, nil)
+		return
+	}
+
+	utils.SendResponse(c, nil, emailsResult)
 }
 
-// 获取邮件内容
+// GetEmailContent 获取邮件内容
 func GetEmailContent(c *gin.Context) {
 	// 为每个请求创建独立的邮件客户端实例
 	mailClient := newMailClient()
