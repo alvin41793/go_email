@@ -322,15 +322,44 @@ func GetEmailContent(c *gin.Context) {
 					log.Printf("[附件处理] 开始上传附件到OSS，邮件ID: %d, 文件名: %s", emailID, attachment.Filename)
 					fmt.Printf("        正在上传到OSS... ")
 					var err error
-					ossURL, err = oss.UploadBase64ToOSS(attachment.Filename, attachment.Base64Data, fileType)
+					// 添加重试机制，最多尝试2次
+					maxRetries := 2
+					for attempt := 1; attempt <= maxRetries; attempt++ {
+						log.Printf("[附件处理] 尝试上传附件到OSS (尝试 %d/%d)，邮件ID: %d, 文件名: %s",
+							attempt, maxRetries, emailID, attachment.Filename)
+						if attempt > 1 {
+							fmt.Printf("        重试上传到OSS (尝试 %d/%d)... ", attempt, maxRetries)
+						} else {
+							fmt.Printf("        正在上传到OSS... ")
+						}
+
+						ossURL, err = oss.UploadBase64ToOSS(attachment.Filename, attachment.Base64Data, fileType)
+						if err == nil {
+							// 上传成功，跳出循环
+							log.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, URL: %s", emailID, attachment.Filename, ossURL)
+							fmt.Printf("✅ 成功\n")
+							break
+						}
+
+						// 上传失败
+						if attempt < maxRetries {
+							log.Printf("[附件处理] 上传附件到OSS失败，准备重试，邮件ID: %d, 文件名: %s, 错误: %v",
+								emailID, attachment.Filename, err)
+							fmt.Printf("❌ 失败: %v，准备重试\n", err)
+							// 可以在这里添加短暂的延迟
+							time.Sleep(time.Second * 2)
+						} else {
+							// 最后一次尝试也失败了
+							log.Printf("[附件处理] 上传附件到OSS失败，已达到最大重试次数，邮件ID: %d, 文件名: %s, 错误: %v",
+								emailID, attachment.Filename, err)
+							fmt.Printf("❌ 最终失败: %v\n", err)
+						}
+					}
+
+					// 检查是否所有尝试都失败了
 					if err != nil {
-						log.Printf("[附件处理] 上传附件到OSS失败，邮件ID: %d, 文件名: %s, 错误: %v", emailID, attachment.Filename, err)
-						fmt.Printf("[附件处理] 上传附件到OSS失败，邮件ID: %d, 文件名: %s, 错误: %v", emailID, attachment.Filename, err)
-						fmt.Printf("❌ 失败: %v\n", err)
-					} else {
-						log.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, URL: %s", emailID, attachment.Filename, ossURL)
-						fmt.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, URL: %s", emailID, attachment.Filename, ossURL)
-						fmt.Printf("✅ 成功\n")
+						fmt.Printf("[附件处理] 经过 %d 次尝试，上传附件到OSS仍然失败，邮件ID: %d, 文件名: %s\n",
+							maxRetries, emailID, attachment.Filename)
 					}
 				} else {
 					log.Printf("[附件处理] 附件没有Base64数据，邮件ID: %d, 文件名: %s", emailID, attachment.Filename)
