@@ -39,7 +39,8 @@ var (
 	emailProcessMutex  sync.Mutex
 	currentGoroutines  int32      // 当前运行的协程总数
 	maxTotalGoroutines int32 = 20 // 全局最大协程数
-	goroutinesPerReq   int32 = 3  // 每次请求创建的协程数
+	goroutinesPerReq   int32 = 5  // 每次请求创建的协程数
+	sleepTime          int   = 5
 )
 
 // 初始化邮件配置
@@ -296,8 +297,9 @@ func GetEmailContentList(c *gin.Context) {
 				err := GetEmailContent(req.Limit)
 				results <- err
 			}(i+1, currentCount)
+
 			// 等待3秒再创建下一个协程
-			time.Sleep(3 * time.Second)
+			time.Sleep(time.Duration(sleepTime) * time.Second)
 		}
 
 		// 等待所有协程完成
