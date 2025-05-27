@@ -2,3 +2,5 @@
 2025/05/27 17:00:32 main.go:45: 标准日志已重定向到 log/default/api_server.log
 2025/05/27 17:02:48 main.go:45: 标准日志已重定向到 log/default/api_server.log
 {"level":"INFO","timestamp":"2025-05-27 17:03:19.954","file":"middleware/logger.go:105","msg":"| 200 |  221.884067ms |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |\n请求: map[folder:INBOX limit:100]\n响应: map[code:10001 data:\u003cnil\u003e message:获取最大email_id失败: Error 1146 (42S02): Table 'primeai_dev.prime_email' doesn't exist]"}
+2025/05/27 17:21:59 main.go:45: 标准日志已重定向到 log/default/api_server.log
+{"level":"INFO","timestamp":"2025-05-27 17:22:19.960","file":"config/config.go:67","msg":"Config file changed: /Users/savoki/Desktop/goproject/go_email/config/debug.yaml"}

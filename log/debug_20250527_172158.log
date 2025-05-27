@@ -1,0 +1,12 @@
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/v1/emails/list       --> go_email/api.ListEmails (7 handlers)
+[GIN-debug] POST   /api/v1/emails/list_by_uid --> go_email/api.ListEmailsByUid (7 handlers)
+[GIN-debug] POST   /api/v1/emails/content    --> go_email/api.GetEmailContentList (7 handlers)
+[GIN-debug] POST   /api/v1/emails/send       --> go_email/api.SendEmail (7 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on :8080
+{"level":"INFO","timestamp":"2025-05-27 17:22:19.960","file":"config/config.go:67","msg":"Config file changed: /Users/savoki/Desktop/goproject/go_email/config/debug.yaml"}
