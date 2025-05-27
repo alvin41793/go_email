@@ -159,10 +159,10 @@ func GetEmailByStatus(status, limit int) ([]int, error) {
 		return emailIDs, nil
 	}
 
-	// 更新这些邮件的状态为"处理中"(2)
+	// 更新这些邮件的状态为"处理中"(0)
 	err = tx.Model(&PrimeEmail{}).
 		Where("email_id IN (?)", emailIDs).
-		Update("status", 2).Error
+		Update("status", 0).Error
 
 	if err != nil {
 		tx.Rollback()

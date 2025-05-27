@@ -126,7 +126,7 @@ func ListEmails(c *gin.Context) {
 		emailInfo.Subject = utils.SanitizeUTF8(email.Subject)
 		emailInfo.Date = utils.SanitizeUTF8(email.Date)
 		emailInfo.HasAttachment = 0
-		emailInfo.Status = 0
+		emailInfo.Status = -1
 		if email.HasAttachments == true {
 			emailInfo.HasAttachment = 1
 		}
@@ -194,7 +194,7 @@ func ListEmailsByUid(c *gin.Context) {
 		emailInfo.Subject = utils.SanitizeUTF8(email.Subject)
 		emailInfo.Date = utils.SanitizeUTF8(email.Date)
 		emailInfo.HasAttachment = 0
-		emailInfo.Status = 0
+		emailInfo.Status = -1
 		if email.HasAttachments == true {
 			emailInfo.HasAttachment = 1
 		}
@@ -232,8 +232,8 @@ func GetEmailContent(c *gin.Context) {
 	folder := req.Folder
 	limit := req.Limit
 
-	// 获取状态为0的邮件ID，并将其状态更新为2（处理中）
-	emailIDs, err := model.GetEmailByStatus(0, limit)
+	// 获取状态为-1的邮件ID，并将其状态更新为0（处理中）
+	emailIDs, err := model.GetEmailByStatus(-1, limit)
 	if err != nil {
 		utils.SendResponse(c, err, nil)
 		return

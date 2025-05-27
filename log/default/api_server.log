@@ -2317,3 +2317,332 @@
 {"level":"INFO","timestamp":"2025-05-27 10:04:40.938","file":"middleware/logger.go:32","msg":"| 200 |  6.730928795s |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
 {"level":"INFO","timestamp":"2025-05-27 10:13:11.713","file":"middleware/logger.go:32","msg":"| 200 | 39.963808207s |             ::1 | POST | /api/v1/emails/list_by_uid | PostmanRuntime-ApipostRuntime/1.1.0 |"}
 {"level":"INFO","timestamp":"2025-05-27 10:13:50.411","file":"middleware/logger.go:32","msg":"| 200 | 20.417559459s |             ::1 | POST | /api/v1/emails/list_by_uid | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/27 10:32:33 main.go:45: 标准日志已重定向到 log/default/api_server.log
+{"level":"INFO","timestamp":"2025-05-27 10:32:44.436","file":"middleware/logger.go:32","msg":"| 200 |  8.851951528s |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/27 10:33:50 handlers.go:250: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/27 10:33:50 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62888
+2025/05/27 10:33:56 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62888, 主题: Fw: [Arrival Notice] B/L : NBOZX6005800 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/27 10:33:56 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62888
+2025/05/27 10:33:56 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62888, 文件名: Arrival Notice.pdf
+2025/05/27 10:33:56 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62888, 文件名: Arrival Notice.pdf
+2025/05/27 10:33:56 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62888, 文件名: Arrival Notice.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/a262f182ef1b4155ad9897ace9033e80.pdf
+2025/05/27 10:33:56 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62887
+2025/05/27 10:34:02 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62887, 主题: Re: AN/ MBL#EGLV143569431566 / HBL#TZH2500221 / Container#GLDU9360903 & FCLU9433454 & GLDU7543377, 发件人: BTL <BTL@SWITCHBL.COM>
+2025/05/27 10:34:02 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62887
+2025/05/27 10:34:02 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62887, 文件名: DC5Q2JHP1.TXT
+2025/05/27 10:34:02 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62887, 文件名: DC5Q2JHP1.TXT
+2025/05/27 10:34:03 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62887, 文件名: DC5Q2JHP1.TXT, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/7f4b683476c34c80ac59c8804e5acac8.TXT
+2025/05/27 10:34:03 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62886
+2025/05/27 10:34:05 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62886, 主题: Fw: CMA CGM Canada Invoice Status Report, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:05 handlers.go:352: [邮件处理] 邮件没有附件，邮件ID: 62886
+2025/05/27 10:34:05 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62885
+2025/05/27 10:34:07 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62885, 主题: Fw: OEC Status Events -> House: CSZSE5036085, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:07 handlers.go:352: [邮件处理] 邮件没有附件，邮件ID: 62885
+2025/05/27 10:34:07 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62884
+2025/05/27 10:34:11 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62884, 主题: Fw: -YM MUTUALITY/PN32517E-W240372373 from Yang Ming, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:11 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62884
+2025/05/27 10:34:11 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62884, 文件名: 45057735.PDF
+2025/05/27 10:34:11 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62884, 文件名: 45057735.PDF
+2025/05/27 10:34:11 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62884, 文件名: 45057735.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/52980ce1e3344c49a75884c30785449d.PDF
+2025/05/27 10:34:11 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62883
+2025/05/27 10:34:14 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62883, 主题: Fw: Arrival notice 252614266, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:14 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62883
+2025/05/27 10:34:14 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62883, 文件名: DB_aabheichdeea0x1368.pdf
+2025/05/27 10:34:14 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62883, 文件名: DB_aabheichdeea0x1368.pdf
+2025/05/27 10:34:15 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62883, 文件名: DB_aabheichdeea0x1368.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/9a2c8c292ab04f50931a1c1e9ca84629.pdf
+2025/05/27 10:34:15 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62882
+2025/05/27 10:34:19 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62882, 主题: Fw: Arrival notice 252614372, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:19 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62882
+2025/05/27 10:34:19 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62882, 文件名: DB_aabheichdeeb0x1373.pdf
+2025/05/27 10:34:19 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62882, 文件名: DB_aabheichdeeb0x1373.pdf
+2025/05/27 10:34:19 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62882, 文件名: DB_aabheichdeeb0x1373.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/d29d9169808c4a17ad3bdff3bf56831d.pdf
+2025/05/27 10:34:19 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62881
+2025/05/27 10:34:24 handlers.go:250: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/27 10:34:24 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62878
+2025/05/27 10:34:24 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62881, 主题: Fw: Arrival notice 252613342, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:24 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62881
+2025/05/27 10:34:24 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62881, 文件名: DB_aabheichdeea0x13C0.pdf
+2025/05/27 10:34:24 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62881, 文件名: DB_aabheichdeea0x13C0.pdf
+2025/05/27 10:34:24 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62881, 文件名: DB_aabheichdeea0x13C0.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/d2eadfb5dbb64ffab9a34fe513a227bb.pdf
+2025/05/27 10:34:24 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62880
+2025/05/27 10:34:27 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62878, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 252593587, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:27 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62878
+2025/05/27 10:34:27 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62878, 文件名: document.pdf
+2025/05/27 10:34:27 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62878, 文件名: document.pdf
+2025/05/27 10:34:27 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62878, 文件名: document.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/7907917afb0e49c88685626bf938bd3a.pdf
+2025/05/27 10:34:27 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62877
+2025/05/27 10:34:28 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62880, 主题: Fw: Arrival notice 252610138, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:28 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62880
+2025/05/27 10:34:28 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62880, 文件名: DB_aabheichdedg0x13C1.pdf
+2025/05/27 10:34:28 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62880, 文件名: DB_aabheichdedg0x13C1.pdf
+2025/05/27 10:34:28 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62880, 文件名: DB_aabheichdedg0x13C1.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/6ac9f61af21d445ab65f17b785406cbb.pdf
+2025/05/27 10:34:28 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62879
+2025/05/27 10:34:32 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62879, 主题: Fw: Arrival notice 252593799, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:32 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62879
+2025/05/27 10:34:32 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62879, 文件名: DB_aabheichdeda0x133B.pdf
+2025/05/27 10:34:32 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62879, 文件名: DB_aabheichdeda0x133B.pdf
+2025/05/27 10:34:32 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62879, 文件名: DB_aabheichdeda0x133B.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/10ac8f7046bb4123b2ad98e948c06543.pdf
+2025/05/27 10:34:32 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62888, 主题: Fw: [Arrival Notice] B/L : NBOZX6005800 / VVD : HMM DRIVE 0054E
+2025/05/27 10:34:32 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62888, 主题=Fw: [Arrival Notice] B/L : NBOZX6005800 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/27 10:34:32 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62888
+2025/05/27 10:34:32 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62888
+2025/05/27 10:34:32 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62888
+2025/05/27 10:34:32 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62887, 主题: Re: AN/ MBL#EGLV143569431566 / HBL#TZH2500221 / Container#GLDU9360903 & FCLU9433454 & GLDU7543377
+2025/05/27 10:34:32 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62887, 主题=Re: AN/ MBL#EGLV143569431566 / HBL#TZH2500221 / Container#GLDU9360903 & FCLU9433454 & GLDU7543377, 发件人=BTL <BTL@SWITCHBL.COM>
+2025/05/27 10:34:32 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62887
+2025/05/27 10:34:32 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62887
+2025/05/27 10:34:32 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62887
+2025/05/27 10:34:32 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62886, 主题: Fw: CMA CGM Canada Invoice Status Report
+2025/05/27 10:34:32 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62886, 主题=Fw: CMA CGM Canada Invoice Status Report, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:32 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62886
+2025/05/27 10:34:32 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62886
+2025/05/27 10:34:32 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62885, 主题: Fw: OEC Status Events -> House: CSZSE5036085
+2025/05/27 10:34:32 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62885, 主题=Fw: OEC Status Events -> House: CSZSE5036085, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:32 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62885
+2025/05/27 10:34:32 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62885
+2025/05/27 10:34:32 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62884, 主题: Fw: -YM MUTUALITY/PN32517E-W240372373 from Yang Ming
+2025/05/27 10:34:32 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62884, 主题=Fw: -YM MUTUALITY/PN32517E-W240372373 from Yang Ming, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:32 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62884
+2025/05/27 10:34:32 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62884
+2025/05/27 10:34:33 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62884
+2025/05/27 10:34:33 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62883, 主题: Fw: Arrival notice 252614266
+2025/05/27 10:34:33 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62883, 主题=Fw: Arrival notice 252614266, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:33 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62883
+2025/05/27 10:34:33 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62883
+2025/05/27 10:34:33 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62883
+2025/05/27 10:34:33 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62882, 主题: Fw: Arrival notice 252614372
+2025/05/27 10:34:33 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62882, 主题=Fw: Arrival notice 252614372, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:33 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62882
+2025/05/27 10:34:33 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62882
+2025/05/27 10:34:33 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62882
+2025/05/27 10:34:33 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62881, 主题: Fw: Arrival notice 252613342
+2025/05/27 10:34:33 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62881, 主题=Fw: Arrival notice 252613342, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:33 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62881
+2025/05/27 10:34:33 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62881
+2025/05/27 10:34:33 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62881
+2025/05/27 10:34:33 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62880, 主题: Fw: Arrival notice 252610138
+2025/05/27 10:34:33 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62880, 主题=Fw: Arrival notice 252610138, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:33 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62880
+2025/05/27 10:34:33 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62880
+2025/05/27 10:34:33 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62880
+2025/05/27 10:34:33 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62879, 主题: Fw: Arrival notice 252593799
+2025/05/27 10:34:33 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62879, 主题=Fw: Arrival notice 252593799, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:33 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62879
+2025/05/27 10:34:33 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62879
+2025/05/27 10:34:33 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62879
+2025/05/27 10:34:33 handlers.go:438: [邮件处理] 成功提交事务，完成处理 10 封邮件
+{"level":"INFO","timestamp":"2025-05-27 10:34:33.280","file":"middleware/logger.go:32","msg":"| 200 | 43.315960623s |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/27 10:34:33 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62877, 主题: Fw: Arrival notice 252593587, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:33 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62877
+2025/05/27 10:34:33 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62877, 文件名: DB_aabheichdeci0x13F8.pdf
+2025/05/27 10:34:33 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62877, 文件名: DB_aabheichdeci0x13F8.pdf
+2025/05/27 10:34:34 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62877, 文件名: DB_aabheichdeci0x13F8.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/79220072a6d44fe482b5e2b58fed9da5.pdf
+2025/05/27 10:34:34 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62876
+2025/05/27 10:34:38 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62876, 主题: Fw: Arrival notice 252593701, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:38 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62876
+2025/05/27 10:34:38 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62876, 文件名: DB_aabheichdecj0x135D.pdf
+2025/05/27 10:34:38 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62876, 文件名: DB_aabheichdecj0x135D.pdf
+2025/05/27 10:34:39 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62876, 文件名: DB_aabheichdecj0x135D.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/3e942db33e294da0af85660d6b3efb4d.pdf
+2025/05/27 10:34:39 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62875
+2025/05/27 10:34:45 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62875, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 252593701, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:45 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62875
+2025/05/27 10:34:45 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62875, 文件名: document.pdf
+2025/05/27 10:34:45 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62875, 文件名: document.pdf
+2025/05/27 10:34:45 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62875, 文件名: document.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/b17b5aae878d40d88fd1fca19d1e9fd3.pdf
+2025/05/27 10:34:45 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62874
+2025/05/27 10:34:49 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62874, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 252593527, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:49 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62874
+2025/05/27 10:34:49 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62874, 文件名: document.pdf
+2025/05/27 10:34:49 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62874, 文件名: document.pdf
+2025/05/27 10:34:49 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62874, 文件名: document.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/699685b26d74452b96630908f2ff3468.pdf
+2025/05/27 10:34:49 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62873
+2025/05/27 10:34:53 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62873, 主题: Fw: Arrival notice 252593527, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:53 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62873
+2025/05/27 10:34:53 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62873, 文件名: DB_aabheichdecg0x1380.pdf
+2025/05/27 10:34:53 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62873, 文件名: DB_aabheichdecg0x1380.pdf
+2025/05/27 10:34:55 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62873, 文件名: DB_aabheichdecg0x1380.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/a1f83e76242040049b59e9ec11ca6c86.pdf
+2025/05/27 10:34:55 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62872
+2025/05/27 10:34:58 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62872, 主题: Fw: -YM MUTUALITY/PN32517E-W245296446 from Yang Ming, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:34:58 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62872
+2025/05/27 10:34:58 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62872, 文件名: 45056531.PDF
+2025/05/27 10:34:58 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62872, 文件名: 45056531.PDF
+2025/05/27 10:34:58 handlers.go:250: [邮件处理] 开始处理 10 封邮件, 文件夹: INBOX
+2025/05/27 10:34:58 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62868
+2025/05/27 10:34:58 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62872, 文件名: 45056531.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/3ea2a2e0ef0448dc9b567a9bb60cd848.PDF
+2025/05/27 10:34:58 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62871
+2025/05/27 10:35:01 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62868, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 292259168, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:01 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62868
+2025/05/27 10:35:01 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62868, 文件名: document.pdf
+2025/05/27 10:35:01 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62868, 文件名: document.pdf
+2025/05/27 10:35:02 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62868, 文件名: document.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/b1046964cb24471c9b4f113d3818e4eb.pdf
+2025/05/27 10:35:02 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62867
+2025/05/27 10:35:03 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62871, 主题: Fw: -YM COSMOS/PN12516E-W232604964 from Yang Ming, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:03 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62871
+2025/05/27 10:35:03 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62871, 文件名: 45056375.PDF
+2025/05/27 10:35:03 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62871, 文件名: 45056375.PDF
+2025/05/27 10:35:03 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62871, 文件名: 45056375.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/e525df788f0f4ab0aa60510e0c636592.PDF
+2025/05/27 10:35:03 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62870
+2025/05/27 10:35:05 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62867, 主题: Fw: Arrival notice 292259168, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:05 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62867
+2025/05/27 10:35:05 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62867, 文件名: DB_aabheichbfff0x12FE.pdf
+2025/05/27 10:35:05 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62867, 文件名: DB_aabheichbfff0x12FE.pdf
+2025/05/27 10:35:06 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62867, 文件名: DB_aabheichbfff0x12FE.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/4df6006480c74f3c8bf5fc5e6c5896ab.pdf
+2025/05/27 10:35:06 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62866
+2025/05/27 10:35:08 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62870, 主题: Fw: -YM MUTUALITY/PN32517E-W245296417 from Yang Ming, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:08 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62870
+2025/05/27 10:35:08 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62870, 文件名: 45055602.PDF
+2025/05/27 10:35:08 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62870, 文件名: 45055602.PDF
+2025/05/27 10:35:09 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62870, 文件名: 45055602.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/4662a82e8ee44c3fb61338e39449db95.PDF
+2025/05/27 10:35:09 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62869
+2025/05/27 10:35:09 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62866, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 292259167, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:09 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62866
+2025/05/27 10:35:09 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62866, 文件名: document.pdf
+2025/05/27 10:35:09 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62866, 文件名: document.pdf
+2025/05/27 10:35:10 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62866, 文件名: document.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/00df3840724c4da990dccd2549be2960.pdf
+2025/05/27 10:35:10 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62865
+2025/05/27 10:35:11 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62869, 主题: Fw: Auto Response: Fw: ERS request - PRTW25055213 CTNR# MRSU7404654 - LMMP251449, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:11 handlers.go:352: [邮件处理] 邮件没有附件，邮件ID: 62869
+2025/05/27 10:35:11 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62878, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 252593587
+2025/05/27 10:35:11 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62878, 主题=Fw: Maersk : Arrival Notice ready for Bill of Lading 252593587, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:11 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62878
+2025/05/27 10:35:11 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62878
+2025/05/27 10:35:11 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62878
+2025/05/27 10:35:11 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62877, 主题: Fw: Arrival notice 252593587
+2025/05/27 10:35:11 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62877, 主题=Fw: Arrival notice 252593587, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:11 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62877
+2025/05/27 10:35:11 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62877
+2025/05/27 10:35:11 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62877
+2025/05/27 10:35:11 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62876, 主题: Fw: Arrival notice 252593701
+2025/05/27 10:35:11 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62876, 主题=Fw: Arrival notice 252593701, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:11 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62876
+2025/05/27 10:35:11 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62876
+2025/05/27 10:35:11 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62876
+2025/05/27 10:35:11 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62875, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 252593701
+2025/05/27 10:35:11 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62875, 主题=Fw: Maersk : Arrival Notice ready for Bill of Lading 252593701, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:11 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62875
+2025/05/27 10:35:11 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62875
+2025/05/27 10:35:11 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62875
+2025/05/27 10:35:11 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62874, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 252593527
+2025/05/27 10:35:11 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62874, 主题=Fw: Maersk : Arrival Notice ready for Bill of Lading 252593527, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:12 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62874
+2025/05/27 10:35:12 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62874
+2025/05/27 10:35:12 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62874
+2025/05/27 10:35:12 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62873, 主题: Fw: Arrival notice 252593527
+2025/05/27 10:35:12 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62873, 主题=Fw: Arrival notice 252593527, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:12 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62873
+2025/05/27 10:35:12 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62873
+2025/05/27 10:35:12 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62873
+2025/05/27 10:35:12 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62872, 主题: Fw: -YM MUTUALITY/PN32517E-W245296446 from Yang Ming
+2025/05/27 10:35:12 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62872, 主题=Fw: -YM MUTUALITY/PN32517E-W245296446 from Yang Ming, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:12 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62872
+2025/05/27 10:35:12 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62872
+2025/05/27 10:35:12 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62872
+2025/05/27 10:35:12 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62871, 主题: Fw: -YM COSMOS/PN12516E-W232604964 from Yang Ming
+2025/05/27 10:35:12 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62871, 主题=Fw: -YM COSMOS/PN12516E-W232604964 from Yang Ming, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:12 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62871
+2025/05/27 10:35:12 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62871
+2025/05/27 10:35:12 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62871
+2025/05/27 10:35:12 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62870, 主题: Fw: -YM MUTUALITY/PN32517E-W245296417 from Yang Ming
+2025/05/27 10:35:12 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62870, 主题=Fw: -YM MUTUALITY/PN32517E-W245296417 from Yang Ming, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:12 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62870
+2025/05/27 10:35:12 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62870
+2025/05/27 10:35:12 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62870
+2025/05/27 10:35:12 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62869, 主题: Fw: Auto Response: Fw: ERS request - PRTW25055213 CTNR# MRSU7404654 - LMMP251449
+2025/05/27 10:35:12 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62869, 主题=Fw: Auto Response: Fw: ERS request - PRTW25055213 CTNR# MRSU7404654 - LMMP251449, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:12 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62869
+2025/05/27 10:35:12 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62869
+2025/05/27 10:35:12 handlers.go:438: [邮件处理] 成功提交事务，完成处理 10 封邮件
+{"level":"INFO","timestamp":"2025-05-27 10:35:12.447","file":"middleware/logger.go:32","msg":"| 200 | 48.259916117s |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
+2025/05/27 10:35:12 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62865, 主题: Fw: Arrival notice 292259167, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:12 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62865
+2025/05/27 10:35:12 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62865, 文件名: DB_aabheichbffe0x12C5.pdf
+2025/05/27 10:35:12 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62865, 文件名: DB_aabheichbffe0x12C5.pdf
+2025/05/27 10:35:13 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62865, 文件名: DB_aabheichbffe0x12C5.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/e0ea7b3d00f342a1a06c7d8aa327f5b4.pdf
+2025/05/27 10:35:13 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62864
+2025/05/27 10:35:28 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62864, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 285445583, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:28 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62864
+2025/05/27 10:35:28 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62864, 文件名: document.pdf
+2025/05/27 10:35:28 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62864, 文件名: document.pdf
+2025/05/27 10:35:28 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62864, 文件名: document.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/f4b034d62b2e4ed7a6af6ad7795159ea.pdf
+2025/05/27 10:35:28 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62863
+2025/05/27 10:35:35 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62863, 主题: Fw: Arrival notice 285445583, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:35 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62863
+2025/05/27 10:35:35 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62863, 文件名: DB_aabheichbfee0x1336.pdf
+2025/05/27 10:35:35 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62863, 文件名: DB_aabheichbfee0x1336.pdf
+2025/05/27 10:35:35 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62863, 文件名: DB_aabheichbfee0x1336.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/6cb9fa0861fb4c09b60ab8d86361f412.pdf
+2025/05/27 10:35:35 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62862
+2025/05/27 10:35:45 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62862, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 253141365, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:45 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62862
+2025/05/27 10:35:45 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62862, 文件名: document.pdf
+2025/05/27 10:35:45 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62862, 文件名: document.pdf
+2025/05/27 10:35:45 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62862, 文件名: document.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/7744dd8c34be4bddbda0009c28365e3a.pdf
+2025/05/27 10:35:45 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62861
+2025/05/27 10:35:49 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62861, 主题: Fw: Arrival notice 253141365, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:35:49 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62861
+2025/05/27 10:35:49 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62861, 文件名: DB_aabheichbfai0x1305.pdf
+2025/05/27 10:35:49 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62861, 文件名: DB_aabheichbfai0x1305.pdf
+2025/05/27 10:35:50 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62861, 文件名: DB_aabheichbfai0x1305.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/5a3665062c384b20a28186b81f61d02e.pdf
+2025/05/27 10:35:50 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62860
+2025/05/27 10:36:13 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62860, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 253241605, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:36:13 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62860
+2025/05/27 10:36:13 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62860, 文件名: document.pdf
+2025/05/27 10:36:13 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62860, 文件名: document.pdf
+2025/05/27 10:36:13 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62860, 文件名: document.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/a41a36f12ac34ee78582592f89f28b80.pdf
+2025/05/27 10:36:13 handlers.go:265: [邮件处理] 正在获取邮件内容，ID: 62859
+2025/05/27 10:36:18 handlers.go:281: [邮件处理] 成功获取邮件内容，邮件ID: 62859, 主题: Fw: Arrival notice 253241605, 发件人: vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:36:18 handlers.go:301: [邮件处理] 邮件含有 1 个附件，邮件ID: 62859
+2025/05/27 10:36:18 handlers.go:306: [附件处理] 开始处理附件 1/1，邮件ID: 62859, 文件名: DB_aabheichbfbc0x12CE.pdf
+2025/05/27 10:36:18 handlers.go:322: [附件处理] 开始上传附件到OSS，邮件ID: 62859, 文件名: DB_aabheichbfbc0x12CE.pdf
+2025/05/27 10:36:18 handlers.go:330: [附件处理] 成功上传附件到OSS，邮件ID: 62859, 文件名: DB_aabheichbfbc0x12CE.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/b9461f5e5c824868aa85a787ff2e6dc1.pdf
+2025/05/27 10:36:18 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62868, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 292259168
+2025/05/27 10:36:18 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62868, 主题=Fw: Maersk : Arrival Notice ready for Bill of Lading 292259168, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:36:18 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62868
+2025/05/27 10:36:18 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62868
+2025/05/27 10:36:18 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62868
+2025/05/27 10:36:18 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62867, 主题: Fw: Arrival notice 292259168
+2025/05/27 10:36:18 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62867, 主题=Fw: Arrival notice 292259168, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:36:18 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62867
+2025/05/27 10:36:18 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62867
+2025/05/27 10:36:18 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62867
+2025/05/27 10:36:18 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62866, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 292259167
+2025/05/27 10:36:18 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62866, 主题=Fw: Maersk : Arrival Notice ready for Bill of Lading 292259167, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:36:18 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62866
+2025/05/27 10:36:18 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62866
+2025/05/27 10:36:18 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62866
+2025/05/27 10:36:18 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62865, 主题: Fw: Arrival notice 292259167
+2025/05/27 10:36:18 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62865, 主题=Fw: Arrival notice 292259167, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:36:18 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62865
+2025/05/27 10:36:18 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62865
+2025/05/27 10:36:18 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62865
+2025/05/27 10:36:18 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62864, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 285445583
+2025/05/27 10:36:18 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62864, 主题=Fw: Maersk : Arrival Notice ready for Bill of Lading 285445583, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:36:18 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62864
+2025/05/27 10:36:18 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62864
+2025/05/27 10:36:18 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62864
+2025/05/27 10:36:18 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62863, 主题: Fw: Arrival notice 285445583
+2025/05/27 10:36:18 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62863, 主题=Fw: Arrival notice 285445583, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:36:18 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62863
+2025/05/27 10:36:18 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62863
+2025/05/27 10:36:18 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62863
+2025/05/27 10:36:18 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62862, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 253141365
+2025/05/27 10:36:18 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62862, 主题=Fw: Maersk : Arrival Notice ready for Bill of Lading 253141365, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:36:18 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62862
+2025/05/27 10:36:18 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62862
+2025/05/27 10:36:18 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62862
+2025/05/27 10:36:18 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62861, 主题: Fw: Arrival notice 253141365
+2025/05/27 10:36:18 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62861, 主题=Fw: Arrival notice 253141365, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:36:18 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62861
+2025/05/27 10:36:18 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62861
+2025/05/27 10:36:18 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62861
+2025/05/27 10:36:18 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62860, 主题: Fw: Maersk : Arrival Notice ready for Bill of Lading 253241605
+2025/05/27 10:36:18 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62860, 主题=Fw: Maersk : Arrival Notice ready for Bill of Lading 253241605, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:36:18 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62860
+2025/05/27 10:36:18 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62860
+2025/05/27 10:36:18 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62860
+2025/05/27 10:36:18 handlers.go:380: [邮件处理] 保存邮件内容，ID: 62859, 主题: Fw: Arrival notice 253241605
+2025/05/27 10:36:18 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=62859, 主题=Fw: Arrival notice 253241605, 发件人=vcfax . <vcfax@usprimeagency.com>
+2025/05/27 10:36:18 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=62859
+2025/05/27 10:36:18 handlers.go:395: [邮件处理] 保存 1 个附件记录，邮件ID: 62859
+2025/05/27 10:36:18 handlers.go:414: [邮件处理] 更新邮件状态为已处理，邮件ID: 62859
+2025/05/27 10:36:18 handlers.go:438: [邮件处理] 成功提交事务，完成处理 10 封邮件
+{"level":"INFO","timestamp":"2025-05-27 10:36:18.768","file":"middleware/logger.go:32","msg":"| 200 | 1m20.202226642s |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |"}
