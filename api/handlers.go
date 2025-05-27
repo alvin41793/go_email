@@ -38,9 +38,9 @@ var (
 	// 添加邮件处理相关的全局变量
 	emailProcessMutex  sync.Mutex
 	currentGoroutines  int32      // 当前运行的协程总数
-	maxTotalGoroutines int32 = 20 // 全局最大协程数
-	goroutinesPerReq   int32 = 5  // 每次请求创建的协程数
-	sleepTime          int   = 5
+	maxTotalGoroutines int32 = 21 // 全局最大协程数
+	goroutinesPerReq   int32 = 3  // 每次请求创建的协程数
+	sleepTime          int   = 3
 )
 
 // 初始化邮件配置
