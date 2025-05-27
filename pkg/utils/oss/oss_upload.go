@@ -133,7 +133,7 @@ func UploadBase64ToOSS(filename string, base64Data string, fileType string) (str
 		return "", fmt.Errorf("读取响应内容失败: %w", err)
 	}
 
-	//fmt.Printf("收到响应，状态码: %d，响应内容: %s\n", resp.StatusCode, string(respBody))
+	fmt.Printf("收到响应，状态码: %d，响应内容: %s\n", resp.StatusCode, string(respBody))
 
 	var result UploadResponse
 	if err := json.Unmarshal(respBody, &result); err != nil {

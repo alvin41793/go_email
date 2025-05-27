@@ -325,9 +325,11 @@ func GetEmailContent(c *gin.Context) {
 					ossURL, err = oss.UploadBase64ToOSS(attachment.Filename, attachment.Base64Data, fileType)
 					if err != nil {
 						log.Printf("[附件处理] 上传附件到OSS失败，邮件ID: %d, 文件名: %s, 错误: %v", emailID, attachment.Filename, err)
+						fmt.Printf("[附件处理] 上传附件到OSS失败，邮件ID: %d, 文件名: %s, 错误: %v", emailID, attachment.Filename, err)
 						fmt.Printf("❌ 失败: %v\n", err)
 					} else {
 						log.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, URL: %s", emailID, attachment.Filename, ossURL)
+						fmt.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, URL: %s", emailID, attachment.Filename, ossURL)
 						fmt.Printf("✅ 成功\n")
 					}
 				} else {
