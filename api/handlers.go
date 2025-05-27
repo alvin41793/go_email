@@ -220,9 +220,6 @@ func ListEmailsByUid(c *gin.Context) {
 
 // GetEmailContent 获取邮件内容
 func GetEmailContent(c *gin.Context) {
-	// 为每个请求创建独立的邮件客户端实例
-	mailClient := newMailClient()
-
 	var req GetEmailContentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.SendResponse(c, err, "无效的参数")
@@ -246,7 +243,8 @@ func GetEmailContent(c *gin.Context) {
 		utils.SendResponse(c, nil, "没有需要处理的新邮件")
 		return
 	}
-
+	// 为每个请求创建独立的邮件客户端实例
+	mailClient := newMailClient()
 	log.Printf("[邮件处理] 开始处理 %d 封邮件, 文件夹: %s", len(emailIDs), folder)
 	fmt.Printf("\n========== 开始处理 %d 封邮件，文件夹: %s ==========\n", len(emailIDs), folder)
 
