@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -33,6 +34,12 @@ var mailConfig struct {
 var (
 	listEmailsMutex      sync.Mutex
 	listEmailsByUidMutex sync.Mutex
+
+	// 添加邮件处理相关的全局变量
+	emailProcessMutex  sync.Mutex
+	currentGoroutines  int32     // 当前运行的协程总数
+	maxTotalGoroutines int32 = 3 // 全局最大协程数
+	goroutinesPerReq   int32 = 1 // 每次请求创建的协程数
 )
 
 // 初始化邮件配置
@@ -225,7 +232,82 @@ func GetEmailContentList(c *gin.Context) {
 		return
 	}
 
-	GetEmailContent(req.Limit)
+	// 使用互斥锁保护并发访问
+	emailProcessMutex.Lock()
+
+	// 检查是否已达到最大协程数
+	if atomic.LoadInt32(&currentGoroutines) >= maxTotalGoroutines {
+		emailProcessMutex.Unlock()
+		utils.SendResponse(c, nil, "已达到最大处理协程数量，请等待当前任务完成")
+		return
+	}
+
+	// 计算本次请求可以创建的协程数量
+	remainingSlots := maxTotalGoroutines - atomic.LoadInt32(&currentGoroutines)
+	createCount := goroutinesPerReq
+	if remainingSlots < goroutinesPerReq {
+		createCount = remainingSlots
+	}
+
+	log.Printf("[邮件处理] 当前已有 %d 个协程，本次请求将创建 %d 个新协程",
+		atomic.LoadInt32(&currentGoroutines), createCount)
+
+	// 释放互斥锁，允许其他请求继续
+	emailProcessMutex.Unlock()
+
+	// 使用WaitGroup来等待本次创建的协程完成
+	var wg sync.WaitGroup
+
+	// 创建结果通道
+	results := make(chan error, createCount)
+
+	// 启动协程以处理结果
+	go func() {
+		for err := range results {
+			if err != nil {
+				log.Printf("[邮件处理] 处理邮件时出错: %v", err)
+			}
+		}
+	}()
+
+	// 启动创建协程的协程
+	go func() {
+		for i := int32(0); i < createCount; i++ {
+			wg.Add(1)
+
+			// 增加全局协程计数
+			currentCount := atomic.AddInt32(&currentGoroutines, 1)
+
+			log.Printf("[邮件处理] 创建第 %d 个协程 (总计: %d/%d)",
+				i+1, currentCount, maxTotalGoroutines)
+
+			// 启动协程处理邮件
+			go func(goroutineNum int32, globalNum int32) {
+				defer wg.Done()
+				defer func() {
+					// 完成时减少计数
+					newCount := atomic.AddInt32(&currentGoroutines, -1)
+					log.Printf("[邮件处理] 协程 %d 完成处理，剩余协程: %d",
+						goroutineNum, newCount)
+				}()
+
+				log.Printf("[邮件处理] 协程 %d (全局 %d) 开始处理邮件，限制为 %d 封",
+					goroutineNum, globalNum, req.Limit)
+				err := GetEmailContent(req.Limit)
+				results <- err
+			}(i+1, currentCount)
+
+			// 等待3秒再创建下一个协程
+			time.Sleep(3 * time.Second)
+		}
+
+		// 等待所有协程完成
+		wg.Wait()
+		close(results)
+		log.Printf("[邮件处理] 本次请求创建的 %d 个协程已全部完成", createCount)
+	}()
+
+	utils.SendResponse(c, nil, fmt.Sprintf("邮件处理任务已启动，创建了 %d 个处理协程", createCount))
 }
 
 // GetEmailContent 获取邮件内容
