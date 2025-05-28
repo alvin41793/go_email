@@ -20,7 +20,7 @@ os_choice=${os_choice:-1}
 read -p "请选择运行环境(默认1 Debug): " env_choice
 env_choice=${env_choice:-1}
 
-output_dir="./bin"
+output_dir="./"
 # 确保输出目录存在
 mkdir -p $output_dir
 
