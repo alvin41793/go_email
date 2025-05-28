@@ -1,0 +1,828 @@
+2025/05/28 16:04:05 main.go:45: 标准日志已重定向到 log/default/api_server.log
+{"level":"INFO","timestamp":"2025-05-28 16:04:21.516","file":"middleware/logger.go:105","msg":"| 200 |   3.96688116s |             ::1 | POST | /api/v1/emails/list | PostmanRuntime-ApipostRuntime/1.1.0 |\n请求: map[folder:INBOX limit:50]\n响应: map[code:0 data:[map[date:Wed, 28 May 2025 07:57:55 +0000 email_id:65374 from:fax . \u003cfax@usprimeagency.com\u003e has_attachments:false subject:Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOM06396600 (VSL : HMM TOPAZ V#0005E) uid:65374] map[date:Wed, 28 May 2025 07:57:36 +0000 email_id:65373 from:fax . \u003cfax@usprimeagency.com\u003e has_attachments:false subject:Fw: Transfer i-B/L - EGLV143554126584 Ref-no: \u003c\u003cA1_DB5SK8GY.CNT\u003e\u003e uid:65373] map[date:Wed, 28 May 2025 07:57:09 +0000 email_id:65372 from:fax . \u003cfax@usprimeagency.com\u003e has_attachments:false subject:Fw: Transfer i-B/L - EGLV143554126592 Ref-no: \u003c\u003cA1_DB5SK8ZD.CNT\u003e\u003e uid:65372] map[date:Wed, 28 May 2025 07:57:00 +0000 email_id:65371 from:dp8 . \u003cdp8@usprimeagency.com\u003e has_attachments:false subject:Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZ8JL54600 (VSL : HMM EMERALD V#0007E) uid:65371] map[date:Wed, 28 May 2025 07:56:31 +0000 email_id:65370 from:dp8 . \u003cdp8@usprimeagency.com\u003e has_attachments:false subject:Fw: [HMM] Notice : Cargo Pick-up - B/L :... (截断)"}
+2025/05/28 16:04:40 handlers.go:253: [邮件处理] 当前已有 0 个协程，本次请求将创建 3 个新协程
+2025/05/28 16:04:40 handlers.go:282: [邮件处理] 创建第 1 个协程 (总计: 1/21)
+{"level":"INFO","timestamp":"2025-05-28 16:04:40.154","file":"middleware/logger.go:105","msg":"| 200 |       234.7µs |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |\n请求: map[limit:20]\n响应: map[code:0 data:邮件处理任务已启动，创建了 3 个处理协程 message:OK]"}
+2025/05/28 16:04:40 handlers.go:295: [邮件处理] 协程 1 (全局 1) 开始处理邮件，限制为 20 封
+2025/05/28 16:04:40 handlers.go:330: [邮件处理] 开始处理 20 封邮件, 文件夹: INBOX
+2025/05/28 16:04:40 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65315
+2025/05/28 16:04:43 handlers.go:282: [邮件处理] 创建第 2 个协程 (总计: 2/21)
+2025/05/28 16:04:43 handlers.go:295: [邮件处理] 协程 2 (全局 2) 开始处理邮件，限制为 20 封
+2025/05/28 16:04:43 handlers.go:330: [邮件处理] 开始处理 20 封邮件, 文件夹: INBOX
+2025/05/28 16:04:43 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65372
+2025/05/28 16:04:46 handlers.go:282: [邮件处理] 创建第 3 个协程 (总计: 3/21)
+2025/05/28 16:04:46 handlers.go:295: [邮件处理] 协程 3 (全局 3) 开始处理邮件，限制为 20 封
+2025/05/28 16:04:46 handlers.go:330: [邮件处理] 开始处理 20 封邮件, 文件夹: INBOX
+2025/05/28 16:04:46 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65352
+2025/05/28 16:04:48 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65352, 主题: RILEY250527, 发件人: PRIME-RILEY <riley@usprimeagency.com>
+2025/05/28 16:04:48 string_utils.go:19: [字符集处理] 检测到非法UTF-8字符，进行清洗
+2025/05/28 16:04:48 string_utils.go:19: [字符集处理] 检测到非法UTF-8字符，进行清洗
+2025/05/28 16:04:48 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65352
+2025/05/28 16:04:48 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65352, 文件名: RILEY250527.xlsx
+2025/05/28 16:04:48 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65352, 文件名: RILEY250527.xlsx
+2025/05/28 16:04:48 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65352, 文件名: RILEY250527.xlsx
+2025/05/28 16:04:49 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65372, 主题: Fw: Transfer i-B/L - EGLV143554126592 Ref-no: <<A1_DB5SK8ZD.CNT>>, 发件人: fax . <fax@usprimeagency.com>
+2025/05/28 16:04:49 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65372
+2025/05/28 16:04:49 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65371
+2025/05/28 16:04:49 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65352, 文件名: RILEY250527.xlsx, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/d9db6e217ca04e65aec6e798e9e499fe.xlsx
+2025/05/28 16:04:49 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65351
+2025/05/28 16:04:51 handlers.go:253: [邮件处理] 当前已有 3 个协程，本次请求将创建 3 个新协程
+2025/05/28 16:04:51 handlers.go:282: [邮件处理] 创建第 1 个协程 (总计: 4/21)
+{"level":"INFO","timestamp":"2025-05-28 16:04:51.002","file":"middleware/logger.go:105","msg":"| 200 |     118.685µs |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |\n请求: map[limit:20]\n响应: map[code:0 data:邮件处理任务已启动，创建了 3 个处理协程 message:OK]"}
+2025/05/28 16:04:51 handlers.go:295: [邮件处理] 协程 1 (全局 4) 开始处理邮件，限制为 20 封
+2025/05/28 16:04:51 handlers.go:330: [邮件处理] 开始处理 8 封邮件, 文件夹: INBOX
+2025/05/28 16:04:51 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65332
+2025/05/28 16:04:54 handlers.go:282: [邮件处理] 创建第 2 个协程 (总计: 5/21)
+2025/05/28 16:04:54 handlers.go:295: [邮件处理] 协程 2 (全局 5) 开始处理邮件，限制为 20 封
+2025/05/28 16:04:54 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:04:54 handlers.go:291: [邮件处理] 协程 2 完成处理，剩余协程: 4
+2025/05/28 16:04:55 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65371, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZ8JL54600 (VSL : HMM EMERALD V#0007E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:04:55 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65371
+2025/05/28 16:04:55 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65370
+2025/05/28 16:04:57 handlers.go:282: [邮件处理] 创建第 3 个协程 (总计: 5/21)
+2025/05/28 16:04:57 handlers.go:295: [邮件处理] 协程 3 (全局 5) 开始处理邮件，限制为 20 封
+2025/05/28 16:04:57 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:04:57 handlers.go:291: [邮件处理] 协程 3 完成处理，剩余协程: 4
+2025/05/28 16:04:58 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65351, 主题: Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#GZSAV2540654], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:04:58 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65351
+2025/05/28 16:04:58 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65350
+2025/05/28 16:05:01 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65370, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZCLQ99800 (VSL : ONE CONTINUITY V#0072E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:01 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65370
+2025/05/28 16:05:01 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65369
+2025/05/28 16:05:06 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65332, 主题: Fw: [Arrival Notice] B/L : NBOZWP574600 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:06 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65332
+2025/05/28 16:05:06 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65332, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:05:06 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65332, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:05:06 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65332, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:05:06 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65332, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/af3172019159418a83a8cd485f303675.pdf
+2025/05/28 16:05:06 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65331
+2025/05/28 16:05:07 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65369, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZFYJ34700 (VSL : ONE CONTINUITY V#0072E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:07 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65369
+2025/05/28 16:05:07 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65368
+2025/05/28 16:05:08 handlers.go:253: [邮件处理] 当前已有 4 个协程，本次请求将创建 3 个新协程
+2025/05/28 16:05:08 handlers.go:282: [邮件处理] 创建第 1 个协程 (总计: 5/21)
+2025/05/28 16:05:08 handlers.go:295: [邮件处理] 协程 1 (全局 5) 开始处理邮件，限制为 20 封
+{"level":"INFO","timestamp":"2025-05-28 16:05:08.736","file":"middleware/logger.go:105","msg":"| 200 |     111.736µs |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |\n请求: map[limit:20]\n响应: map[code:0 data:邮件处理任务已启动，创建了 3 个处理协程 message:OK]"}
+2025/05/28 16:05:08 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:05:08 handlers.go:291: [邮件处理] 协程 1 完成处理，剩余协程: 4
+2025/05/28 16:05:08 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65315, 主题: Fw: [SM Line America] U.S. Government Hold Notice, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:08 handlers.go:380: [邮件处理] 邮件含有 2 个附件，邮件ID: 65315
+2025/05/28 16:05:08 handlers.go:385: [附件处理] 开始处理附件 1/2，邮件ID: 65315, 文件名: HoldNotice_SHUH4C733400.pdf
+2025/05/28 16:05:08 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65315, 文件名: HoldNotice_SHUH4C733400.pdf
+2025/05/28 16:05:08 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65315, 文件名: HoldNotice_SHUH4C733400.pdf
+2025/05/28 16:05:09 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65315, 文件名: HoldNotice_SHUH4C733400.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/b19f9e5b81fa44089c5d93ab425f026e.pdf
+2025/05/28 16:05:09 handlers.go:385: [附件处理] 开始处理附件 2/2，邮件ID: 65315, 文件名: OBL_SHUH4C733400.pdf
+2025/05/28 16:05:09 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65315, 文件名: OBL_SHUH4C733400.pdf
+2025/05/28 16:05:09 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65315, 文件名: OBL_SHUH4C733400.pdf
+2025/05/28 16:05:09 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65315, 文件名: OBL_SHUH4C733400.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/004c90c509b0435ba750bbe71ae005c5.pdf
+2025/05/28 16:05:09 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65314
+2025/05/28 16:05:11 handlers.go:282: [邮件处理] 创建第 2 个协程 (总计: 5/21)
+2025/05/28 16:05:11 handlers.go:295: [邮件处理] 协程 2 (全局 5) 开始处理邮件，限制为 20 封
+2025/05/28 16:05:11 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:05:11 handlers.go:291: [邮件处理] 协程 2 完成处理，剩余协程: 4
+2025/05/28 16:05:14 handlers.go:282: [邮件处理] 创建第 3 个协程 (总计: 5/21)
+2025/05/28 16:05:14 handlers.go:295: [邮件处理] 协程 3 (全局 5) 开始处理邮件，限制为 20 封
+2025/05/28 16:05:14 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:05:14 handlers.go:291: [邮件处理] 协程 3 完成处理，剩余协程: 4
+2025/05/28 16:05:16 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65368, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZR2L01500 (VSL : HMM EMERALD V#0007E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:16 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65368
+2025/05/28 16:05:16 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65367
+2025/05/28 16:05:17 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65314, 主题: Fw: MILD1399-004E - Import Cargo Discharge Notice Ref-no: <<A1_DB5RD6VD.CNT>>, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:17 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65314
+2025/05/28 16:05:17 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65314, 文件名: DB5RD6VD1.PDF
+2025/05/28 16:05:17 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65314, 文件名: DB5RD6VD1.PDF
+2025/05/28 16:05:17 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65314, 文件名: DB5RD6VD1.PDF
+2025/05/28 16:05:17 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65314, 文件名: DB5RD6VD1.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/955ab796d7fe4a61babf1358e1e3c595.PDF
+2025/05/28 16:05:17 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65313
+2025/05/28 16:05:17 handlers.go:308: [邮件处理] 本次请求创建的 3 个协程已全部完成
+2025/05/28 16:05:20 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65367, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZRS745400 (VSL : YM UBIQUITY V#0070E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:20 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65367
+2025/05/28 16:05:20 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65366
+2025/05/28 16:05:21 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65350, 主题: Fw: Arrival Notice for BL:- L12TJ2504208 - Our ref.:- 672335-2, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:21 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65350
+2025/05/28 16:05:21 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65350, 文件名: IarrivalNotice.pdf
+2025/05/28 16:05:21 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65350, 文件名: IarrivalNotice.pdf
+2025/05/28 16:05:21 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65350, 文件名: IarrivalNotice.pdf
+2025/05/28 16:05:21 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65350, 文件名: IarrivalNotice.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/4aab717635254853ba6cc508daccc718.pdf
+2025/05/28 16:05:21 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65349
+2025/05/28 16:05:24 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65366, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZSNQ91800 (VSL : YM UBIQUITY V#0070E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:24 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65366
+2025/05/28 16:05:24 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65365
+2025/05/28 16:05:24 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65331, 主题: Fw: [Arrival Notice] B/L : NBOZW1V21300 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:24 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65331
+2025/05/28 16:05:24 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65331, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:05:24 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65331, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:05:24 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65331, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:05:24 handlers.go:253: [邮件处理] 当前已有 4 个协程，本次请求将创建 3 个新协程
+2025/05/28 16:05:24 handlers.go:282: [邮件处理] 创建第 1 个协程 (总计: 5/21)
+{"level":"INFO","timestamp":"2025-05-28 16:05:24.351","file":"middleware/logger.go:105","msg":"| 200 |     217.703µs |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |\n请求: map[limit:20]\n响应: map[code:0 data:邮件处理任务已启动，创建了 3 个处理协程 message:OK]"}
+2025/05/28 16:05:24 handlers.go:295: [邮件处理] 协程 1 (全局 5) 开始处理邮件，限制为 20 封
+2025/05/28 16:05:24 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:05:24 handlers.go:291: [邮件处理] 协程 1 完成处理，剩余协程: 4
+2025/05/28 16:05:24 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65331, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/c1ddb4c27ec149c8b4df635f30765e0b.pdf
+2025/05/28 16:05:24 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65330
+2025/05/28 16:05:27 handlers.go:282: [邮件处理] 创建第 2 个协程 (总计: 5/21)
+2025/05/28 16:05:27 handlers.go:295: [邮件处理] 协程 2 (全局 5) 开始处理邮件，限制为 20 封
+2025/05/28 16:05:27 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:05:27 handlers.go:291: [邮件处理] 协程 2 完成处理，剩余协程: 4
+2025/05/28 16:05:28 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65365, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZSWQ56900 (VSL : YM UBIQUITY V#0070E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:28 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65365
+2025/05/28 16:05:28 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65364
+2025/05/28 16:05:30 handlers.go:282: [邮件处理] 创建第 3 个协程 (总计: 5/21)
+2025/05/28 16:05:30 handlers.go:295: [邮件处理] 协程 3 (全局 5) 开始处理邮件，限制为 20 封
+2025/05/28 16:05:30 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:05:30 handlers.go:291: [邮件处理] 协程 3 完成处理，剩余协程: 4
+2025/05/28 16:05:31 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65364, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZW0Q40400 (VSL : HMM TURQUOISE V#0003E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:31 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65364
+2025/05/28 16:05:31 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65363
+2025/05/28 16:05:33 handlers.go:308: [邮件处理] 本次请求创建的 3 个协程已全部完成
+2025/05/28 16:05:37 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65363, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZW8W54400 (VSL : YM UNIFORM V#0241E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:37 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65363
+2025/05/28 16:05:37 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65362
+2025/05/28 16:05:42 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65330, 主题: Fw: [Arrival Notice] B/L : NBOZU1871100 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:42 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65330
+2025/05/28 16:05:42 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65330, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:05:42 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65330, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:05:42 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65330, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:05:42 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65330, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/b0d8e54dfcae472d9abd3d5b56b18fa1.pdf
+2025/05/28 16:05:42 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65329
+2025/05/28 16:05:50 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65362, 主题: Fw: COSCO Arrival Notice COSU6415406450 | COSCO PHILIPPINES - 0PGKPE1MA, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:50 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65362
+2025/05/28 16:05:50 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65362, 文件名: BL6415406450.PDF
+2025/05/28 16:05:50 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65362, 文件名: BL6415406450.PDF
+2025/05/28 16:05:50 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65362, 文件名: BL6415406450.PDF
+2025/05/28 16:05:50 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65362, 文件名: BL6415406450.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/b53981086d2b4ae0b1692da70ed81fdb.PDF
+2025/05/28 16:05:50 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65361
+2025/05/28 16:05:55 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65329, 主题: Fw: [Arrival Notice] B/L : NBOZS3N18700 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:55 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65329
+2025/05/28 16:05:55 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65329, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:05:55 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65329, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:05:55 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65329, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:05:55 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65329, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/8559140a9a6945e0a7cc6d25f3800676.pdf
+2025/05/28 16:05:55 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65328
+2025/05/28 16:05:56 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65349, 主题: Fw: ARRIVAL NOTICE - EGLV143557556458 / OI20LA250700214 / ETA 6/4 LA, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:05:56 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65349
+2025/05/28 16:05:56 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65349, 文件名: ARRIVAL NOTICE - EGLV143557556458.pdf
+2025/05/28 16:05:56 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65349, 文件名: ARRIVAL NOTICE - EGLV143557556458.pdf
+2025/05/28 16:05:56 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65349, 文件名: ARRIVAL NOTICE - EGLV143557556458.pdf
+2025/05/28 16:05:57 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65349, 文件名: ARRIVAL NOTICE - EGLV143557556458.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/2ad0033839204731affc979565215676.pdf
+2025/05/28 16:05:57 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65348
+2025/05/28 16:06:09 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65361, 主题: Fw: COSCO Arrival Notice COSU6415406490 | COSCO PHILIPPINES - 0PGKPE1MA, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:06:09 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65361
+2025/05/28 16:06:09 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65361, 文件名: BL6415406490.PDF
+2025/05/28 16:06:09 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65361, 文件名: BL6415406490.PDF
+2025/05/28 16:06:09 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65361, 文件名: BL6415406490.PDF
+2025/05/28 16:06:09 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65361, 文件名: BL6415406490.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/db5af0f949d84175b45631b362cce8e7.PDF
+2025/05/28 16:06:09 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65360
+2025/05/28 16:06:09 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65328, 主题: Fw: [Arrival Notice] B/L : NBOZQ6903700 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:06:09 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65328
+2025/05/28 16:06:09 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65328, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:06:09 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65328, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:06:09 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65328, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:06:10 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65328, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/3f40ba98437545a2ab560aeb377fe601.pdf
+2025/05/28 16:06:10 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65327
+2025/05/28 16:06:17 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65360, 主题: Fw: COSCO Arrival Notice COSU6415406480 | COSCO PHILIPPINES - 0PGKPE1MA, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:06:17 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65360
+2025/05/28 16:06:17 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65360, 文件名: BL6415406480.PDF
+2025/05/28 16:06:17 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65360, 文件名: BL6415406480.PDF
+2025/05/28 16:06:17 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65360, 文件名: BL6415406480.PDF
+2025/05/28 16:06:17 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65360, 文件名: BL6415406480.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/487d6824276f4451939a48042f76363b.PDF
+2025/05/28 16:06:17 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65359
+2025/05/28 16:06:22 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65359, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZWEJ97400 (VSL : YM UBIQUITY V#0070E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:06:22 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65359
+2025/05/28 16:06:22 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65358
+2025/05/28 16:06:27 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65327, 主题: Fw: [Arrival Notice] B/L : NBOZN6317500 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:06:27 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65327
+2025/05/28 16:06:27 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65327, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:06:27 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65327, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:06:27 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65327, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:06:28 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65327, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/1638426489a74945a6da0271bf3bfbf2.pdf
+2025/05/28 16:06:28 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65326
+2025/05/28 16:06:29 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65358, 主题: Fw: AN /PRIME AGENCY /HDMUNBOZCCN04600 /SELNGB252984 /KOCU4809807 / OI113143, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:06:29 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65358
+2025/05/28 16:06:29 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65358, 文件名: ARRIVAL NOTICE - NO BILLING.pdf
+2025/05/28 16:06:29 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65358, 文件名: ARRIVAL NOTICE - NO BILLING.pdf
+2025/05/28 16:06:29 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65358, 文件名: ARRIVAL NOTICE - NO BILLING.pdf
+2025/05/28 16:06:30 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65358, 文件名: ARRIVAL NOTICE - NO BILLING.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/368baba5cdc44a6aa05cc680947d2173.pdf
+2025/05/28 16:06:30 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65357
+2025/05/28 16:06:46 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65326, 主题: Fw: [Arrival Notice] B/L : NBOZHFX10000 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:06:46 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65326
+2025/05/28 16:06:46 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65326, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:06:46 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65326, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:06:46 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65326, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:06:46 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65326, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/8ec75651564e4c609928e8e48f19ff9f.pdf
+2025/05/28 16:06:46 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65325
+2025/05/28 16:06:53 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65357, 主题: Fw: ARRIVAL NOTICE [HBL NO:SHOG25050168] // LOIF-502178 // COSU6418415720 // DENU9013996 // PRIME AGENCY - CITY OF INDUSTRY, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:06:53 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65357
+2025/05/28 16:06:53 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65357, 文件名: ARRIVAL NOTICE of HBL#SHOG25050168 MBL#COSU6418415720 Filing#LOIF-502178.pdf
+2025/05/28 16:06:53 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65357, 文件名: ARRIVAL NOTICE of HBL#SHOG25050168 MBL#COSU6418415720 Filing#LOIF-502178.pdf
+2025/05/28 16:06:53 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65357, 文件名: ARRIVAL NOTICE of HBL#SHOG25050168 MBL#COSU6418415720 Filing#LOIF-502178.pdf
+2025/05/28 16:06:54 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65357, 文件名: ARRIVAL NOTICE of HBL#SHOG25050168 MBL#COSU6418415720 Filing#LOIF-502178.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/0ed14eb43d3645e8b0326cb03a05bc93.pdf
+2025/05/28 16:06:54 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65356
+2025/05/28 16:07:15 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65325, 主题: Fw: [Arrival Notice] B/L : NBOZHCU38500 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:07:15 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65325
+2025/05/28 16:07:15 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65325, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:07:15 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65325, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:07:15 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65325, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:07:16 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65325, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/4677f971e3334c4bbe13b55d705dabd7.pdf
+2025/05/28 16:07:16 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65332, 主题: Fw: [Arrival Notice] B/L : NBOZWP574600 / VVD : HMM DRIVE 0054E
+2025/05/28 16:07:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65332, 主题=Fw: [Arrival Notice] B/L : NBOZWP574600 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:07:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65332
+2025/05/28 16:07:16 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65332
+2025/05/28 16:07:16 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65332
+2025/05/28 16:07:16 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65331, 主题: Fw: [Arrival Notice] B/L : NBOZW1V21300 / VVD : HMM DRIVE 0054E
+2025/05/28 16:07:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65331, 主题=Fw: [Arrival Notice] B/L : NBOZW1V21300 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:07:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65331
+2025/05/28 16:07:16 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65331
+2025/05/28 16:07:16 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65331
+2025/05/28 16:07:16 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65330, 主题: Fw: [Arrival Notice] B/L : NBOZU1871100 / VVD : HMM DRIVE 0054E
+2025/05/28 16:07:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65330, 主题=Fw: [Arrival Notice] B/L : NBOZU1871100 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:07:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65330
+2025/05/28 16:07:16 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65330
+2025/05/28 16:07:16 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65330
+2025/05/28 16:07:16 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65329, 主题: Fw: [Arrival Notice] B/L : NBOZS3N18700 / VVD : HMM DRIVE 0054E
+2025/05/28 16:07:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65329, 主题=Fw: [Arrival Notice] B/L : NBOZS3N18700 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:07:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65329
+2025/05/28 16:07:16 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65329
+2025/05/28 16:07:16 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65356, 主题: Fw: (WEB)ARRIVAL NOTICE 025F599244 E515JVLT CNSKU CNSKU USNYC USNYC, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:07:16 handlers.go:380: [邮件处理] 邮件含有 2 个附件，邮件ID: 65356
+2025/05/28 16:07:16 handlers.go:385: [附件处理] 开始处理附件 1/2，邮件ID: 65356, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001201_025F599244.pdf
+2025/05/28 16:07:16 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65356, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001201_025F599244.pdf
+2025/05/28 16:07:16 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65356, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001201_025F599244.pdf
+2025/05/28 16:07:16 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65329
+2025/05/28 16:07:16 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65328, 主题: Fw: [Arrival Notice] B/L : NBOZQ6903700 / VVD : HMM DRIVE 0054E
+2025/05/28 16:07:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65328, 主题=Fw: [Arrival Notice] B/L : NBOZQ6903700 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:07:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65328
+2025/05/28 16:07:16 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65328
+2025/05/28 16:07:16 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65328
+2025/05/28 16:07:16 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65327, 主题: Fw: [Arrival Notice] B/L : NBOZN6317500 / VVD : HMM DRIVE 0054E
+2025/05/28 16:07:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65327, 主题=Fw: [Arrival Notice] B/L : NBOZN6317500 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:07:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65327
+2025/05/28 16:07:16 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65327
+2025/05/28 16:07:16 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65327
+2025/05/28 16:07:16 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65326, 主题: Fw: [Arrival Notice] B/L : NBOZHFX10000 / VVD : HMM DRIVE 0054E
+2025/05/28 16:07:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65326, 主题=Fw: [Arrival Notice] B/L : NBOZHFX10000 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:07:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65326
+2025/05/28 16:07:16 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65326
+2025/05/28 16:07:16 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65326
+2025/05/28 16:07:16 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65325, 主题: Fw: [Arrival Notice] B/L : NBOZHCU38500 / VVD : HMM DRIVE 0054E
+2025/05/28 16:07:16 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65325, 主题=Fw: [Arrival Notice] B/L : NBOZHCU38500 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:07:16 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65325
+2025/05/28 16:07:16 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65325
+2025/05/28 16:07:16 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65325
+2025/05/28 16:07:16 handlers.go:544: [邮件处理] 成功提交事务，完成处理 8 封邮件
+2025/05/28 16:07:16 handlers.go:291: [邮件处理] 协程 1 完成处理，剩余协程: 3
+2025/05/28 16:07:16 handlers.go:308: [邮件处理] 本次请求创建的 3 个协程已全部完成
+2025/05/28 16:07:16 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65356, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001201_025F599244.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/1d523c2bee294d238f940d2e456c409b.pdf
+2025/05/28 16:07:16 handlers.go:385: [附件处理] 开始处理附件 2/2，邮件ID: 65356, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001201_025F599244_A.pdf
+2025/05/28 16:07:16 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65356, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001201_025F599244_A.pdf
+2025/05/28 16:07:16 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65356, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001201_025F599244_A.pdf
+2025/05/28 16:07:17 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65356, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001201_025F599244_A.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/fdc3c5ba4c3341cfab660349326ea0d4.pdf
+2025/05/28 16:07:17 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65355
+{"level":"INFO","timestamp":"2025-05-28 16:07:37.985","file":"config/config.go:67","msg":"Config file changed: /Users/savoki/Desktop/goproject/go_email/config/debug.yaml"}
+2025/05/28 16:07:41 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65355, 主题: Fw: Arrival Notice for BL:- L12TJ2504017 - Our ref.:- 669118-2, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:07:41 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65355
+2025/05/28 16:07:41 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65355, 文件名: IarrivalNotice.pdf
+2025/05/28 16:07:41 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65355, 文件名: IarrivalNotice.pdf
+2025/05/28 16:07:41 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65355, 文件名: IarrivalNotice.pdf
+2025/05/28 16:07:41 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65355, 文件名: IarrivalNotice.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/452088427a3448a58e755e2d16deb3ca.pdf
+2025/05/28 16:07:41 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65354
+2025/05/28 16:07:58 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65354, 主题: Fw: [Jupiter International USA Inc][Ocean-OI-25050298][COSU6415010420][Container#OOCU6518934][ETA: 05-23-2025][ARRIVAL NOTICE FREIGHT INVOICE - SZXF25050053], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:07:58 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65354
+2025/05/28 16:07:58 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65353
+2025/05/28 16:08:03 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65353, 主题: Fw: BL# 6413358030, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:03 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65353
+2025/05/28 16:08:03 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65372, 主题: Fw: Transfer i-B/L - EGLV143554126592 Ref-no: <<A1_DB5SK8ZD.CNT>>
+2025/05/28 16:08:03 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65372, 主题=Fw: Transfer i-B/L - EGLV143554126592 Ref-no: <<A1_DB5SK8ZD.CNT>>, 发件人=fax . <fax@usprimeagency.com>
+2025/05/28 16:08:03 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65372
+2025/05/28 16:08:03 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65372
+2025/05/28 16:08:03 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65371, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZ8JL54600 (VSL : HMM EMERALD V#0007E)
+2025/05/28 16:08:03 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65371, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZ8JL54600 (VSL : HMM EMERALD V#0007E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:03 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65371
+2025/05/28 16:08:03 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65371
+2025/05/28 16:08:03 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65370, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZCLQ99800 (VSL : ONE CONTINUITY V#0072E)
+2025/05/28 16:08:03 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65370, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZCLQ99800 (VSL : ONE CONTINUITY V#0072E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:03 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65370
+2025/05/28 16:08:03 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65370
+2025/05/28 16:08:03 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65369, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZFYJ34700 (VSL : ONE CONTINUITY V#0072E)
+2025/05/28 16:08:03 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65369, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZFYJ34700 (VSL : ONE CONTINUITY V#0072E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:03 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65369
+2025/05/28 16:08:03 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65369
+2025/05/28 16:08:03 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65368, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZR2L01500 (VSL : HMM EMERALD V#0007E)
+2025/05/28 16:08:03 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65368, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZR2L01500 (VSL : HMM EMERALD V#0007E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:03 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65368
+2025/05/28 16:08:03 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65368
+2025/05/28 16:08:03 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65367, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZRS745400 (VSL : YM UBIQUITY V#0070E)
+2025/05/28 16:08:03 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65367, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZRS745400 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:03 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65367
+2025/05/28 16:08:03 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65367
+2025/05/28 16:08:03 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65366, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZSNQ91800 (VSL : YM UBIQUITY V#0070E)
+2025/05/28 16:08:03 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65366, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZSNQ91800 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65366
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65366
+2025/05/28 16:08:04 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65365, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZSWQ56900 (VSL : YM UBIQUITY V#0070E)
+2025/05/28 16:08:04 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65365, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZSWQ56900 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65365
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65365
+2025/05/28 16:08:04 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65364, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZW0Q40400 (VSL : HMM TURQUOISE V#0003E)
+2025/05/28 16:08:04 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65364, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZW0Q40400 (VSL : HMM TURQUOISE V#0003E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65364
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65364
+2025/05/28 16:08:04 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65363, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZW8W54400 (VSL : YM UNIFORM V#0241E)
+2025/05/28 16:08:04 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65363, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZW8W54400 (VSL : YM UNIFORM V#0241E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65363
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65363
+2025/05/28 16:08:04 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65362, 主题: Fw: COSCO Arrival Notice COSU6415406450 | COSCO PHILIPPINES - 0PGKPE1MA
+2025/05/28 16:08:04 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65362, 主题=Fw: COSCO Arrival Notice COSU6415406450 | COSCO PHILIPPINES - 0PGKPE1MA, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65362
+2025/05/28 16:08:04 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65362
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65362
+2025/05/28 16:08:04 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65361, 主题: Fw: COSCO Arrival Notice COSU6415406490 | COSCO PHILIPPINES - 0PGKPE1MA
+2025/05/28 16:08:04 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65361, 主题=Fw: COSCO Arrival Notice COSU6415406490 | COSCO PHILIPPINES - 0PGKPE1MA, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65361
+2025/05/28 16:08:04 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65361
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65361
+2025/05/28 16:08:04 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65360, 主题: Fw: COSCO Arrival Notice COSU6415406480 | COSCO PHILIPPINES - 0PGKPE1MA
+2025/05/28 16:08:04 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65360, 主题=Fw: COSCO Arrival Notice COSU6415406480 | COSCO PHILIPPINES - 0PGKPE1MA, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65360
+2025/05/28 16:08:04 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65360
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65360
+2025/05/28 16:08:04 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65359, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZWEJ97400 (VSL : YM UBIQUITY V#0070E)
+2025/05/28 16:08:04 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65359, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOZWEJ97400 (VSL : YM UBIQUITY V#0070E), 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65359
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65359
+2025/05/28 16:08:04 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65358, 主题: Fw: AN /PRIME AGENCY /HDMUNBOZCCN04600 /SELNGB252984 /KOCU4809807 / OI113143
+2025/05/28 16:08:04 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65358, 主题=Fw: AN /PRIME AGENCY /HDMUNBOZCCN04600 /SELNGB252984 /KOCU4809807 / OI113143, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65358
+2025/05/28 16:08:04 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65358
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65358
+2025/05/28 16:08:04 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65357, 主题: Fw: ARRIVAL NOTICE [HBL NO:SHOG25050168] // LOIF-502178 // COSU6418415720 // DENU9013996 // PRIME AGENCY - CITY OF INDUSTRY
+2025/05/28 16:08:04 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65357, 主题=Fw: ARRIVAL NOTICE [HBL NO:SHOG25050168] // LOIF-502178 // COSU6418415720 // DENU9013996 // PRIME AGENCY - CITY OF INDUSTRY, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65357
+2025/05/28 16:08:04 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65357
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65357
+2025/05/28 16:08:04 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65356, 主题: Fw: (WEB)ARRIVAL NOTICE 025F599244 E515JVLT CNSKU CNSKU USNYC USNYC
+2025/05/28 16:08:04 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65356, 主题=Fw: (WEB)ARRIVAL NOTICE 025F599244 E515JVLT CNSKU CNSKU USNYC USNYC, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65356
+2025/05/28 16:08:04 handlers.go:504: [邮件处理] 保存 2 个附件记录，邮件ID: 65356
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65356
+2025/05/28 16:08:04 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65355, 主题: Fw: Arrival Notice for BL:- L12TJ2504017 - Our ref.:- 669118-2
+2025/05/28 16:08:04 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65355, 主题=Fw: Arrival Notice for BL:- L12TJ2504017 - Our ref.:- 669118-2, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65355
+2025/05/28 16:08:04 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65355
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65355
+2025/05/28 16:08:04 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65354, 主题: Fw: [Jupiter International USA Inc][Ocean-OI-25050298][COSU6415010420][Container#OOCU6518934][ETA: 05-23-2025][ARRIVAL NOTICE FREIGHT INVOICE - SZXF25050053]
+2025/05/28 16:08:04 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65354, 主题=Fw: [Jupiter International USA Inc][Ocean-OI-25050298][COSU6415010420][Container#OOCU6518934][ETA: 05-23-2025][ARRIVAL NOTICE FREIGHT INVOICE - SZXF25050053], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65354
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65354
+2025/05/28 16:08:04 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65353, 主题: Fw: BL# 6413358030
+2025/05/28 16:08:04 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65353, 主题=Fw: BL# 6413358030, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:08:04 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65353
+2025/05/28 16:08:04 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65353
+2025/05/28 16:08:04 handlers.go:544: [邮件处理] 成功提交事务，完成处理 20 封邮件
+2025/05/28 16:08:04 handlers.go:291: [邮件处理] 协程 2 完成处理，剩余协程: 2
+2025/05/28 16:08:42 handlers.go:253: [邮件处理] 当前已有 2 个协程，本次请求将创建 3 个新协程
+2025/05/28 16:08:42 handlers.go:282: [邮件处理] 创建第 1 个协程 (总计: 3/21)
+{"level":"INFO","timestamp":"2025-05-28 16:08:42.941","file":"middleware/logger.go:105","msg":"| 200 |     522.145µs |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |\n请求: map[limit:20]\n响应: map[code:0 data:邮件处理任务已启动，创建了 3 个处理协程 message:OK]"}
+2025/05/28 16:08:42 handlers.go:295: [邮件处理] 协程 1 (全局 3) 开始处理邮件，限制为 20 封
+2025/05/28 16:08:43 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:08:43 handlers.go:291: [邮件处理] 协程 1 完成处理，剩余协程: 2
+2025/05/28 16:08:45 handlers.go:282: [邮件处理] 创建第 2 个协程 (总计: 3/21)
+2025/05/28 16:08:45 handlers.go:295: [邮件处理] 协程 2 (全局 3) 开始处理邮件，限制为 20 封
+2025/05/28 16:08:46 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:08:46 handlers.go:291: [邮件处理] 协程 2 完成处理，剩余协程: 2
+2025/05/28 16:08:48 handlers.go:282: [邮件处理] 创建第 3 个协程 (总计: 3/21)
+2025/05/28 16:08:48 handlers.go:295: [邮件处理] 协程 3 (全局 3) 开始处理邮件，限制为 20 封
+2025/05/28 16:08:49 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:08:49 handlers.go:291: [邮件处理] 协程 3 完成处理，剩余协程: 2
+2025/05/28 16:08:51 handlers.go:308: [邮件处理] 本次请求创建的 3 个协程已全部完成
+2025/05/28 16:09:21 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65313, 主题: Fw: [REVISED ARRIVAL NOTICE/ FREIGHT INVOICE - XMAF2505085A] ETA 6/2 PENDING T/R $15 [PRIME AGENCY][Ocean-OI-253422][ONEYXMNF48214700][Container#ONEU2095568][ETA: 06-02-2025], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:09:21 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65313
+2025/05/28 16:09:21 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65313, 文件名: REVISED ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505085A.pdf
+2025/05/28 16:09:21 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65313, 文件名: REVISED ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505085A.pdf
+2025/05/28 16:09:21 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65313, 文件名: REVISED ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505085A.pdf
+2025/05/28 16:09:24 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65313, 文件名: REVISED ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505085A.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/2e4cb31ae2b24b1eb4a61e0106b7ded8.pdf
+2025/05/28 16:09:24 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65312
+2025/05/28 16:09:55 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65348, 主题: Fw: [ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505084A] ETA 6/2 PENDING T/R $15[PRIME AGENCY][Ocean-OI-253421][ONEYXMNF45946900][Container#TRHU3778582][ETA: 06-02-2025], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:09:55 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65348
+2025/05/28 16:09:55 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65348, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505084A.pdf
+2025/05/28 16:09:55 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65348, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505084A.pdf
+2025/05/28 16:09:55 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65348, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505084A.pdf
+2025/05/28 16:09:56 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65348, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505084A.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/5cd502226d5e4bb9bee618fd038cb223.pdf
+2025/05/28 16:09:56 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65347
+2025/05/28 16:13:31 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65312, 主题: Fw: [HMM] INV : USR250424037 | NBOM92583800 - TAILGATE EXAMS, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:13:31 handlers.go:380: [邮件处理] 邮件含有 3 个附件，邮件ID: 65312
+2025/05/28 16:13:31 handlers.go:385: [附件处理] 开始处理附件 1/3，邮件ID: 65312, 文件名: (HMM) Online Payment Instructions.pdf
+2025/05/28 16:13:31 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65312, 文件名: (HMM) Online Payment Instructions.pdf
+2025/05/28 16:13:31 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65312, 文件名: (HMM) Online Payment Instructions.pdf
+2025/05/28 16:13:33 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65312, 文件名: (HMM) Online Payment Instructions.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/afeb57145fd04164937d4a32bdf14d6c.pdf
+2025/05/28 16:13:33 handlers.go:385: [附件处理] 开始处理附件 2/3，邮件ID: 65312, 文件名: Rebilling invoice NBOM92583800.msg
+2025/05/28 16:13:33 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65312, 文件名: Rebilling invoice NBOM92583800.msg
+2025/05/28 16:13:33 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65312, 文件名: Rebilling invoice NBOM92583800.msg
+2025/05/28 16:13:33 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65312, 文件名: Rebilling invoice NBOM92583800.msg, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/6efc66d207b6495a84e417447e2d527e.msg
+2025/05/28 16:13:33 handlers.go:385: [附件处理] 开始处理附件 3/3，邮件ID: 65312, 文件名: USR250424037.pdf
+2025/05/28 16:13:33 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65312, 文件名: USR250424037.pdf
+2025/05/28 16:13:33 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65312, 文件名: USR250424037.pdf
+2025/05/28 16:13:33 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65312, 文件名: USR250424037.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/e73ff9632d3e4c25a3b1f490dadf4628.pdf
+2025/05/28 16:13:33 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65311
+2025/05/28 16:13:42 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65347, 主题: Fw: [ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505086A] ETA 6/2 PENDING T/R $15 [PRIME AGENCY][Ocean-OI-253420][ONEYXMNF45942500][Container#ONEU2673619][ETA: 06-02-2025], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:13:42 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65347
+2025/05/28 16:13:42 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65347, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505086A.pdf
+2025/05/28 16:13:42 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65347, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505086A.pdf
+2025/05/28 16:13:42 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65347, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505086A.pdf
+2025/05/28 16:13:43 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65347, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505086A.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/0e2caf9d4faa4058a8570801069e9762.pdf
+2025/05/28 16:13:43 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65346
+2025/05/28 16:13:59 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65346, 主题: Fw: (WEB)ARRIVAL NOTICE 129F503339 E515JVLT CNSHA CNSHA USNYC USNYC, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:13:59 handlers.go:380: [邮件处理] 邮件含有 2 个附件，邮件ID: 65346
+2025/05/28 16:13:59 handlers.go:385: [附件处理] 开始处理附件 1/2，邮件ID: 65346, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001468_129F503339.pdf
+2025/05/28 16:13:59 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65346, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001468_129F503339.pdf
+2025/05/28 16:13:59 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65346, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001468_129F503339.pdf
+2025/05/28 16:13:59 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65346, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001468_129F503339.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/2fee2245091c45bd868efd1d807e6c5e.pdf
+2025/05/28 16:13:59 handlers.go:385: [附件处理] 开始处理附件 2/2，邮件ID: 65346, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001468_129F503339_A.pdf
+2025/05/28 16:13:59 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65346, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001468_129F503339_A.pdf
+2025/05/28 16:13:59 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65346, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001468_129F503339_A.pdf
+2025/05/28 16:13:59 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65346, 文件名: WDMFT505_AN_USPHX01_US01000218_0528_001468_129F503339_A.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/d659783719624f039bcf3b49360f0f40.pdf
+2025/05/28 16:13:59 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65345
+2025/05/28 16:14:03 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65345, 主题: Fw: [PRIME AGENCY][Ocean-OI-25050361][ONEYNB5BF2235500][ETA: 06-01-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406809], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:14:03 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65345
+2025/05/28 16:14:03 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65344
+2025/05/28 16:14:09 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65344, 主题: Fw: [PRIME AGENCY][Ocean-OI-25050363][ONEYNB5BF2234400][ETA: 06-01-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406810], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:14:09 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65344
+2025/05/28 16:14:09 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65343
+2025/05/28 16:14:15 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65343, 主题: Fw: CUSTOMS WARNING MESSAGE 143554067162 CNNBO/CNNBO/USSVN/USSVN Ref-no: <<A5_DC5RD3PN.CNT>>, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:14:15 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65343
+2025/05/28 16:14:15 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65342
+2025/05/28 16:14:18 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65342, 主题: Fw: [PRIME AGENCY][Ocean-OI-25040906][CMDUNGP2221417][ETA: 05-05-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50402033], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:14:18 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65342
+2025/05/28 16:14:18 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65341
+2025/05/28 16:14:39 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65341, 主题: Fw: ARRIVAL NOTICE [HBL#:SLAX5501297] [MBL#:MAEU253692974] [LOT#:OITSL244940] [CTNR#:SUDU6904827] [CNEE:PRIME AGENCY], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:14:39 handlers.go:380: [邮件处理] 邮件含有 2 个附件，邮件ID: 65341
+2025/05/28 16:14:39 handlers.go:385: [附件处理] 开始处理附件 1/2，邮件ID: 65341, 文件名: AN-SLAX5501297.pdf
+2025/05/28 16:14:39 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65341, 文件名: AN-SLAX5501297.pdf
+2025/05/28 16:14:39 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65341, 文件名: AN-SLAX5501297.pdf
+2025/05/28 16:14:39 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65341, 文件名: AN-SLAX5501297.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/04316c79fa1847529e193ef9447dc0f7.pdf
+2025/05/28 16:14:39 handlers.go:385: [附件处理] 开始处理附件 2/2，邮件ID: 65341, 文件名: HBL COPY_20250527-253049010.pdf
+2025/05/28 16:14:39 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65341, 文件名: HBL COPY_20250527-253049010.pdf
+2025/05/28 16:14:39 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65341, 文件名: HBL COPY_20250527-253049010.pdf
+2025/05/28 16:14:40 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65341, 文件名: HBL COPY_20250527-253049010.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/902f9be9cacd42f2a43b0f0c29b09810.pdf
+2025/05/28 16:14:40 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65340
+2025/05/28 16:14:55 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65340, 主题: Fw: [Arrival Notice] B/L : SHAM96900700 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:14:55 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65340
+2025/05/28 16:14:55 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65340, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:14:55 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65340, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:14:55 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65340, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:14:56 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65340, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/02084ece42d04495815b348c4ae1520f.pdf
+2025/05/28 16:14:56 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65339
+2025/05/28 16:15:11 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65339, 主题: Fw: [Arrival Notice] B/L : SHAM13469600 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:15:11 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65339
+2025/05/28 16:15:11 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65339, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:15:11 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65339, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:15:11 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65339, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:15:11 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65339, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/28fd392664ed4637b7946f3c9a9ffecb.pdf
+2025/05/28 16:15:11 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65338
+2025/05/28 16:15:14 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65338, 主题: Fw: [PRIME AGENCY][Ocean-OI-25050343][ZIMUNGB1274379][Container#ZCSU7640801][ETA: 06-03-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406733], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:15:14 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65338
+2025/05/28 16:15:14 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65337
+2025/05/28 16:15:21 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65337, 主题: Fw: [PRIME AGENCY][Ocean-OI-25050342][ZIMUNGB1274496][Container#XHCU5615390][ETA: 06-03-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406734], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:15:21 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65337
+2025/05/28 16:15:21 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65336
+2025/05/28 16:15:28 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65336, 主题: Fw: [PRIME AGENCY][Ocean-OI-25050340][ZIMUNGB1274497][Container#UESU5262803][ETA: 06-03-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406736], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:15:28 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65336
+2025/05/28 16:15:28 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65335
+2025/05/28 16:16:07 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65335, 主题: Fw: NEED ARRIVAL NOTICE FOR OI250526//ONEYNB5BH4569500, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:16:07 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65335
+2025/05/28 16:16:07 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65335, 文件名: telex released BL.pdf
+2025/05/28 16:16:07 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65335, 文件名: telex released BL.pdf
+2025/05/28 16:16:07 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65335, 文件名: telex released BL.pdf
+2025/05/28 16:16:07 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65335, 文件名: telex released BL.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/498f8551499f44a9ace9017c30527c8a.pdf
+2025/05/28 16:16:07 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65334
+2025/05/28 16:16:41 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65311, 主题: Fw: PAYMENT - REMINDER NBOM92583800 - EXAM FEES, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:16:41 handlers.go:380: [邮件处理] 邮件含有 2 个附件，邮件ID: 65311
+2025/05/28 16:16:41 handlers.go:385: [附件处理] 开始处理附件 1/2，邮件ID: 65311, 文件名: USR250424037.pdf
+2025/05/28 16:16:41 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65311, 文件名: USR250424037.pdf
+2025/05/28 16:16:41 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65311, 文件名: USR250424037.pdf
+2025/05/28 16:16:42 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65311, 文件名: USR250424037.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/c881c65d18c047fa85085d205506cafe.pdf
+2025/05/28 16:16:42 handlers.go:385: [附件处理] 开始处理附件 2/2，邮件ID: 65311, 文件名: (HMM) Online Payment Instructions.pdf
+2025/05/28 16:16:42 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65311, 文件名: (HMM) Online Payment Instructions.pdf
+2025/05/28 16:16:42 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65311, 文件名: (HMM) Online Payment Instructions.pdf
+2025/05/28 16:16:43 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65311, 文件名: (HMM) Online Payment Instructions.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/10e5d5d2422946129bdc5e2e16c68935.pdf
+2025/05/28 16:16:43 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65310
+2025/05/28 16:17:08 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65310, 主题: Fw: ARRIVAL NOTICE BL# HDUJSLA25KA00576- ADONIS 2505E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:17:08 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65310
+2025/05/28 16:17:08 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65310, 文件名: HDUJSLA25KA00576-ARRIVAL NOTICE-hql5aknd3i.pdf
+2025/05/28 16:17:08 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65310, 文件名: HDUJSLA25KA00576-ARRIVAL NOTICE-hql5aknd3i.pdf
+2025/05/28 16:17:08 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65310, 文件名: HDUJSLA25KA00576-ARRIVAL NOTICE-hql5aknd3i.pdf
+2025/05/28 16:17:08 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65310, 文件名: HDUJSLA25KA00576-ARRIVAL NOTICE-hql5aknd3i.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/441c202c1e9a45c0a65be48760508478.pdf
+2025/05/28 16:17:08 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65309
+2025/05/28 16:17:17 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65309, 主题: Fw: ARRIVAL NOTICE - PRE-PU# [HBL#:NBKJ25040971] [MBL#:HDMUNBOZ7T240500] [LOT#:OI25051067] [CTNR#:GVTU2636951] [CNEE:PRIME AGENCY], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:17:17 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65309
+2025/05/28 16:17:17 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65309, 文件名: AN-NBKJ25040971.pdf
+2025/05/28 16:17:17 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65309, 文件名: AN-NBKJ25040971.pdf
+2025/05/28 16:17:17 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65309, 文件名: AN-NBKJ25040971.pdf
+2025/05/28 16:17:17 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65309, 文件名: AN-NBKJ25040971.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/7e63bda1327741e99c95a0b8c710a83a.pdf
+2025/05/28 16:17:17 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65308
+2025/05/28 16:17:37 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65308, 主题: Fw: ARRIVAL NOTICE OOCL ROTTERDAM 155E Ref-no: <<A5_DB5RDH8P.CNT>>, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:17:37 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65308
+2025/05/28 16:17:37 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65308, 文件名: DB5RDH8P1.PDF
+2025/05/28 16:17:37 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65308, 文件名: DB5RDH8P1.PDF
+2025/05/28 16:17:37 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65308, 文件名: DB5RDH8P1.PDF
+2025/05/28 16:17:37 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65308, 文件名: DB5RDH8P1.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/7c7cae2abe6a449687c7695eb1b24ff5.PDF
+2025/05/28 16:17:37 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65307
+2025/05/28 16:17:59 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65307, 主题: Fw: ARRIVAL NOTICE COSCO SHIPPING CAMELLIA Ref-no: <<A5_DB5RDH22.CNT>>, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:17:59 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65307
+2025/05/28 16:17:59 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65307, 文件名: DB5RDH221.PDF
+2025/05/28 16:17:59 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65307, 文件名: DB5RDH221.PDF
+2025/05/28 16:17:59 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65307, 文件名: DB5RDH221.PDF
+2025/05/28 16:17:59 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65307, 文件名: DB5RDH221.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/a9ea96b688a44431832f2790115d1a92.PDF
+2025/05/28 16:17:59 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65306
+2025/05/28 16:18:22 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65306, 主题: Fw: ARRIVAL NOTICE BL# HDUJSLX25KA00579- ADONIS 2505E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:18:22 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65306
+2025/05/28 16:18:22 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65306, 文件名: HDUJSLX25KA00579-ARRIVAL NOTICE-25j44jwkk3.pdf
+2025/05/28 16:18:22 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65306, 文件名: HDUJSLX25KA00579-ARRIVAL NOTICE-25j44jwkk3.pdf
+2025/05/28 16:18:22 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65306, 文件名: HDUJSLX25KA00579-ARRIVAL NOTICE-25j44jwkk3.pdf
+2025/05/28 16:18:22 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65306, 文件名: HDUJSLX25KA00579-ARRIVAL NOTICE-25j44jwkk3.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/d4d5cb4253244924883cb73ddbd922b6.pdf
+2025/05/28 16:18:22 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65318
+2025/05/28 16:18:44 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65318, 主题: Fw: [Arrival Notice] B/L : NBOZ31S64500 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:18:44 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65318
+2025/05/28 16:18:44 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65318, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:18:44 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65318, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:18:44 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65318, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:18:44 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65318, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/5de1ce4f8b1d4cd9ac6d16e220dc3d97.pdf
+2025/05/28 16:18:44 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65317
+2025/05/28 16:19:01 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65317, 主题: Fw: [Arrival Notice] B/L : NBOZ0JL70000 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:19:01 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65317
+2025/05/28 16:19:01 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65317, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:19:01 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65317, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:19:01 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65317, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:19:01 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65317, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/d4e46e0feedc42b69f0b6468ffbef0c6.pdf
+2025/05/28 16:19:01 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65316
+2025/05/28 16:19:11 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65316, 主题: Fw: [Jupiter International USA Inc][Ocean-OI-25040973][WHLC027F564912][Container#WHSU2424998,WHSU6174541][ETA: 06-08-2025][ARRIVAL NOTICE FREIGHT INVOICE - SHAF25040707], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:19:11 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65316
+2025/05/28 16:19:11 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65316, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - SHAF25040707.pdf
+2025/05/28 16:19:11 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65316, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - SHAF25040707.pdf
+2025/05/28 16:19:11 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65316, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - SHAF25040707.pdf
+2025/05/28 16:19:12 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65316, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - SHAF25040707.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/dcdc1fcf3bfb4219ae3f79038bb2f507.pdf
+2025/05/28 16:19:12 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65319
+2025/05/28 16:19:25 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65319, 主题: Fw: [Arrival Notice] B/L : NBOZ5Q495700 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:19:25 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65319
+2025/05/28 16:19:25 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65319, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:19:25 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65319, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:19:25 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65319, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:19:25 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65319, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/bb1bb40ccefb4aa49f89496ecc57683b.pdf
+2025/05/28 16:19:25 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65323
+2025/05/28 16:19:40 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65323, 主题: Fw: [Arrival Notice] B/L : NBOZEUP52500 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:19:40 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65323
+2025/05/28 16:19:40 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65323, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:19:40 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65323, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:19:40 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65323, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:19:41 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65323, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/e3f83decf12d445da2f4e4d79dc74f91.pdf
+2025/05/28 16:19:41 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65322
+2025/05/28 16:20:03 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65322, 主题: Fw: [Arrival Notice] B/L : NBOZCNG28600 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:03 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65322
+2025/05/28 16:20:03 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65322, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:20:03 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65322, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:20:03 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65322, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:20:04 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65322, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/c0fed25164e24429a2d58ac5524bd0a3.pdf
+2025/05/28 16:20:04 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65321
+2025/05/28 16:20:17 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65334, 主题: Fw: [ARRIVAL NOTICE - XMAF2505085A] ETA 6/2 PENDING T/R[PRIME AGENCY][Ocean-OI-253422][ONEYXMNF48214700][Container#ONEU2095568][ETA: 06-02-2025], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:17 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65334
+2025/05/28 16:20:17 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65334, 文件名: ARRIVAL NOTICE - XMAF2505085A.pdf
+2025/05/28 16:20:17 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65334, 文件名: ARRIVAL NOTICE - XMAF2505085A.pdf
+2025/05/28 16:20:17 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65334, 文件名: ARRIVAL NOTICE - XMAF2505085A.pdf
+2025/05/28 16:20:18 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65334, 文件名: ARRIVAL NOTICE - XMAF2505085A.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/a35658e22daf4d54849cc8a2e38ad6a6.pdf
+2025/05/28 16:20:18 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65333
+2025/05/28 16:20:29 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65333, 主题: Fw: [Arrival Notice] B/L : NBOZX6005800 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:29 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65333
+2025/05/28 16:20:29 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65333, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:20:29 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65333, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:20:29 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65333, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:20:30 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65333, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/883c0adaf9f6451190a9d45cc096d692.pdf
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65352, 主题: RILEY250527
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65352, 主题=RILEY250527, 发件人=PRIME-RILEY <riley@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65352
+2025/05/28 16:20:30 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65352
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65352
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65351, 主题: Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#GZSAV2540654]
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65351, 主题=Fw: [TANERA TRANSPORT LLC] Unloaded from Vessel - [PO#/REF#][HBL#GZSAV2540654], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65351
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65351
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65350, 主题: Fw: Arrival Notice for BL:- L12TJ2504208 - Our ref.:- 672335-2
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65350, 主题=Fw: Arrival Notice for BL:- L12TJ2504208 - Our ref.:- 672335-2, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65350
+2025/05/28 16:20:30 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65350
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65350
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65349, 主题: Fw: ARRIVAL NOTICE - EGLV143557556458 / OI20LA250700214 / ETA 6/4 LA
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65349, 主题=Fw: ARRIVAL NOTICE - EGLV143557556458 / OI20LA250700214 / ETA 6/4 LA, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65349
+2025/05/28 16:20:30 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65349
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65349
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65348, 主题: Fw: [ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505084A] ETA 6/2 PENDING T/R $15[PRIME AGENCY][Ocean-OI-253421][ONEYXMNF45946900][Container#TRHU3778582][ETA: 06-02-2025]
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65348, 主题=Fw: [ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505084A] ETA 6/2 PENDING T/R $15[PRIME AGENCY][Ocean-OI-253421][ONEYXMNF45946900][Container#TRHU3778582][ETA: 06-02-2025], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65348
+2025/05/28 16:20:30 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65348
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65348
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65347, 主题: Fw: [ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505086A] ETA 6/2 PENDING T/R $15 [PRIME AGENCY][Ocean-OI-253420][ONEYXMNF45942500][Container#ONEU2673619][ETA: 06-02-2025]
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65347, 主题=Fw: [ARRIVAL NOTICE FREIGHT INVOICE - XMAF2505086A] ETA 6/2 PENDING T/R $15 [PRIME AGENCY][Ocean-OI-253420][ONEYXMNF45942500][Container#ONEU2673619][ETA: 06-02-2025], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65347
+2025/05/28 16:20:30 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65347
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65347
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65346, 主题: Fw: (WEB)ARRIVAL NOTICE 129F503339 E515JVLT CNSHA CNSHA USNYC USNYC
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65346, 主题=Fw: (WEB)ARRIVAL NOTICE 129F503339 E515JVLT CNSHA CNSHA USNYC USNYC, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65346
+2025/05/28 16:20:30 handlers.go:504: [邮件处理] 保存 2 个附件记录，邮件ID: 65346
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65346
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65345, 主题: Fw: [PRIME AGENCY][Ocean-OI-25050361][ONEYNB5BF2235500][ETA: 06-01-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406809]
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65345, 主题=Fw: [PRIME AGENCY][Ocean-OI-25050361][ONEYNB5BF2235500][ETA: 06-01-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406809], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65345
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65345
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65344, 主题: Fw: [PRIME AGENCY][Ocean-OI-25050363][ONEYNB5BF2234400][ETA: 06-01-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406810]
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65344, 主题=Fw: [PRIME AGENCY][Ocean-OI-25050363][ONEYNB5BF2234400][ETA: 06-01-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406810], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65344
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65344
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65343, 主题: Fw: CUSTOMS WARNING MESSAGE 143554067162 CNNBO/CNNBO/USSVN/USSVN Ref-no: <<A5_DC5RD3PN.CNT>>
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65343, 主题=Fw: CUSTOMS WARNING MESSAGE 143554067162 CNNBO/CNNBO/USSVN/USSVN Ref-no: <<A5_DC5RD3PN.CNT>>, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65343
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65343
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65342, 主题: Fw: [PRIME AGENCY][Ocean-OI-25040906][CMDUNGP2221417][ETA: 05-05-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50402033]
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65342, 主题=Fw: [PRIME AGENCY][Ocean-OI-25040906][CMDUNGP2221417][ETA: 05-05-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50402033], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65342
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65342
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65341, 主题: Fw: ARRIVAL NOTICE [HBL#:SLAX5501297] [MBL#:MAEU253692974] [LOT#:OITSL244940] [CTNR#:SUDU6904827] [CNEE:PRIME AGENCY]
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65341, 主题=Fw: ARRIVAL NOTICE [HBL#:SLAX5501297] [MBL#:MAEU253692974] [LOT#:OITSL244940] [CTNR#:SUDU6904827] [CNEE:PRIME AGENCY], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65341
+2025/05/28 16:20:30 handlers.go:504: [邮件处理] 保存 2 个附件记录，邮件ID: 65341
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65341
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65340, 主题: Fw: [Arrival Notice] B/L : SHAM96900700 / VVD : HMM DRIVE 0054E
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65340, 主题=Fw: [Arrival Notice] B/L : SHAM96900700 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65340
+2025/05/28 16:20:30 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65340
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65340
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65339, 主题: Fw: [Arrival Notice] B/L : SHAM13469600 / VVD : HMM DRIVE 0054E
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65339, 主题=Fw: [Arrival Notice] B/L : SHAM13469600 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65339
+2025/05/28 16:20:30 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65339
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65339
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65338, 主题: Fw: [PRIME AGENCY][Ocean-OI-25050343][ZIMUNGB1274379][Container#ZCSU7640801][ETA: 06-03-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406733]
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65338, 主题=Fw: [PRIME AGENCY][Ocean-OI-25050343][ZIMUNGB1274379][Container#ZCSU7640801][ETA: 06-03-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406733], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65338
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65338
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65337, 主题: Fw: [PRIME AGENCY][Ocean-OI-25050342][ZIMUNGB1274496][Container#XHCU5615390][ETA: 06-03-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406734]
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65337, 主题=Fw: [PRIME AGENCY][Ocean-OI-25050342][ZIMUNGB1274496][Container#XHCU5615390][ETA: 06-03-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406734], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65337
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65337
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65336, 主题: Fw: [PRIME AGENCY][Ocean-OI-25050340][ZIMUNGB1274497][Container#UESU5262803][ETA: 06-03-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406736]
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65336, 主题=Fw: [PRIME AGENCY][Ocean-OI-25050340][ZIMUNGB1274497][Container#UESU5262803][ETA: 06-03-2025][ARRIVAL NOTICE FREIGHT INVOICE - NB50406736], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65336
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65336
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65335, 主题: Fw: NEED ARRIVAL NOTICE FOR OI250526//ONEYNB5BH4569500
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65335, 主题=Fw: NEED ARRIVAL NOTICE FOR OI250526//ONEYNB5BH4569500, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65335
+2025/05/28 16:20:30 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65335
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65335
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65334, 主题: Fw: [ARRIVAL NOTICE - XMAF2505085A] ETA 6/2 PENDING T/R[PRIME AGENCY][Ocean-OI-253422][ONEYXMNF48214700][Container#ONEU2095568][ETA: 06-02-2025]
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65334, 主题=Fw: [ARRIVAL NOTICE - XMAF2505085A] ETA 6/2 PENDING T/R[PRIME AGENCY][Ocean-OI-253422][ONEYXMNF48214700][Container#ONEU2095568][ETA: 06-02-2025], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65334
+2025/05/28 16:20:30 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65334
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65334
+2025/05/28 16:20:30 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65333, 主题: Fw: [Arrival Notice] B/L : NBOZX6005800 / VVD : HMM DRIVE 0054E
+2025/05/28 16:20:30 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65333, 主题=Fw: [Arrival Notice] B/L : NBOZX6005800 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:30 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65333
+2025/05/28 16:20:30 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65333
+2025/05/28 16:20:30 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65333
+2025/05/28 16:20:30 handlers.go:544: [邮件处理] 成功提交事务，完成处理 20 封邮件
+2025/05/28 16:20:30 handlers.go:291: [邮件处理] 协程 3 完成处理，剩余协程: 1
+2025/05/28 16:20:32 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65321, 主题: Fw: [Arrival Notice] B/L : NBOZ9CA70600 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:32 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65321
+2025/05/28 16:20:32 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65321, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:20:32 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65321, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:20:32 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65321, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:20:32 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65321, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/61da14a3a8ff4b8f968b6bc6e159aaf8.pdf
+2025/05/28 16:20:32 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65320
+2025/05/28 16:20:44 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65320, 主题: Fw: [Arrival Notice] B/L : NBOZ93Z55300 / VVD : HMM DRIVE 0054E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:44 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 65320
+2025/05/28 16:20:44 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 65320, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:20:44 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 65320, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:20:44 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 65320, 文件名: Arrival Notice Data Gathering.pdf
+2025/05/28 16:20:45 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 65320, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/66e6fabecb9549109daf6f17b2d4ce89.pdf
+2025/05/28 16:20:45 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65374
+2025/05/28 16:20:49 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65374, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOM06396600 (VSL : HMM TOPAZ V#0005E), 发件人: fax . <fax@usprimeagency.com>
+2025/05/28 16:20:49 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65374
+2025/05/28 16:20:49 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 65373
+2025/05/28 16:20:52 handlers.go:360: [邮件处理] 成功获取邮件内容，邮件ID: 65373, 主题: Fw: Transfer i-B/L - EGLV143554126584 Ref-no: <<A1_DB5SK8GY.CNT>>, 发件人: fax . <fax@usprimeagency.com>
+2025/05/28 16:20:52 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 65373
+2025/05/28 16:20:52 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65315, 主题: Fw: [SM Line America] U.S. Government Hold Notice
+2025/05/28 16:20:52 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65315, 主题=Fw: [SM Line America] U.S. Government Hold Notice, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:52 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65315
+2025/05/28 16:20:52 handlers.go:504: [邮件处理] 保存 2 个附件记录，邮件ID: 65315
+2025/05/28 16:20:52 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65315
+2025/05/28 16:20:52 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65314, 主题: Fw: MILD1399-004E - Import Cargo Discharge Notice Ref-no: <<A1_DB5RD6VD.CNT>>
+2025/05/28 16:20:52 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65314, 主题=Fw: MILD1399-004E - Import Cargo Discharge Notice Ref-no: <<A1_DB5RD6VD.CNT>>, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:52 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65314
+2025/05/28 16:20:52 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65314
+2025/05/28 16:20:52 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65314
+2025/05/28 16:20:52 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65313, 主题: Fw: [REVISED ARRIVAL NOTICE/ FREIGHT INVOICE - XMAF2505085A] ETA 6/2 PENDING T/R $15 [PRIME AGENCY][Ocean-OI-253422][ONEYXMNF48214700][Container#ONEU2095568][ETA: 06-02-2025]
+2025/05/28 16:20:52 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65313, 主题=Fw: [REVISED ARRIVAL NOTICE/ FREIGHT INVOICE - XMAF2505085A] ETA 6/2 PENDING T/R $15 [PRIME AGENCY][Ocean-OI-253422][ONEYXMNF48214700][Container#ONEU2095568][ETA: 06-02-2025], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:52 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65313
+2025/05/28 16:20:52 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65313
+2025/05/28 16:20:52 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65313
+2025/05/28 16:20:52 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65312, 主题: Fw: [HMM] INV : USR250424037 | NBOM92583800 - TAILGATE EXAMS
+2025/05/28 16:20:52 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65312, 主题=Fw: [HMM] INV : USR250424037 | NBOM92583800 - TAILGATE EXAMS, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:52 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65312
+2025/05/28 16:20:52 handlers.go:504: [邮件处理] 保存 3 个附件记录，邮件ID: 65312
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65312
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65311, 主题: Fw: PAYMENT - REMINDER NBOM92583800 - EXAM FEES
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65311, 主题=Fw: PAYMENT - REMINDER NBOM92583800 - EXAM FEES, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65311
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 2 个附件记录，邮件ID: 65311
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65311
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65310, 主题: Fw: ARRIVAL NOTICE BL# HDUJSLA25KA00576- ADONIS 2505E
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65310, 主题=Fw: ARRIVAL NOTICE BL# HDUJSLA25KA00576- ADONIS 2505E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65310
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65310
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65310
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65309, 主题: Fw: ARRIVAL NOTICE - PRE-PU# [HBL#:NBKJ25040971] [MBL#:HDMUNBOZ7T240500] [LOT#:OI25051067] [CTNR#:GVTU2636951] [CNEE:PRIME AGENCY]
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65309, 主题=Fw: ARRIVAL NOTICE - PRE-PU# [HBL#:NBKJ25040971] [MBL#:HDMUNBOZ7T240500] [LOT#:OI25051067] [CTNR#:GVTU2636951] [CNEE:PRIME AGENCY], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65309
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65309
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65309
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65308, 主题: Fw: ARRIVAL NOTICE OOCL ROTTERDAM 155E Ref-no: <<A5_DB5RDH8P.CNT>>
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65308, 主题=Fw: ARRIVAL NOTICE OOCL ROTTERDAM 155E Ref-no: <<A5_DB5RDH8P.CNT>>, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65308
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65308
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65308
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65307, 主题: Fw: ARRIVAL NOTICE COSCO SHIPPING CAMELLIA Ref-no: <<A5_DB5RDH22.CNT>>
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65307, 主题=Fw: ARRIVAL NOTICE COSCO SHIPPING CAMELLIA Ref-no: <<A5_DB5RDH22.CNT>>, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65307
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65307
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65307
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65306, 主题: Fw: ARRIVAL NOTICE BL# HDUJSLX25KA00579- ADONIS 2505E
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65306, 主题=Fw: ARRIVAL NOTICE BL# HDUJSLX25KA00579- ADONIS 2505E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65306
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65306
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65306
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65318, 主题: Fw: [Arrival Notice] B/L : NBOZ31S64500 / VVD : HMM DRIVE 0054E
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65318, 主题=Fw: [Arrival Notice] B/L : NBOZ31S64500 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65318
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65318
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65318
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65317, 主题: Fw: [Arrival Notice] B/L : NBOZ0JL70000 / VVD : HMM DRIVE 0054E
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65317, 主题=Fw: [Arrival Notice] B/L : NBOZ0JL70000 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65317
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65317
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65317
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65316, 主题: Fw: [Jupiter International USA Inc][Ocean-OI-25040973][WHLC027F564912][Container#WHSU2424998,WHSU6174541][ETA: 06-08-2025][ARRIVAL NOTICE FREIGHT INVOICE - SHAF25040707]
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65316, 主题=Fw: [Jupiter International USA Inc][Ocean-OI-25040973][WHLC027F564912][Container#WHSU2424998,WHSU6174541][ETA: 06-08-2025][ARRIVAL NOTICE FREIGHT INVOICE - SHAF25040707], 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65316
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65316
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65316
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65319, 主题: Fw: [Arrival Notice] B/L : NBOZ5Q495700 / VVD : HMM DRIVE 0054E
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65319, 主题=Fw: [Arrival Notice] B/L : NBOZ5Q495700 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65319
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65319
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65319
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65323, 主题: Fw: [Arrival Notice] B/L : NBOZEUP52500 / VVD : HMM DRIVE 0054E
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65323, 主题=Fw: [Arrival Notice] B/L : NBOZEUP52500 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65323
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65323
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65323
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65322, 主题: Fw: [Arrival Notice] B/L : NBOZCNG28600 / VVD : HMM DRIVE 0054E
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65322, 主题=Fw: [Arrival Notice] B/L : NBOZCNG28600 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65322
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65322
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65322
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65321, 主题: Fw: [Arrival Notice] B/L : NBOZ9CA70600 / VVD : HMM DRIVE 0054E
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65321, 主题=Fw: [Arrival Notice] B/L : NBOZ9CA70600 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65321
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65321
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65321
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65320, 主题: Fw: [Arrival Notice] B/L : NBOZ93Z55300 / VVD : HMM DRIVE 0054E
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65320, 主题=Fw: [Arrival Notice] B/L : NBOZ93Z55300 / VVD : HMM DRIVE 0054E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65320
+2025/05/28 16:20:53 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 65320
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65320
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65374, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOM06396600 (VSL : HMM TOPAZ V#0005E)
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65374, 主题=Fw: [HMM] Notice : Cargo Pick-up - B/L : NBOM06396600 (VSL : HMM TOPAZ V#0005E), 发件人=fax . <fax@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65374
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65374
+2025/05/28 16:20:53 handlers.go:490: [邮件处理] 保存邮件内容，ID: 65373, 主题: Fw: Transfer i-B/L - EGLV143554126584 Ref-no: <<A1_DB5SK8GY.CNT>>
+2025/05/28 16:20:53 prime_email_content.go:73: [邮件内容保存] 准备保存邮件内容: ID=65373, 主题=Fw: Transfer i-B/L - EGLV143554126584 Ref-no: <<A1_DB5SK8GY.CNT>>, 发件人=fax . <fax@usprimeagency.com>
+2025/05/28 16:20:53 prime_email_content.go:89: [邮件内容保存] 成功保存邮件内容: ID=65373
+2025/05/28 16:20:53 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 65373
+2025/05/28 16:20:53 handlers.go:544: [邮件处理] 成功提交事务，完成处理 20 封邮件
+2025/05/28 16:20:53 handlers.go:291: [邮件处理] 协程 1 完成处理，剩余协程: 0
+2025/05/28 16:20:53 handlers.go:308: [邮件处理] 本次请求创建的 3 个协程已全部完成
+2025/05/28 16:22:00 handlers.go:253: [邮件处理] 当前已有 0 个协程，本次请求将创建 3 个新协程
+2025/05/28 16:22:00 handlers.go:282: [邮件处理] 创建第 1 个协程 (总计: 1/21)
+{"level":"INFO","timestamp":"2025-05-28 16:22:00.363","file":"middleware/logger.go:105","msg":"| 200 |     226.897µs |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |\n请求: map[limit:20]\n响应: map[code:0 data:邮件处理任务已启动，创建了 3 个处理协程 message:OK]"}
+2025/05/28 16:22:00 handlers.go:295: [邮件处理] 协程 1 (全局 1) 开始处理邮件，限制为 20 封
+2025/05/28 16:22:00 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:22:00 handlers.go:291: [邮件处理] 协程 1 完成处理，剩余协程: 0
+2025/05/28 16:22:03 handlers.go:282: [邮件处理] 创建第 2 个协程 (总计: 1/21)
+2025/05/28 16:22:03 handlers.go:295: [邮件处理] 协程 2 (全局 1) 开始处理邮件，限制为 20 封
+2025/05/28 16:22:03 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:22:03 handlers.go:291: [邮件处理] 协程 2 完成处理，剩余协程: 0
+2025/05/28 16:22:06 handlers.go:282: [邮件处理] 创建第 3 个协程 (总计: 1/21)
+2025/05/28 16:22:06 handlers.go:295: [邮件处理] 协程 3 (全局 1) 开始处理邮件，限制为 20 封
+2025/05/28 16:22:06 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/05/28 16:22:06 handlers.go:291: [邮件处理] 协程 3 完成处理，剩余协程: 0
+2025/05/28 16:22:09 handlers.go:308: [邮件处理] 本次请求创建的 3 个协程已全部完成

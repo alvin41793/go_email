@@ -15,7 +15,7 @@ log:
   log_backup_count: 7
 db:
   addr: dev-mysql.geekyum.com
-  name: primeai
+  name: primeai_dev
   username: primeai
   password: REDACTED
 docker_db:
