@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# 如果参数1是restart，设置重启标志
-if [ "$1" == "restart" ]; then
-    restart_flag=true
-else
-    restart_flag=false
-fi
-
 # 选择环境菜单
 echo "请选择运行环境:"
 echo "1. Debug环境（默认）"
@@ -49,12 +42,10 @@ if [ ! -f "$app_file" ]; then
     exit 1
 fi
 
-# 如果需要重启，先停止程序
-if [ "$restart_flag" = true ]; then
-    echo "正在重启程序..."
-    pkill -f "$app_file"
-    sleep 1
-fi
+# 停止之前的程序实例
+echo "停止现有程序实例..."
+pkill -f "$app_file" || true
+sleep 1
 
 # 创建日志目录和文件
 mkdir -p log
