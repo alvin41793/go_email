@@ -111,7 +111,7 @@ func ListEmails(c *gin.Context) {
 	var emailsResult []mailclient.EmailInfo
 	if lastEmail.EmailID > 0 {
 		fmt.Printf("当前数据库最大email_id: %d\n", lastEmail.EmailID)
-		startUID := lastEmail.EmailID
+		startUID := lastEmail.EmailID + 1
 		endUID := startUID + limit
 		// 使用UID范围获取邮件
 		emailsResult, err = mailClient.ListEmails(folder, limit, uint32(startUID), uint32(endUID))
