@@ -569,24 +569,6 @@ func ListAttachments(c *gin.Context) {
 	utils.SendResponse(c, err, email.Attachments)
 }
 
-// GetMaxEmailID 获取数据库中最大的email_id
-func GetMaxEmailID(c *gin.Context) {
-	lastEmail, err := model.GetLatestEmail()
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// 如果没有记录，返回0
-			utils.SendResponse(c, nil, map[string]int{"max_email_id": 0})
-			return
-		}
-		// 其他错误
-		utils.SendResponse(c, fmt.Errorf("获取最大email_id失败: %v", err), nil)
-		return
-	}
-
-	// 返回最大的email_id
-	utils.SendResponse(c, nil, map[string]int{"max_email_id": lastEmail.EmailID})
-}
-
 // ListEmailsRequest 获取邮件列表请求结构
 type ListEmailsRequest struct {
 	Folder string `json:"folder" binding:"required"`
@@ -635,4 +617,19 @@ func SendEmail(c *gin.Context) {
 		return
 	}
 	utils.SendResponse(c, err, "邮件发送成功")
+}
+
+func GetForwardOriginalEmail(c *gin.Context) {
+	mailClient := newMailClient()
+	//err := mailClient.ForwardOriginalEmail(65629, "INBOX", "1577880969@qq.com")
+	//if err != nil {
+	//	fmt.Printf("转发失败", err)
+	//}
+	//utils.SendResponse(c, err, "邮件转发成功")
+
+	err := mailClient.ForwardStructuredEmail(66828, "INBOX", "1577880969@qq.com")
+	if err != nil {
+		fmt.Printf("转发失败", err)
+	}
+	utils.SendResponse(c, err, "邮件转发成功")
 }

@@ -915,3 +915,207 @@ func cleanHTMLContent(html string) string {
 
 	return strings.TrimSpace(html)
 }
+
+func (m *MailClient) ForwardOriginalEmail(uid uint32, sourceFolder string, toAddress string) error {
+	// 连接IMAP服务器
+	c, err := m.ConnectIMAP()
+	if err != nil {
+		return err
+	}
+	defer c.Logout()
+
+	// 选择邮箱
+	_, err = c.Select(sourceFolder, false)
+	if err != nil {
+		return fmt.Errorf("选择邮箱失败: %w", err)
+	}
+
+	// 创建搜索条件
+	criteria := imap.NewSearchCriteria()
+	criteria.Uid = new(imap.SeqSet)
+	criteria.Uid.AddNum(uid)
+
+	// 搜索邮件
+	ids, err := c.Search(criteria)
+	if err != nil {
+		return fmt.Errorf("搜索邮件失败: %w", err)
+	}
+
+	if len(ids) == 0 {
+		return fmt.Errorf("未找到邮件")
+	}
+
+	seqSet := new(imap.SeqSet)
+	seqSet.AddNum(ids...)
+
+	// 获取原始邮件数据
+	section := &imap.BodySectionName{}
+	items := []imap.FetchItem{imap.FetchEnvelope, section.FetchItem()}
+
+	messages := make(chan *imap.Message, 1)
+	done := make(chan error, 1)
+	go func() {
+		done <- c.Fetch(seqSet, items, messages)
+	}()
+
+	msg := <-messages
+	if err := <-done; err != nil {
+		return fmt.Errorf("获取邮件内容失败: %w", err)
+	}
+
+	if msg == nil {
+		return fmt.Errorf("邮件不存在")
+	}
+
+	// 获取邮件正文
+	r := msg.GetBody(section)
+	if r == nil {
+		return fmt.Errorf("邮件正文为空")
+	}
+
+	// 读取原始邮件数据
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, r); err != nil {
+		return fmt.Errorf("读取邮件内容失败: %w", err)
+	}
+	rawEmail := buf.Bytes()
+
+	// 创建新的MIME邮件
+	var newEmail bytes.Buffer
+
+	// 设置邮件头
+	fmt.Fprintf(&newEmail, "From: %s\r\n", m.EmailAddress)
+	fmt.Fprintf(&newEmail, "To: %s\r\n", toAddress)
+	fmt.Fprintf(&newEmail, "Subject: Fwd: %s\r\n", mime.QEncoding.Encode("utf-8", msg.Envelope.Subject))
+	fmt.Fprintf(&newEmail, "MIME-Version: 1.0\r\n")
+
+	// 创建多部分邮件
+	boundary := "----=_NextPart_" + time.Now().Format("20060102150405")
+	fmt.Fprintf(&newEmail, "Content-Type: multipart/mixed; boundary=\"%s\"\r\n\r\n", boundary)
+
+	// 添加转发前言
+	fmt.Fprintf(&newEmail, "--%s\r\n", boundary)
+	fmt.Fprintf(&newEmail, "Content-Type: text/plain; charset=UTF-8\r\n\r\n")
+	fmt.Fprintf(&newEmail, "---------- 转发的原始邮件 ----------\r\n")
+	fmt.Fprintf(&newEmail, "发件人: %s\r\n", parseAddressList(msg.Envelope.From))
+	fmt.Fprintf(&newEmail, "日期: %s\r\n", msg.Envelope.Date.Format(time.RFC1123Z))
+	fmt.Fprintf(&newEmail, "主题: %s\r\n", msg.Envelope.Subject)
+	fmt.Fprintf(&newEmail, "收件人: %s\r\n\r\n", parseAddressList(msg.Envelope.To))
+
+	// 添加原始邮件作为附件
+	fmt.Fprintf(&newEmail, "--%s\r\n", boundary)
+	fmt.Fprintf(&newEmail, "Content-Type: message/rfc822\r\n")
+	fmt.Fprintf(&newEmail, "Content-Disposition: attachment; filename=\"original_message.eml\"\r\n\r\n")
+	newEmail.Write(rawEmail)
+
+	// 结束边界
+	fmt.Fprintf(&newEmail, "\r\n--%s--", boundary)
+
+	// 发送邮件
+	auth := smtp.PlainAuth("", m.EmailAddress, m.Password, m.SMTPServer)
+	err = smtp.SendMail(
+		fmt.Sprintf("%s:%d", m.SMTPServer, m.SMTPPort),
+		auth,
+		m.EmailAddress,
+		[]string{toAddress},
+		newEmail.Bytes(),
+	)
+
+	if err != nil {
+		return fmt.Errorf("发送邮件失败: %w", err)
+	}
+
+	return nil
+}
+
+func (m *MailClient) ForwardStructuredEmail(uid uint32, sourceFolder string, toAddress string) error {
+	// 获取原始邮件内容
+	email, err := m.GetEmailContent(uid, sourceFolder)
+	if err != nil {
+		return fmt.Errorf("获取原始邮件失败: %w", err)
+	}
+
+	// 准备转发邮件
+	forwardSubject := "Fwd: " + email.Subject
+
+	// 构建转发邮件
+	var buf bytes.Buffer
+	writer := multipart.NewWriter(&buf)
+
+	// 设置邮件头
+	header := make(map[string]string)
+	header["From"] = m.EmailAddress
+	header["To"] = toAddress
+	header["Subject"] = mime.QEncoding.Encode("utf-8", forwardSubject)
+	header["MIME-Version"] = "1.0"
+	header["Content-Type"] = "multipart/mixed; boundary=" + writer.Boundary()
+
+	// 写入邮件头
+	for k, v := range header {
+		fmt.Fprintf(&buf, "%s: %s\r\n", k, v)
+	}
+	buf.WriteString("\r\n")
+
+	// 转发头信息
+	forwardHeader := fmt.Sprintf(`---------- 转发的邮件 ----------
+发件人: %s
+日期: %s
+主题: %s
+收件人: %s
+
+`, email.From, email.Date, email.Subject, email.To)
+
+	// 添加文本部分
+	textPart, _ := writer.CreatePart(textproto.MIMEHeader{
+		"Content-Type": []string{"text/plain; charset=UTF-8"},
+	})
+	fmt.Fprint(textPart, forwardHeader+email.Body)
+
+	// 如果有HTML内容，也添加HTML部分
+	if email.BodyHTML != "" {
+		htmlForwardHeader := strings.ReplaceAll(forwardHeader, "\n", "<br>")
+		htmlPart, _ := writer.CreatePart(textproto.MIMEHeader{
+			"Content-Type": []string{"text/html; charset=UTF-8"},
+		})
+		fmt.Fprintf(htmlPart, "<div>%s</div><hr>%s", htmlForwardHeader, email.BodyHTML)
+	}
+
+	// 添加所有附件
+	for _, attachment := range email.Attachments {
+		// 获取附件内容
+		data, mimeType, err := m.GetAttachment(uid, attachment.Filename, sourceFolder)
+		if err != nil {
+			continue // 如果无法获取，跳过此附件
+		}
+
+		// 创建附件部分
+		attachmentPart, _ := writer.CreatePart(textproto.MIMEHeader{
+			"Content-Type":              []string{mimeType},
+			"Content-Disposition":       []string{fmt.Sprintf("attachment; filename=\"%s\"", attachment.Filename)},
+			"Content-Transfer-Encoding": []string{"base64"},
+		})
+
+		// 写入base64编码的附件数据
+		encoder := base64.NewEncoder(base64.StdEncoding, attachmentPart)
+		encoder.Write(data)
+		encoder.Close()
+	}
+
+	writer.Close()
+
+	// 发送邮件
+	auth := smtp.PlainAuth("", m.EmailAddress, m.Password, m.SMTPServer)
+	err = smtp.SendMail(
+		fmt.Sprintf("%s:%d", m.SMTPServer, m.SMTPPort),
+		auth,
+		m.EmailAddress,
+		[]string{toAddress},
+		buf.Bytes(),
+	)
+
+	if err != nil {
+		return fmt.Errorf("发送邮件失败: %w", err)
+	}
+
+	return nil
+}

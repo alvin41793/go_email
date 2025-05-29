@@ -41,6 +41,8 @@ func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 			// 获取附件列表
 			//emails.GET("/attachments/:uid", ListAttachments)
 
+			//转发邮件
+			emails.POST("/tr_send", GetForwardOriginalEmail)
 			// 发送邮件
 			emails.POST("/send", SendEmail)
 		}
