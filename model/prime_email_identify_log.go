@@ -12,7 +12,7 @@ type PrimeEmailIdentifyLog struct {
 	BeginTime     utils.JsonTime `gorm:"column:begin_time" json:"begin_time"`
 	EndTime       utils.JsonTime `gorm:"column:end_time" json:"end_time"`
 	RunTime       int            `gorm:"column:run_time" json:"run_time"`
-	Status        int            `gorm:"column:status" json:"status"`
+	Type          int            `gorm:"column:type" json:"type"`
 	ResultStatus  int            `gorm:"column:result_status" json:"result_status"`
 	ResultContent string         `gorm:"column:result_content;type:text" json:"result_content"`
 	JsonContent   string         `gorm:"column:Json_content;type:text" json:"json_content"`
