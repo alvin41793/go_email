@@ -341,49 +341,50 @@ func GetEmailContent(limit int) error {
 
 	// 第一步：获取所有邮件内容
 	fmt.Printf("\n【第1阶段】获取所有邮件内容...\n")
-	for _, emailID := range emailIDs {
-		log.Printf("[邮件处理] 正在获取邮件内容，ID: %d", emailID)
-		fmt.Printf("  • 获取邮件 ID: %d 内容... ", emailID)
+	for _, emailOne := range emailIDs {
+		log.Printf("[邮件处理] 正在获取邮件内容，ID: %d", emailOne.EmailID)
+		fmt.Printf("  • 获取邮件 ID: %d 内容... ", emailOne.EmailID)
 
-		email, err := mailClient.GetEmailContent(uint32(emailID), folder)
+		email, err := mailClient.GetEmailContent(uint32(emailOne.EmailID), folder)
 		if err != nil {
-			log.Printf("[邮件处理] 获取邮件内容失败，邮件ID: %d, 错误: %v", emailID, err)
+			log.Printf("[邮件处理] 获取邮件内容失败，邮件ID: %d, 错误: %v", emailOne.EmailID, err)
 			fmt.Printf("❌ 失败: %v\n", err)
 			// 如果获取失败，将邮件状态置为-2.
-			resetErr := model.ResetEmailStatus(emailID, -2)
+			resetErr := model.ResetEmailStatus(emailOne.EmailID, -2)
 			if resetErr != nil {
-				log.Printf("[邮件处理] 设置邮件状态失败，邮件ID: %d, 错误: %v", emailID, resetErr)
+				log.Printf("[邮件处理] 设置邮件状态失败，邮件ID: %d, 错误: %v", email.EmailID, resetErr)
 			}
 			return err
 		}
 
-		log.Printf("[邮件处理] 成功获取邮件内容，邮件ID: %d, 主题: %s, 发件人: %s", emailID, email.Subject, email.From)
+		log.Printf("[邮件处理] 成功获取邮件内容，邮件ID: %d, 主题: %s, 发件人: %s", emailOne.EmailID, email.Subject, email.From)
 		fmt.Printf("✅ 成功，主题: %s\n", email.Subject)
 
 		// 创建邮件内容记录
 		emailContent := &model.PrimeEmailContent{
-			EmailID:     emailID,
-			Subject:     utils.SanitizeUTF8(email.Subject),
-			FromEmail:   utils.SanitizeUTF8(email.From),
-			ToEmail:     utils.SanitizeUTF8(email.To),
-			Date:        utils.SanitizeUTF8(email.Date),
-			Content:     utils.SanitizeUTF8(email.Body),
-			HTMLContent: utils.SanitizeUTF8(email.BodyHTML),
-			Type:        0,
-			CreatedAt:   utils.JsonTime{Time: time.Now()},
-			UpdatedAt:   utils.JsonTime{Time: time.Now()},
+			EmailID:       emailOne.EmailID,
+			Subject:       utils.SanitizeUTF8(email.Subject),
+			FromEmail:     utils.SanitizeUTF8(email.From),
+			ToEmail:       utils.SanitizeUTF8(email.To),
+			Date:          utils.SanitizeUTF8(email.Date),
+			Content:       utils.SanitizeUTF8(email.Body),
+			HTMLContent:   utils.SanitizeUTF8(email.BodyHTML),
+			Type:          0,
+			HasAttachment: emailOne.HasAttachment,
+			CreatedAt:     utils.JsonTime{Time: time.Now()},
+			UpdatedAt:     utils.JsonTime{Time: time.Now()},
 		}
 
 		// 创建附件记录列表
 		attachmentRecords := make([]*model.PrimeEmailContentAttachment, 0)
 		if len(email.Attachments) > 0 {
-			log.Printf("[邮件处理] 邮件含有 %d 个附件，邮件ID: %d", len(email.Attachments), emailID)
+			log.Printf("[邮件处理] 邮件含有 %d 个附件，邮件ID: %d", len(email.Attachments), emailOne.EmailID)
 			fmt.Printf("    📎 发现 %d 个附件\n", len(email.Attachments))
 
 			// 处理附件
 			for i, attachment := range email.Attachments {
 				log.Printf("[附件处理] 开始处理附件 %d/%d，邮件ID: %d, 文件名: %s",
-					i+1, len(email.Attachments), emailID, attachment.Filename)
+					i+1, len(email.Attachments), emailOne.EmailID, attachment.Filename)
 				fmt.Printf("      - 附件 %d/%d: %s (%.2f KB, %s)\n",
 					i+1, len(email.Attachments), attachment.Filename, attachment.SizeKB, attachment.MimeType)
 
@@ -398,14 +399,14 @@ func GetEmailContent(limit int) error {
 						}
 					}
 
-					log.Printf("[附件处理] 开始上传附件到OSS，邮件ID: %d, 文件名: %s", emailID, attachment.Filename)
+					log.Printf("[附件处理] 开始上传附件到OSS，邮件ID: %d, 文件名: %s", emailOne.EmailID, attachment.Filename)
 					fmt.Printf("        正在上传到OSS... ")
 					var err error
 					// 添加重试机制，最多尝试2次
 					maxRetries := 2
 					for attempt := 1; attempt <= maxRetries; attempt++ {
 						log.Printf("[附件处理] 尝试上传附件到OSS (尝试 %d/%d)，邮件ID: %d, 文件名: %s",
-							attempt, maxRetries, emailID, attachment.Filename)
+							attempt, maxRetries, emailOne.EmailID, attachment.Filename)
 						if attempt > 1 {
 							fmt.Printf("        重试上传到OSS (尝试 %d/%d)... ", attempt, maxRetries)
 						} else {
@@ -415,7 +416,7 @@ func GetEmailContent(limit int) error {
 						ossURL, err = oss.UploadBase64ToOSS(attachment.Filename, attachment.Base64Data, fileType)
 						if err == nil {
 							// 上传成功，跳出循环
-							log.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, URL: %s", emailID, attachment.Filename, ossURL)
+							log.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, URL: %s", emailOne.EmailID, attachment.Filename, ossURL)
 							fmt.Printf("✅ 成功\n")
 							break
 						}
@@ -423,14 +424,14 @@ func GetEmailContent(limit int) error {
 						// 上传失败
 						if attempt < maxRetries {
 							log.Printf("[附件处理] 上传附件到OSS失败，准备重试，邮件ID: %d, 文件名: %s, 错误: %v",
-								emailID, attachment.Filename, err)
+								emailOne.EmailID, attachment.Filename, err)
 							fmt.Printf("❌ 失败: %v，准备重试\n", err)
 							// 可以在这里添加短暂的延迟
 							time.Sleep(time.Second * 2)
 						} else {
 							// 最后一次尝试也失败了
 							log.Printf("[附件处理] 上传附件到OSS失败，已达到最大重试次数，邮件ID: %d, 文件名: %s, 错误: %v",
-								emailID, attachment.Filename, err)
+								emailOne.EmailID, attachment.Filename, err)
 							fmt.Printf("❌ 最终失败: %v\n", err)
 						}
 					}
@@ -438,16 +439,16 @@ func GetEmailContent(limit int) error {
 					// 检查是否所有尝试都失败了
 					if err != nil {
 						fmt.Printf("[附件处理] 经过 %d 次尝试，上传附件到OSS仍然失败，邮件ID: %d, 文件名: %s\n",
-							maxRetries, emailID, attachment.Filename)
+							maxRetries, emailOne.EmailID, attachment.Filename)
 					}
 				} else {
-					log.Printf("[附件处理] 附件没有Base64数据，邮件ID: %d, 文件名: %s", emailID, attachment.Filename)
+					log.Printf("[附件处理] 附件没有Base64数据，邮件ID: %d, 文件名: %s", emailOne.EmailID, attachment.Filename)
 					fmt.Printf("        附件没有Base64数据，跳过上传\n")
 				}
 
 				// 创建附件记录
 				attachmentRecord := &model.PrimeEmailContentAttachment{
-					EmailID:   emailID,
+					EmailID:   emailOne.EmailID,
 					FileName:  utils.SanitizeUTF8(attachment.Filename),
 					SizeKb:    attachment.SizeKB,
 					MimeType:  utils.SanitizeUTF8(attachment.MimeType),
@@ -459,13 +460,13 @@ func GetEmailContent(limit int) error {
 				attachmentRecords = append(attachmentRecords, attachmentRecord)
 			}
 		} else {
-			log.Printf("[邮件处理] 邮件没有附件，邮件ID: %d", emailID)
+			log.Printf("[邮件处理] 邮件没有附件，邮件ID: %d", emailOne.EmailID)
 			fmt.Printf("    📄 邮件没有附件\n")
 		}
 
 		// 添加到待处理列表
 		allEmailData = append(allEmailData, EmailData{
-			EmailID:      emailID,
+			EmailID:      emailOne.EmailID,
 			EmailContent: emailContent,
 			Attachments:  attachmentRecords,
 		})

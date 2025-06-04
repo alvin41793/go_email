@@ -12,18 +12,19 @@ import (
 
 // PrimeEmailContent 邮件内容表结构
 type PrimeEmailContent struct {
-	ID          uint           `gorm:"primarykey;column:id" json:"id"`
-	EmailID     int            `gorm:"column:email_id" json:"email_id"`
-	Subject     string         `gorm:"column:subject;size:255" json:"subject"`                // 主题
-	FromEmail   string         `gorm:"column:from_email;size:255" json:"from_email"`          // 发送者
-	ToEmail     string         `gorm:"column:to_email;size:255" json:"to_email"`              // 接收者
-	Date        string         `gorm:"column:date;size:255" json:"date"`                      // 邮件日期
-	Content     string         `gorm:"column:content;type:text" json:"content"`               // 正文
-	HTMLContent string         `gorm:"column:html_content;type:longtext" json:"html_content"` // html正文
-	Type        int            `gorm:"column:type" json:"type"`                               // 邮件类型
-	Status      int            `gorm:"column:status" json:"status"`
-	CreatedAt   utils.JsonTime `gorm:"column:created_at" json:"created_at"`
-	UpdatedAt   utils.JsonTime `gorm:"column:updated_at" json:"updated_at"`
+	ID            uint           `gorm:"primarykey;column:id" json:"id"`
+	EmailID       int            `gorm:"column:email_id" json:"email_id"`
+	Subject       string         `gorm:"column:subject;size:255" json:"subject"`                // 主题
+	FromEmail     string         `gorm:"column:from_email;size:255" json:"from_email"`          // 发送者
+	ToEmail       string         `gorm:"column:to_email;size:255" json:"to_email"`              // 接收者
+	Date          string         `gorm:"column:date;size:255" json:"date"`                      // 邮件日期
+	Content       string         `gorm:"column:content;type:text" json:"content"`               // 正文
+	HTMLContent   string         `gorm:"column:html_content;type:longtext" json:"html_content"` // html正文
+	HasAttachment int            `gorm:"column:has_attachment;" json:"has_attachment"`          // 附件 0:没有1:有
+	Type          int            `gorm:"column:type" json:"type"`                               // 邮件类型
+	Status        int            `gorm:"column:status" json:"status"`
+	CreatedAt     utils.JsonTime `gorm:"column:created_at" json:"created_at"`
+	UpdatedAt     utils.JsonTime `gorm:"column:updated_at" json:"updated_at"`
 }
 
 // Create 创建一条邮件内容记录
@@ -79,6 +80,7 @@ func (e *PrimeEmailContent) CreateWithTransaction(tx *gorm.DB) error {
 	e.Date = utils.SanitizeUTF8(e.Date)
 	e.Content = utils.SanitizeUTF8(e.Content)
 	e.HTMLContent = utils.SanitizeUTF8(e.HTMLContent)
+	e.HasAttachment = e.HasAttachment
 	e.Status = -1
 	err := tx.Create(e).Error
 	if err != nil {

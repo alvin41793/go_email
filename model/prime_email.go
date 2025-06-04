@@ -131,9 +131,9 @@ func BatchCreateEmailsWithTx(emails []*PrimeEmail, tx *gorm.DB) error {
 }
 
 // GetEmailByStatus 获取指定状态的邮件ID并更新其状态为"处理中"
-func GetEmailByStatus(status, limit int) ([]int, error) {
+func GetEmailByStatus(status, limit int) ([]PrimeEmail, error) {
+	var emails []PrimeEmail
 	var emailIDs []int
-
 	// 开始事务
 	tx := db.DB().Begin()
 	defer func() {
@@ -143,20 +143,25 @@ func GetEmailByStatus(status, limit int) ([]int, error) {
 	}()
 
 	// 使用事务查询指定状态的邮件ID
-	err := tx.Model(&PrimeEmail{}).
+	p := tx.Model(&PrimeEmail{}).
 		Where("status = ?", status).
-		Limit(limit).
-		Pluck("email_id", &emailIDs).Error
+		Limit(limit)
+	err := p.Pluck("email_id", &emailIDs).Error
 
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
+	err = p.Find(&emails).Error
 
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
 	// 如果没有找到邮件，直接返回
 	if len(emailIDs) == 0 {
 		tx.Rollback() // 没有更新操作，回滚事务
-		return emailIDs, nil
+		return emails, nil
 	}
 
 	// 更新这些邮件的状态为"处理中"(0)
@@ -174,7 +179,7 @@ func GetEmailByStatus(status, limit int) ([]int, error) {
 		return nil, err
 	}
 
-	return emailIDs, nil
+	return emails, nil
 }
 
 // ResetEmailStatus 重置邮件状态
