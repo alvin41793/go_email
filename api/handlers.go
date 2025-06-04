@@ -344,7 +344,6 @@ func GetEmailContent(limit int) error {
 	for _, emailOne := range emailIDs {
 		log.Printf("[邮件处理] 正在获取邮件内容，ID: %d", emailOne.EmailID)
 		fmt.Printf("  • 获取邮件 ID: %d 内容... ", emailOne.EmailID)
-
 		email, err := mailClient.GetEmailContent(uint32(emailOne.EmailID), folder)
 		if err != nil {
 			log.Printf("[邮件处理] 获取邮件内容失败，邮件ID: %d, 错误: %v", emailOne.EmailID, err)

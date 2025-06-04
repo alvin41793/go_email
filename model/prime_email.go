@@ -3,8 +3,9 @@ package model
 import (
 	"go_email/db"
 	"go_email/pkg/utils"
-	"gorm.io/gorm"
 	"log"
+
+	"gorm.io/gorm"
 )
 
 // PrimeEmail 邮件基本信息表结构
@@ -133,7 +134,7 @@ func BatchCreateEmailsWithTx(emails []*PrimeEmail, tx *gorm.DB) error {
 // GetEmailByStatus 获取指定状态的邮件ID并更新其状态为"处理中"
 func GetEmailByStatus(status, limit int) ([]PrimeEmail, error) {
 	var emails []PrimeEmail
-	var emailIDs []int
+
 	// 开始事务
 	tx := db.DB().Begin()
 	defer func() {
@@ -142,29 +143,30 @@ func GetEmailByStatus(status, limit int) ([]PrimeEmail, error) {
 		}
 	}()
 
-	// 使用事务查询指定状态的邮件ID
-	p := tx.Model(&PrimeEmail{}).
+	// 第一步：使用事务查询指定状态的邮件记录
+	err := tx.Model(&PrimeEmail{}).
 		Where("status = ?", status).
-		Limit(limit)
-	err := p.Pluck("email_id", &emailIDs).Error
+		Limit(limit).
+		Find(&emails).Error
 
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
-	err = p.Find(&emails).Error
 
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
 	// 如果没有找到邮件，直接返回
-	if len(emailIDs) == 0 {
+	if len(emails) == 0 {
 		tx.Rollback() // 没有更新操作，回滚事务
 		return emails, nil
 	}
 
-	// 更新这些邮件的状态为"处理中"(0)
+	// 获取所有email_id
+	var emailIDs []int
+	for _, email := range emails {
+		emailIDs = append(emailIDs, email.EmailID)
+	}
+
+	// 第二步：更新这些邮件的状态为"处理中"(0)
 	err = tx.Model(&PrimeEmail{}).
 		Where("email_id IN (?)", emailIDs).
 		Update("status", 0).Error
