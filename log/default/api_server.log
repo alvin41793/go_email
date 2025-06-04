@@ -782,3 +782,103 @@
 2025/06/04 16:36:20 handlers.go:330: [邮件处理] 开始处理 3 封邮件, 文件夹: INBOX
 2025/06/04 16:36:20 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 75529
 2025/06/04 16:36:40 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/06/04 16:38:01 main.go:45: 标准日志已重定向到 log/default/api_server.log
+2025/06/04 16:38:53 handlers.go:253: [邮件处理] 当前已有 0 个协程，本次请求将创建 3 个新协程
+2025/06/04 16:38:53 handlers.go:282: [邮件处理] 创建第 1 个协程 (总计: 1/21)
+2025/06/04 16:38:53 handlers.go:295: [邮件处理] 协程 1 (全局 1) 开始处理邮件，限制为 20 封
+{"level":"INFO","timestamp":"2025-06-04 16:38:53.609","file":"middleware/logger.go:105","msg":"| 200 |     882.445µs |             ::1 | POST | /api/v1/emails/content | PostmanRuntime-ApipostRuntime/1.1.0 |\n请求: map[limit:20]\n响应: map[code:0 data:邮件处理任务已启动，创建了 3 个处理协程 message:OK]"}
+2025/06/04 16:38:53 handlers.go:330: [邮件处理] 开始处理 20 封邮件, 文件夹: INBOX
+2025/06/04 16:38:53 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 75556
+2025/06/04 16:38:56 handlers.go:282: [邮件处理] 创建第 2 个协程 (总计: 2/21)
+2025/06/04 16:38:56 handlers.go:295: [邮件处理] 协程 2 (全局 2) 开始处理邮件，限制为 20 封
+2025/06/04 16:38:56 handlers.go:330: [邮件处理] 开始处理 3 封邮件, 文件夹: INBOX
+2025/06/04 16:38:56 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 75529
+2025/06/04 16:38:59 handlers.go:282: [邮件处理] 创建第 3 个协程 (总计: 3/21)
+2025/06/04 16:38:59 handlers.go:295: [邮件处理] 协程 3 (全局 3) 开始处理邮件，限制为 20 封
+2025/06/04 16:38:59 handlers.go:324: [邮件处理] 没有需要处理的新邮件
+2025/06/04 16:38:59 handlers.go:291: [邮件处理] 协程 3 完成处理，剩余协程: 2
+2025/06/04 16:39:17 handlers.go:359: [邮件处理] 成功获取邮件内容，邮件ID: 75556, 主题: Fw: [PRIME AGENCY][Ocean-OI-25051281][EGLV149502229993][Container#TXGU4076825][ARRIVAL NOTICE FREIGHT INVOICE - GZSAV2550151], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:39:17 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 75556
+2025/06/04 16:39:17 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 75556, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - GZSAV2550151.pdf
+2025/06/04 16:39:17 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 75556, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - GZSAV2550151.pdf
+2025/06/04 16:39:17 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 75556, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - GZSAV2550151.pdf
+2025/06/04 16:39:18 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 75556, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - GZSAV2550151.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/88816509bd8d4259ae327591dfec3708.pdf
+2025/06/04 16:39:18 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 75548
+2025/06/04 16:39:18 handlers.go:359: [邮件处理] 成功获取邮件内容，邮件ID: 75529, 主题: Fw: COSCO Arrival Notice COSU6418129860 | CSCL SOUTH CHINA SEA - 075E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:39:18 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 75529
+2025/06/04 16:39:18 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 75529, 文件名: BL6418129860.PDF
+2025/06/04 16:39:18 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 75529, 文件名: BL6418129860.PDF
+2025/06/04 16:39:18 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 75529, 文件名: BL6418129860.PDF
+2025/06/04 16:39:18 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 75529, 文件名: BL6418129860.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/fdd73fc508514a1aaffb517a41cef626.PDF
+2025/06/04 16:39:18 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 75528
+2025/06/04 16:39:37 handlers.go:359: [邮件处理] 成功获取邮件内容，邮件ID: 75528, 主题: Fw: COSCO Arrival Notice COSU6418116760 | CSCL SOUTH CHINA SEA - 075E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:39:37 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 75528
+2025/06/04 16:39:37 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 75528, 文件名: BL6418116760.PDF
+2025/06/04 16:39:37 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 75528, 文件名: BL6418116760.PDF
+2025/06/04 16:39:37 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 75528, 文件名: BL6418116760.PDF
+2025/06/04 16:39:37 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 75528, 文件名: BL6418116760.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/1fd38ac92fdc416a8adfe690c1ce3f74.PDF
+2025/06/04 16:39:37 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 75527
+2025/06/04 16:39:37 handlers.go:359: [邮件处理] 成功获取邮件内容，邮件ID: 75548, 主题: Fw: [PRIME AGENCY][Ocean-OI-25051766][ONEYSZPF78111600][Container#ONEU0443140][ARRIVAL NOTICE FREIGHT INVOICE - ZSOAK2550047], 发件人: dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:39:37 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 75548
+2025/06/04 16:39:37 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 75548, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - ZSOAK2550047.pdf
+2025/06/04 16:39:37 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 75548, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - ZSOAK2550047.pdf
+2025/06/04 16:39:37 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 75548, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - ZSOAK2550047.pdf
+2025/06/04 16:39:38 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 75548, 文件名: ARRIVAL NOTICE FREIGHT INVOICE - ZSOAK2550047.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/efcf9787057b4d328b3c96e98da7a024.pdf
+2025/06/04 16:39:38 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 75547
+2025/06/04 16:39:56 handlers.go:359: [邮件处理] 成功获取邮件内容，邮件ID: 75527, 主题: Fw: COSCO Arrival Notice COSU6418130160 | CSCL SOUTH CHINA SEA - 075E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:39:56 handlers.go:380: [邮件处理] 邮件含有 1 个附件，邮件ID: 75527
+2025/06/04 16:39:56 handlers.go:385: [附件处理] 开始处理附件 1/1，邮件ID: 75527, 文件名: BL6418130160.PDF
+2025/06/04 16:39:56 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 75527, 文件名: BL6418130160.PDF
+2025/06/04 16:39:56 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 75527, 文件名: BL6418130160.PDF
+2025/06/04 16:39:56 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 75527, 文件名: BL6418130160.PDF, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/e88178df80aa42b68e1954a474d34299.PDF
+2025/06/04 16:39:56 handlers.go:490: [邮件处理] 保存邮件内容，ID: 75529, 主题: Fw: COSCO Arrival Notice COSU6418129860 | CSCL SOUTH CHINA SEA - 075E
+2025/06/04 16:39:56 prime_email_content.go:74: [邮件内容保存] 准备保存邮件内容: ID=75529, 主题=Fw: COSCO Arrival Notice COSU6418129860 | CSCL SOUTH CHINA SEA - 075E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:39:57 prime_email_content.go:91: [邮件内容保存] 成功保存邮件内容: ID=75529
+2025/06/04 16:39:57 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 75529
+2025/06/04 16:39:57 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 75529
+2025/06/04 16:39:57 handlers.go:490: [邮件处理] 保存邮件内容，ID: 75528, 主题: Fw: COSCO Arrival Notice COSU6418116760 | CSCL SOUTH CHINA SEA - 075E
+2025/06/04 16:39:57 prime_email_content.go:74: [邮件内容保存] 准备保存邮件内容: ID=75528, 主题=Fw: COSCO Arrival Notice COSU6418116760 | CSCL SOUTH CHINA SEA - 075E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:39:57 prime_email_content.go:91: [邮件内容保存] 成功保存邮件内容: ID=75528
+2025/06/04 16:39:57 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 75528
+2025/06/04 16:39:57 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 75528
+2025/06/04 16:39:57 handlers.go:490: [邮件处理] 保存邮件内容，ID: 75527, 主题: Fw: COSCO Arrival Notice COSU6418130160 | CSCL SOUTH CHINA SEA - 075E
+2025/06/04 16:39:57 prime_email_content.go:74: [邮件内容保存] 准备保存邮件内容: ID=75527, 主题=Fw: COSCO Arrival Notice COSU6418130160 | CSCL SOUTH CHINA SEA - 075E, 发件人=dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:39:57 prime_email_content.go:91: [邮件内容保存] 成功保存邮件内容: ID=75527
+2025/06/04 16:39:57 handlers.go:504: [邮件处理] 保存 1 个附件记录，邮件ID: 75527
+2025/06/04 16:39:57 handlers.go:522: [邮件处理] 更新邮件状态为已处理，邮件ID: 75527
+2025/06/04 16:39:57 handlers.go:544: [邮件处理] 成功提交事务，完成处理 3 封邮件
+2025/06/04 16:39:57 handlers.go:291: [邮件处理] 协程 2 完成处理，剩余协程: 1
+2025/06/04 16:40:45 handlers.go:359: [邮件处理] 成功获取邮件内容，邮件ID: 75547, 主题: Fw: [Arrival Notice] B/L : SHAM41982300 / VVD : ONE COSMOS 0102E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:40:45 handlers.go:380: [邮件处理] 邮件含有 2 个附件，邮件ID: 75547
+2025/06/04 16:40:45 handlers.go:385: [附件处理] 开始处理附件 1/2，邮件ID: 75547, 文件名: (25-038) Reefer Import Dwell Fee Updates - Effective July 1, 2025.pdf
+2025/06/04 16:40:45 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 75547, 文件名: (25-038) Reefer Import Dwell Fee Updates - Effective July 1, 2025.pdf
+2025/06/04 16:40:45 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 75547, 文件名: (25-038) Reefer Import Dwell Fee Updates - Effective July 1, 2025.pdf
+2025/06/04 16:40:45 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 75547, 文件名: (25-038) Reefer Import Dwell Fee Updates - Effective July 1, 2025.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/3c93d37d134443b6b0911da7c1a807d8.pdf
+2025/06/04 16:40:45 handlers.go:385: [附件处理] 开始处理附件 2/2，邮件ID: 75547, 文件名: Arrival Notice Data Gathering.pdf
+2025/06/04 16:40:45 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 75547, 文件名: Arrival Notice Data Gathering.pdf
+2025/06/04 16:40:45 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 75547, 文件名: Arrival Notice Data Gathering.pdf
+2025/06/04 16:40:45 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 75547, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/14f0d76dbf84408ea3c5387e967eb319.pdf
+2025/06/04 16:40:45 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 75546
+2025/06/04 16:41:44 handlers.go:359: [邮件处理] 成功获取邮件内容，邮件ID: 75546, 主题: Fw: [Arrival Notice] B/L : SHAM29155700 / VVD : ONE COSMOS 0102E, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:41:44 handlers.go:380: [邮件处理] 邮件含有 2 个附件，邮件ID: 75546
+2025/06/04 16:41:44 handlers.go:385: [附件处理] 开始处理附件 1/2，邮件ID: 75546, 文件名: (25-038) Reefer Import Dwell Fee Updates - Effective July 1, 2025.pdf
+2025/06/04 16:41:44 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 75546, 文件名: (25-038) Reefer Import Dwell Fee Updates - Effective July 1, 2025.pdf
+2025/06/04 16:41:44 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 75546, 文件名: (25-038) Reefer Import Dwell Fee Updates - Effective July 1, 2025.pdf
+2025/06/04 16:41:44 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 75546, 文件名: (25-038) Reefer Import Dwell Fee Updates - Effective July 1, 2025.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/b8edb08fdf1e45489e755236b4c8749c.pdf
+2025/06/04 16:41:44 handlers.go:385: [附件处理] 开始处理附件 2/2，邮件ID: 75546, 文件名: Arrival Notice Data Gathering.pdf
+2025/06/04 16:41:44 handlers.go:401: [附件处理] 开始上传附件到OSS，邮件ID: 75546, 文件名: Arrival Notice Data Gathering.pdf
+2025/06/04 16:41:44 handlers.go:407: [附件处理] 尝试上传附件到OSS (尝试 1/2)，邮件ID: 75546, 文件名: Arrival Notice Data Gathering.pdf
+2025/06/04 16:41:44 handlers.go:418: [附件处理] 成功上传附件到OSS，邮件ID: 75546, 文件名: Arrival Notice Data Gathering.pdf, URL: https://geekfiles.oss-cn-shanghai.aliyuncs.com/spider/recognize/497d48900ab54dbbb8f2c973115f80a1.pdf
+2025/06/04 16:41:44 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 75545
+2025/06/04 16:41:53 handlers.go:359: [邮件处理] 成功获取邮件内容，邮件ID: 75545, 主题: Fw: BL# 6413358030, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:41:53 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 75545
+2025/06/04 16:41:53 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 75544
+2025/06/04 16:42:08 handlers.go:359: [邮件处理] 成功获取邮件内容，邮件ID: 75544, 主题: Fw: ARRIVAL NOTICE PRIME AGENCY// ETA LGB 5/22// ETA DET RAMP 6/1//PVGS2503379 MBL# COSU6415712970// CNTR# TCKU7660985 40HC, 发件人: dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:42:08 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 75544
+2025/06/04 16:42:08 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 75543
+2025/06/04 16:42:19 handlers.go:359: [邮件处理] 成功获取邮件内容，邮件ID: 75543, 主题: Fw: [HMM] Notice : Cargo Pick-up - B/L : SHAM29155700 (VSL : ONE COSMOS V#0102E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:42:19 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 75543
+2025/06/04 16:42:19 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 75542
+2025/06/04 16:42:26 handlers.go:359: [邮件处理] 成功获取邮件内容，邮件ID: 75542, 主题: Fw: [HMM] Notice : Cargo Pending Release - B/L : SHAM41982300 (VSL : ONE COSMOS V#0102E), 发件人: dp8 . <dp8@usprimeagency.com>
+2025/06/04 16:42:26 handlers.go:462: [邮件处理] 邮件没有附件，邮件ID: 75542
+2025/06/04 16:42:26 handlers.go:345: [邮件处理] 正在获取邮件内容，ID: 75541

@@ -23,7 +23,7 @@
 
 # 日志文件
 *.log
-/log/
+log/
 
 # 配置文件（根据需要调整）
 # config/*.yaml
