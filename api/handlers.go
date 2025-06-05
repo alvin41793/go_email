@@ -621,6 +621,7 @@ func SendEmail(c *gin.Context) {
 
 func GetForwardOriginalEmail(c *gin.Context) {
 	mailClient := newMailClient()
+
 	//err := mailClient.ForwardOriginalEmail(65629, "INBOX", "1577880969@qq.com")
 	//if err != nil {
 	//	fmt.Printf("转发失败", err)
