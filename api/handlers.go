@@ -622,15 +622,88 @@ func SendEmail(c *gin.Context) {
 func GetForwardOriginalEmail(c *gin.Context) {
 	mailClient := newMailClient()
 
-	//err := mailClient.ForwardOriginalEmail(65629, "INBOX", "1577880969@qq.com")
-	//if err != nil {
-	//	fmt.Printf("转发失败", err)
-	//}
-	//utils.SendResponse(c, err, "邮件转发成功")
-
-	err := mailClient.ForwardStructuredEmail(66828, "INBOX", "1577880969@qq.com")
-	if err != nil {
-		fmt.Printf("转发失败", err)
+	// 创建请求结构体
+	type ForwardRequest struct {
+		EmailID int `json:"email_id"`
+		Limit   int `json:"limit"`
 	}
-	utils.SendResponse(c, err, "邮件转发成功")
+
+	var req ForwardRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.SendResponse(c, err, "参数错误")
+	}
+
+	// 如果请求中有email_id，则直接转发该邮件
+	if req.EmailID > 0 {
+		// 查询这条记录以获取PrimeOp邮箱地址
+		var forward model.PrimeEmailForward
+		if err := db.DB().First(&forward, "email_id = ?", req.EmailID).Error; err != nil {
+			utils.SendResponse(c, err, "未找到对应的转发记录")
+			return
+		}
+
+		// 执行转发
+		err := mailClient.ForwardStructuredEmail(uint32(req.EmailID), "INBOX", forward.PrimeOp)
+		if err != nil {
+			utils.SendResponse(c, err, fmt.Sprintf("转发失败: %v", err))
+			return
+		}
+
+		// 更新状态为已转发(1)
+		db.DB().Model(&forward).Update("status", 1)
+		utils.SendResponse(c, nil, "邮件转发成功")
+		return
+	}
+
+	// 如果没有指定email_id，则查找PrimeEmailForward表中状态为-1的前10条记录
+	var records []model.PrimeEmailForward
+	tx := db.DB().Begin()
+
+	// 查询前10条状态为-1的记录
+	if err := tx.Where("status = ?", -1).Limit(req.Limit).Find(&records).Error; err != nil {
+		tx.Rollback()
+		utils.SendResponse(c, err, "查询待转发记录失败")
+		return
+	}
+
+	// 如果没有找到记录
+	if len(records) == 0 {
+		tx.Rollback()
+		utils.SendResponse(c, nil, "没有找到待转发的记录")
+		return
+	}
+
+	// 更新这些记录的状态为处理中(0)
+	var ids []int
+	for _, record := range records {
+		ids = append(ids, record.ID)
+	}
+
+	if err := tx.Model(&model.PrimeEmailForward{}).Where("id IN ?", ids).Update("status", 0).Error; err != nil {
+		tx.Rollback()
+		utils.SendResponse(c, err, "更新记录状态失败")
+		return
+	}
+
+	// 提交事务
+	tx.Commit()
+
+	// 转发邮件
+	var successCount, failCount int
+	for _, record := range records {
+		// 执行转发
+		err := mailClient.ForwardStructuredEmail(uint32(record.EmailID), "INBOX", record.PrimeOp)
+		if err != nil {
+			failCount++
+			// 更新状态为失败(-1)
+			db.DB().Model(&model.PrimeEmailForward{}).Where("id = ?", record.ID).Update("status", -1)
+			log.Printf("邮件 %d 转发失败: %v", record.EmailID, err)
+		} else {
+			successCount++
+			// 更新状态为成功(1)
+			db.DB().Model(&model.PrimeEmailForward{}).Where("id = ?", record.ID).Update("status", 1)
+		}
+	}
+
+	utils.SendResponse(c, nil, fmt.Sprintf("邮件转发完成：成功 %d 条，失败 %d 条", successCount, failCount))
 }
