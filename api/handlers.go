@@ -631,6 +631,7 @@ func GetForwardOriginalEmail(c *gin.Context) {
 	var req ForwardRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.SendResponse(c, err, "参数错误")
+		return
 	}
 
 	// 如果请求中有email_id，则直接转发该邮件
