@@ -1029,8 +1029,14 @@ func (m *MailClient) ForwardOriginalEmail(uid uint32, sourceFolder string, toAdd
 }
 
 func (m *MailClient) ForwardStructuredEmail(uid uint32, sourceFolder string, toAddress string) error {
+	startTime := time.Now() // 总开始时间
+
 	// 获取原始邮件内容
+	fetchStartTime := time.Now()
 	email, err := m.GetEmailContent(uid, sourceFolder)
+	fetchDuration := time.Since(fetchStartTime)
+	log.Printf("[邮件转发详情] 邮件ID: %d, 获取原始邮件内容耗时: %v", uid, fetchDuration)
+
 	if err != nil {
 		return fmt.Errorf("获取原始邮件失败: %w", err)
 	}
@@ -1039,6 +1045,7 @@ func (m *MailClient) ForwardStructuredEmail(uid uint32, sourceFolder string, toA
 	forwardSubject := "Fwd: " + email.Subject
 
 	// 构建转发邮件
+	buildStartTime := time.Now()
 	var buf bytes.Buffer
 	writer := multipart.NewWriter(&buf)
 
@@ -1080,11 +1087,18 @@ func (m *MailClient) ForwardStructuredEmail(uid uint32, sourceFolder string, toA
 		fmt.Fprintf(htmlPart, "<div>%s</div><hr>%s", htmlForwardHeader, email.BodyHTML)
 	}
 
+	buildContentDuration := time.Since(buildStartTime)
+	log.Printf("[邮件转发详情] 邮件ID: %d, 构建邮件内容耗时: %v", uid, buildContentDuration)
+
 	// 添加所有附件
+	attachmentStartTime := time.Now()
+	attachmentCount := 0
+
 	for _, attachment := range email.Attachments {
 		// 获取附件内容
 		data, mimeType, err := m.GetAttachment(uid, attachment.Filename, sourceFolder)
 		if err != nil {
+			log.Printf("[邮件转发详情] 邮件ID: %d, 获取附件 %s 失败: %v", uid, attachment.Filename, err)
 			continue // 如果无法获取，跳过此附件
 		}
 
@@ -1099,11 +1113,16 @@ func (m *MailClient) ForwardStructuredEmail(uid uint32, sourceFolder string, toA
 		encoder := base64.NewEncoder(base64.StdEncoding, attachmentPart)
 		encoder.Write(data)
 		encoder.Close()
+		attachmentCount++
 	}
+
+	attachmentDuration := time.Since(attachmentStartTime)
+	log.Printf("[邮件转发详情] 邮件ID: %d, 处理 %d 个附件耗时: %v", uid, attachmentCount, attachmentDuration)
 
 	writer.Close()
 
 	// 发送邮件
+	sendStartTime := time.Now()
 	auth := smtp.PlainAuth("", m.EmailAddress, m.Password, m.SMTPServer)
 	err = smtp.SendMail(
 		fmt.Sprintf("%s:%d", m.SMTPServer, m.SMTPPort),
@@ -1112,10 +1131,16 @@ func (m *MailClient) ForwardStructuredEmail(uid uint32, sourceFolder string, toA
 		[]string{toAddress},
 		buf.Bytes(),
 	)
+	sendDuration := time.Since(sendStartTime)
+	log.Printf("[邮件转发详情] 邮件ID: %d, 发送邮件耗时: %v", uid, sendDuration)
 
 	if err != nil {
 		return fmt.Errorf("发送邮件失败: %w", err)
 	}
+
+	totalDuration := time.Since(startTime)
+	log.Printf("[邮件转发详情] 邮件ID: %d, 转发完成, 总耗时: %v (获取: %v, 构建: %v, 附件: %v, 发送: %v)",
+		uid, totalDuration, fetchDuration, buildContentDuration, attachmentDuration, sendDuration)
 
 	return nil
 }

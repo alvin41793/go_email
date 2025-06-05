@@ -620,6 +620,7 @@ func SendEmail(c *gin.Context) {
 }
 
 func GetForwardOriginalEmail(c *gin.Context) {
+	startTime := time.Now() // 开始计时
 	mailClient := newMailClient()
 
 	// 创建请求结构体
@@ -644,15 +645,21 @@ func GetForwardOriginalEmail(c *gin.Context) {
 		}
 
 		// 执行转发
+		forwardStartTime := time.Now() // 转发开始时间
 		err := mailClient.ForwardStructuredEmail(uint32(req.EmailID), "INBOX", forward.PrimeOp)
+		forwardDuration := time.Since(forwardStartTime) // 转发耗时
+
 		if err != nil {
+			log.Printf("[邮件转发] 邮件ID: %d 转发失败, 耗时: %v, 错误: %v", req.EmailID, forwardDuration, err)
 			utils.SendResponse(c, err, fmt.Sprintf("转发失败: %v", err))
 			return
 		}
 
 		// 更新状态为已转发(1)
 		db.DB().Model(&forward).Update("status", 1)
-		utils.SendResponse(c, nil, "邮件转发成功")
+		totalDuration := time.Since(startTime) // 总耗时
+		log.Printf("[邮件转发] 邮件ID: %d 转发成功, 转发耗时: %v, 总耗时: %v", req.EmailID, forwardDuration, totalDuration)
+		utils.SendResponse(c, nil, fmt.Sprintf("邮件转发成功, 耗时: %v", forwardDuration))
 		return
 	}
 
@@ -691,20 +698,43 @@ func GetForwardOriginalEmail(c *gin.Context) {
 
 	// 转发邮件
 	var successCount, failCount int
+	var totalForwardTime time.Duration
+
 	for _, record := range records {
 		// 执行转发
+		forwardStartTime := time.Now() // 单封邮件转发开始时间
 		err := mailClient.ForwardStructuredEmail(uint32(record.EmailID), "INBOX", record.PrimeOp)
+		forwardDuration := time.Since(forwardStartTime) // 单封邮件转发耗时
+		totalForwardTime += forwardDuration
+
 		if err != nil {
 			failCount++
 			// 更新状态为失败(-1)
 			db.DB().Model(&model.PrimeEmailForward{}).Where("id = ?", record.ID).Update("status", -1)
-			log.Printf("邮件 %d 转发失败: %v", record.EmailID, err)
+			log.Printf("[邮件转发] 邮件ID: %d 转发失败, 耗时: %v, 错误: %v", record.EmailID, forwardDuration, err)
 		} else {
 			successCount++
 			// 更新状态为成功(1)
 			db.DB().Model(&model.PrimeEmailForward{}).Where("id = ?", record.ID).Update("status", 1)
+			log.Printf("[邮件转发] 邮件ID: %d 转发成功, 耗时: %v", record.EmailID, forwardDuration)
 		}
 	}
 
-	utils.SendResponse(c, nil, fmt.Sprintf("邮件转发完成：成功 %d 条，失败 %d 条", successCount, failCount))
+	totalDuration := time.Since(startTime)
+	avgTime := time.Duration(0)
+	if len(records) > 0 {
+		avgTime = totalForwardTime / time.Duration(len(records))
+	}
+
+	result := map[string]interface{}{
+		"总耗时":    totalDuration.String(),
+		"平均转发耗时": avgTime.String(),
+		"成功数":    successCount,
+		"失败数":    failCount,
+	}
+
+	log.Printf("[邮件转发] 批量转发完成: 成功 %d 条, 失败 %d 条, 总耗时: %v, 平均耗时: %v",
+		successCount, failCount, totalDuration, avgTime)
+
+	utils.SendResponse(c, nil, result)
 }
