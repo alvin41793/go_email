@@ -55,12 +55,11 @@ func InitMailClient(imapServer, smtpServer, emailAddress, password string, imapP
 }
 
 // 获取新的邮件客户端实例
-func newMailClient() (*mailclient.MailClient, error) {
+func newMailClient(account model.PrimeEmailAccount) (*mailclient.MailClient, error) {
 	// 每次都从数据库获取最新的邮箱配置
-	emailConfig, err := mailclient.GetEmailConfig()
+	emailConfig, err := mailclient.GetEmailConfig(account)
 	if err != nil {
 		log.Printf("获取邮箱配置失败: %v", err)
-		// 获取失败时使用全局配置作为备选
 		return nil, err
 	}
 
@@ -83,9 +82,14 @@ func ListEmails(c *gin.Context) {
 	// 如果需要更好的性能，可以考虑使用数据库事务和条件更新
 	listEmailsMutex.Lock()
 	defer listEmailsMutex.Unlock()
+	account, err := model.GetActiveAccount()
+	if err != nil {
+		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
+	}
 
 	// 为每个请求创建独立的邮件客户端实例
-	mailClient, err := newMailClient()
+	mailClient, err := newMailClient(account)
 	if err != nil {
 		utils.SendResponse(c, err, "获取邮箱配置失败")
 		return
@@ -175,8 +179,14 @@ func ListEmailsByUid(c *gin.Context) {
 	listEmailsByUidMutex.Lock()
 	defer listEmailsByUidMutex.Unlock()
 
+	account, err := model.GetActiveAccount()
+	if err != nil {
+		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
+	}
+
 	// 为每个请求创建独立的邮件客户端实例
-	mailClient, err := newMailClient()
+	mailClient, err := newMailClient(account)
 	if err != nil {
 		utils.SendResponse(c, err, "获取邮箱配置失败")
 		return
@@ -247,7 +257,11 @@ func GetEmailContentList(c *gin.Context) {
 		utils.SendResponse(c, err, "无效的参数")
 		return
 	}
-
+	account, err := model.GetActiveAccount()
+	if err != nil {
+		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
+	}
 	// 使用互斥锁保护并发访问
 	emailProcessMutex.Lock()
 
@@ -309,7 +323,7 @@ func GetEmailContentList(c *gin.Context) {
 
 				log.Printf("[邮件处理] 协程 %d (全局 %d) 开始处理邮件，限制为 %d 封",
 					goroutineNum, globalNum, req.Limit)
-				err := GetEmailContent(req.Limit)
+				err := GetEmailContent(req.Limit, account)
 				results <- err
 			}(i+1, currentCount)
 
@@ -327,7 +341,7 @@ func GetEmailContentList(c *gin.Context) {
 }
 
 // GetEmailContent 获取邮件内容
-func GetEmailContent(limit int) error {
+func GetEmailContent(limit int, account model.PrimeEmailAccount) error {
 	// 获取状态为-1的邮件ID，并将其状态更新为0（处理中）
 	emailIDs, err := model.GetEmailByStatus(-1, limit)
 	if err != nil {
@@ -341,7 +355,7 @@ func GetEmailContent(limit int) error {
 		return nil
 	}
 	// 为每个请求创建独立的邮件客户端实例
-	mailClient, err := newMailClient()
+	mailClient, err := newMailClient(account)
 	if err != nil {
 		log.Printf("获取邮箱配置失败", err)
 		fmt.Println("获取邮箱配置失败", err)
@@ -570,11 +584,17 @@ func GetEmailContent(limit int) error {
 // 列出邮件附件
 func ListAttachments(c *gin.Context) {
 	// 为每个请求创建独立的邮件客户端实例
-	mailClient, err := newMailClient()
+	account, err := model.GetActiveAccount()
 	if err != nil {
-		log.Printf("获取邮箱配置失败: %v", err)
 		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
+	}
 
+	// 为每个请求创建独立的邮件客户端实例
+	mailClient, err := newMailClient(account)
+	if err != nil {
+		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
 	}
 	uidStr := c.Param("uid")
 	folder := c.DefaultQuery("folder", "INBOX")
@@ -620,8 +640,14 @@ type SendEmailRequest struct {
 
 // 发送邮件
 func SendEmail(c *gin.Context) {
+	account, err := model.GetActiveAccount()
+	if err != nil {
+		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
+	}
+
 	// 为每个请求创建独立的邮件客户端实例
-	mailClient, err := newMailClient()
+	mailClient, err := newMailClient(account)
 	if err != nil {
 		utils.SendResponse(c, err, "获取邮箱配置失败")
 		return
@@ -648,7 +674,14 @@ func SendEmail(c *gin.Context) {
 
 func GetForwardOriginalEmail(c *gin.Context) {
 	startTime := time.Now() // 开始计时
-	mailClient, err := newMailClient()
+	account, err := model.GetActiveAccount()
+	if err != nil {
+		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
+	}
+
+	// 为每个请求创建独立的邮件客户端实例
+	mailClient, err := newMailClient(account)
 	if err != nil {
 		utils.SendResponse(c, err, "获取邮箱配置失败")
 		return

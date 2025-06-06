@@ -124,12 +124,7 @@ func (m *MailClient) ConnectIMAP() (*client.Client, error) {
 }
 
 // GetEmailConfig 从数据库获取邮箱配置
-func GetEmailConfig() (*EmailConfigInfo, error) {
-	account, err := model.GetActiveAccount()
-	if err != nil {
-		return nil, fmt.Errorf("查询邮箱账号失败: %w", err)
-	}
-
+func GetEmailConfig(account model.PrimeEmailAccount) (*EmailConfigInfo, error) {
 	return &EmailConfigInfo{
 		IMAPServer:   "imap.ipage.com",
 		SMTPServer:   "smtp.ipage.com",
