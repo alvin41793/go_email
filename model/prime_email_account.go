@@ -16,9 +16,9 @@ type PrimeEmailAccount struct {
 	UpdatedAt time.Time `json:"updated_at" gorm:"type:datetime"`
 }
 
-// GetActiveAccount 获取一个状态为启用的账号
-func GetActiveAccount() (PrimeEmailAccount, error) {
-	var account PrimeEmailAccount
-	result := db.DB().Where("status = ?", 1).First(&account)
+// GetActiveAccount 获取状态为启用的账号
+func GetActiveAccount() ([]PrimeEmailAccount, error) {
+	var account []PrimeEmailAccount
+	result := db.DB().Where("status = ?", 1).Find(&account)
 	return account, result.Error
 }

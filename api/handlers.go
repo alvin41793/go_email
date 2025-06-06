@@ -77,16 +77,16 @@ func newMailClient(account model.PrimeEmailAccount) (*mailclient.MailClient, err
 
 // 获取邮件列表
 func ListEmails(c *gin.Context) {
-	account, err := model.GetActiveAccount()
+	accounts, err := model.GetActiveAccount()
 	if err != nil {
-		utils.SendResponse(c, err, "获取邮箱配置失败")
+		fmt.Printf("获取邮箱配置失败 %s", err)
 		return
 	}
-
+	account := accounts[0]
 	// 为每个请求创建独立的邮件客户端实例
 	mailClient, err := newMailClient(account)
 	if err != nil {
-		utils.SendResponse(c, err, "获取邮箱配置失败")
+		fmt.Printf("获取邮箱配置失败 %s", err)
 		return
 	}
 	var req ListEmailsRequest
@@ -95,7 +95,7 @@ func ListEmails(c *gin.Context) {
 		return
 	}
 
-	folder := req.Folder
+	folder := "INBOX"
 	limit := req.Limit
 
 	// 使用数据库事务获取最新邮件ID并处理邮件
@@ -175,11 +175,12 @@ func ListEmailsByUid(c *gin.Context) {
 	listEmailsByUidMutex.Lock()
 	defer listEmailsByUidMutex.Unlock()
 
-	account, err := model.GetActiveAccount()
+	accounts, err := model.GetActiveAccount()
 	if err != nil {
 		utils.SendResponse(c, err, "获取邮箱配置失败")
 		return
 	}
+	account := accounts[0]
 
 	// 为每个请求创建独立的邮件客户端实例
 	mailClient, err := newMailClient(account)
@@ -253,11 +254,13 @@ func GetEmailContentList(c *gin.Context) {
 		utils.SendResponse(c, err, "无效的参数")
 		return
 	}
-	account, err := model.GetActiveAccount()
+	accounts, err := model.GetActiveAccount()
 	if err != nil {
 		utils.SendResponse(c, err, "获取邮箱配置失败")
 		return
 	}
+	account := accounts[0]
+
 	// 使用互斥锁保护并发访问
 	emailProcessMutex.Lock()
 
@@ -580,11 +583,12 @@ func GetEmailContent(limit int, account model.PrimeEmailAccount) error {
 // 列出邮件附件
 func ListAttachments(c *gin.Context) {
 	// 为每个请求创建独立的邮件客户端实例
-	account, err := model.GetActiveAccount()
+	accounts, err := model.GetActiveAccount()
 	if err != nil {
 		utils.SendResponse(c, err, "获取邮箱配置失败")
 		return
 	}
+	account := accounts[0]
 
 	// 为每个请求创建独立的邮件客户端实例
 	mailClient, err := newMailClient(account)
@@ -626,21 +630,28 @@ type GetEmailContentRequest struct {
 	Limit int `json:"limit" binding:"required"`
 }
 
-// 发送邮件请求结构
+// SendEmailRequest 发送邮件请求结构体
 type SendEmailRequest struct {
-	To          string `json:"to" binding:"required"`
-	Subject     string `json:"subject" binding:"required"`
-	Body        string `json:"body" binding:"required"`
-	ContentType string `json:"content_type"` // "text" 或 "html"
+	To          string `json:"to"`
+	Subject     string `json:"subject"`
+	Body        string `json:"body"`
+	ContentType string `json:"content_type"`
+}
+
+// SyncMultipleAccountsRequest 同步多账号邮件请求结构体
+type SyncMultipleAccountsRequest struct {
+	MaxWorkers int `json:"max_workers"` // 最大worker数量
+	Limit      int `json:"limit"`       // 每个账号同步的邮件数量限制
 }
 
 // 发送邮件
 func SendEmail(c *gin.Context) {
-	account, err := model.GetActiveAccount()
+	accounts, err := model.GetActiveAccount()
 	if err != nil {
 		utils.SendResponse(c, err, "获取邮箱配置失败")
 		return
 	}
+	account := accounts[0]
 
 	// 为每个请求创建独立的邮件客户端实例
 	mailClient, err := newMailClient(account)
@@ -670,11 +681,12 @@ func SendEmail(c *gin.Context) {
 
 func GetForwardOriginalEmail(c *gin.Context) {
 	startTime := time.Now() // 开始计时
-	account, err := model.GetActiveAccount()
+	accounts, err := model.GetActiveAccount()
 	if err != nil {
 		utils.SendResponse(c, err, "获取邮箱配置失败")
 		return
 	}
+	account := accounts[0]
 
 	// 为每个请求创建独立的邮件客户端实例
 	mailClient, err := newMailClient(account)
@@ -796,4 +808,312 @@ func GetForwardOriginalEmail(c *gin.Context) {
 		successCount, failCount, totalDuration, avgTime)
 
 	utils.SendResponse(c, nil, result)
+}
+
+// SyncEmails 定时同步邮件的函数，不依赖gin.Context
+func SyncEmails() {
+	log.Printf("开始定时同步邮件")
+
+	accounts, err := model.GetActiveAccount()
+	if err != nil {
+		log.Printf("获取邮箱配置失败: %v", err)
+		return
+	}
+	account := accounts[0]
+
+	// 为每个请求创建独立的邮件客户端实例
+	mailClient, err := newMailClient(account)
+	if err != nil {
+		log.Printf("创建邮件客户端失败: %v", err)
+		return
+	}
+
+	// 默认参数
+	folder := "INBOX"
+	limit := 50 // 设置一个合理的默认值
+
+	// 使用数据库事务获取最新邮件ID并处理邮件
+	tx := db.DB().Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			log.Printf("同步邮件时发生异常: %v", r)
+		}
+	}()
+
+	lastEmail, err := model.GetLatestEmailWithTx(tx, account.ID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// 如果没有记录，设置最大ID为0
+			log.Printf("数据库中没有邮件记录，可能为第一次同步")
+		} else {
+			// 其他错误
+			tx.Rollback()
+			log.Printf("获取最大email_id失败: %v", err)
+			return
+		}
+	}
+
+	var emailsResult []mailclient.EmailInfo
+	if lastEmail.EmailID > 0 {
+		log.Printf("当前数据库最大email_id: %d", lastEmail.EmailID)
+		startUID := lastEmail.EmailID + 1
+		endUID := startUID + limit
+		// 使用UID范围获取邮件
+		emailsResult, err = mailClient.ListEmails(folder, limit, uint32(startUID), uint32(endUID))
+	} else {
+		// 获取最新邮件（原有功能）
+		emailsResult, err = mailClient.ListEmails(folder, limit)
+	}
+
+	if err != nil {
+		tx.Rollback()
+		log.Printf("获取邮件列表失败: %v", err)
+		return
+	}
+
+	var emailList []*model.PrimeEmail
+	for _, email := range emailsResult {
+		var emailInfo model.PrimeEmail
+		emailInfo.EmailID, _ = strconv.Atoi(email.EmailID)
+		emailInfo.FromEmail = utils.SanitizeUTF8(email.From)
+		emailInfo.Subject = utils.SanitizeUTF8(email.Subject)
+		emailInfo.Date = utils.SanitizeUTF8(email.Date)
+		emailInfo.HasAttachment = 0
+		emailInfo.AccountId = account.ID
+		emailInfo.Status = -1
+		if email.HasAttachments == true {
+			emailInfo.HasAttachment = 1
+		}
+		emailInfo.CreatedAt = utils.JsonTime{Time: time.Now()}
+
+		emailList = append(emailList, &emailInfo)
+	}
+
+	if len(emailList) > 0 {
+		err = model.BatchCreateEmailsWithTx(emailList, tx)
+		if err != nil {
+			tx.Rollback()
+			log.Printf("批量创建邮件记录失败: %v", err)
+			return
+		}
+
+		if err := tx.Commit().Error; err != nil {
+			log.Printf("提交事务失败: %v", err)
+			return
+		}
+
+		log.Printf("成功同步 %d 封新邮件", len(emailList))
+	} else {
+		tx.Rollback() // 没有邮件时回滚事务
+		log.Printf("没有新邮件需要同步")
+	}
+}
+
+// SyncMultipleAccounts 处理多个账号的邮件同步，限制最大并发数
+func SyncMultipleAccounts(c *gin.Context) {
+	var req SyncMultipleAccountsRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.SendResponse(c, err, "无效的参数")
+		return
+	}
+
+	// 设置默认值
+	maxWorkers := req.MaxWorkers
+	if maxWorkers <= 0 {
+		maxWorkers = 20 // 默认最大worker数量为20
+	}
+
+	limit := req.Limit
+	if limit <= 0 {
+		limit = 50 // 默认每个账号同步的邮件数量
+	}
+
+	// 获取所有活跃的邮箱账号
+	accounts, err := model.GetActiveAccount()
+	if err != nil {
+		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
+	}
+
+	if len(accounts) == 0 {
+		utils.SendResponse(c, nil, "没有找到活跃的邮箱账号")
+		return
+	}
+
+	// 创建任务通道
+	tasks := make(chan model.PrimeEmailAccount, len(accounts))
+
+	// 创建结果通道
+	results := make(chan struct {
+		AccountID int
+		Error     error
+		Count     int
+	}, len(accounts))
+
+	// 启动工作池
+	var wg sync.WaitGroup
+
+	// 控制实际worker数量，避免创建过多无用的worker
+	workerCount := maxWorkers
+	if len(accounts) < maxWorkers {
+		workerCount = len(accounts)
+	}
+
+	log.Printf("[邮件同步] 启动 %d 个工作协程处理 %d 个账号", workerCount, len(accounts))
+
+	// 启动worker goroutines
+	for i := 0; i < workerCount; i++ {
+		wg.Add(1)
+		go func(workerID int) {
+			defer wg.Done()
+			for account := range tasks {
+				log.Printf("[邮件同步] 工作协程 %d 开始处理账号: %s", workerID, account.Account)
+				count, err := syncSingleAccount(account, limit)
+				results <- struct {
+					AccountID int
+					Error     error
+					Count     int
+				}{
+					AccountID: account.ID,
+					Error:     err,
+					Count:     count,
+				}
+				log.Printf("[邮件同步] 工作协程 %d 完成账号: %s 处理", workerID, account.Account)
+			}
+		}(i + 1)
+	}
+
+	// 发送所有任务
+	go func() {
+		for _, account := range accounts {
+			tasks <- account
+		}
+		close(tasks) // 关闭任务通道，表示没有更多任务
+	}()
+
+	// 收集结果的goroutine
+	go func() {
+		wg.Wait()      // 等待所有worker完成
+		close(results) // 关闭结果通道
+	}()
+
+	// 返回正在处理的信息
+	utils.SendResponse(c, nil, fmt.Sprintf("正在同步 %d 个邮箱账号，使用 %d 个工作协程", len(accounts), workerCount))
+
+	// 后台处理结果
+	go func() {
+		successCount := 0
+		failCount := 0
+		resultMap := make(map[int]string)
+
+		for result := range results {
+			if result.Error != nil {
+				failCount++
+				resultMap[result.AccountID] = fmt.Sprintf("同步失败: %v", result.Error)
+				log.Printf("[邮件同步] 账号ID %d 同步失败: %v", result.AccountID, result.Error)
+			} else {
+				successCount++
+				resultMap[result.AccountID] = fmt.Sprintf("同步成功, 获取了 %d 封邮件", result.Count)
+				log.Printf("[邮件同步] 账号ID %d 同步成功, 获取了 %d 封邮件", result.AccountID, result.Count)
+			}
+		}
+
+		log.Printf("[邮件同步] 所有账号同步完成: 成功 %d 个, 失败 %d 个", successCount, failCount)
+	}()
+}
+
+// syncSingleAccount 同步单个账号的邮件
+func syncSingleAccount(account model.PrimeEmailAccount, limit int) (int, error) {
+	// 为每个账号创建独立的邮件客户端实例
+	mailClient, err := newMailClient(account)
+	if err != nil {
+		return 0, fmt.Errorf("创建邮件客户端失败: %v", err)
+	}
+
+	// 默认参数
+	folder := "INBOX"
+
+	// 使用数据库事务获取最新邮件ID并处理邮件
+	tx := db.DB().Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			log.Printf("同步邮件时发生异常: %v", r)
+		}
+	}()
+
+	lastEmail, err := model.GetLatestEmailWithTx(tx, account.ID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// 如果没有记录，设置最大ID为0
+			log.Printf("账号ID %d 数据库中没有邮件记录，可能为第一次同步", account.ID)
+		} else {
+			// 其他错误
+			tx.Rollback()
+			return 0, fmt.Errorf("获取最大email_id失败: %v", err)
+		}
+	}
+
+	var emailsResult []mailclient.EmailInfo
+	if lastEmail.EmailID > 0 {
+		log.Printf("账号ID %d 当前数据库最大email_id: %d", account.ID, lastEmail.EmailID)
+		startUID := lastEmail.EmailID + 1
+		endUID := startUID + limit
+		// 使用UID范围获取邮件
+		emailsResult, err = mailClient.ListEmails(folder, limit, uint32(startUID), uint32(endUID))
+	} else {
+		// 获取最新邮件（原有功能）
+		emailsResult, err = mailClient.ListEmails(folder, limit)
+	}
+
+	if err != nil {
+		tx.Rollback()
+		return 0, fmt.Errorf("获取邮件列表失败: %v", err)
+	}
+
+	// 如果没有新邮件，提交事务并返回
+	if len(emailsResult) == 0 {
+		if err := tx.Commit().Error; err != nil {
+			return 0, fmt.Errorf("提交事务失败: %v", err)
+		}
+		return 0, nil
+	}
+
+	// 构建邮件列表
+	var emailList []*model.PrimeEmail
+	for _, email := range emailsResult {
+		emailID, _ := strconv.Atoi(email.EmailID)
+		emailInfo := &model.PrimeEmail{
+			EmailID:       emailID,
+			FromEmail:     utils.SanitizeUTF8(email.From),
+			Subject:       utils.SanitizeUTF8(email.Subject),
+			Date:          utils.SanitizeUTF8(email.Date),
+			HasAttachment: 0,
+			AccountId:     account.ID,
+			Status:        -1, // 初始状态
+			CreatedAt:     utils.JsonTime{Time: time.Now()},
+		}
+
+		if email.HasAttachments {
+			emailInfo.HasAttachment = 1
+		}
+
+		emailList = append(emailList, emailInfo)
+	}
+
+	// 批量创建邮件记录
+	err = model.BatchCreateEmailsWithTx(emailList, tx)
+	if err != nil {
+		tx.Rollback()
+		return 0, fmt.Errorf("批量创建邮件记录失败: %v", err)
+	}
+
+	// 提交事务
+	if err := tx.Commit().Error; err != nil {
+		return 0, fmt.Errorf("提交事务失败: %v", err)
+	}
+
+	return len(emailsResult), nil
 }

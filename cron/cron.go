@@ -1,7 +1,6 @@
 package crontab
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/robfig/cron/v3"
 	"log"
 )
@@ -19,7 +18,7 @@ func Cron() {
 	//"*/1 * * * * *"
 	_, err := worker.AddFunc("0 */2 * * * *", func() { //每3分钟
 		//
-		ListEmails(c * gin.Context)
+		//ListEmails(c * gin.Context)
 
 	})
 	if err != nil {
