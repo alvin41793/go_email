@@ -2,6 +2,7 @@ package api
 
 import (
 	"go_email/api/middleware"
+	crontab "go_email/cron"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,7 +20,7 @@ func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	g.Use(middleware.Auth()) // 启用Auth中间件进行token验证
 	g.Use(mw...)
 	//定时任务
-	//crontab.Cron()
+	crontab.Cron()
 	g.NoRoute(func(c *gin.Context) {
 		c.String(http.StatusNotFound, "The incorrect API route...")
 	})

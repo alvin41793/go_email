@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"go_email/api"
 	"go_email/config"
-	"go_email/pkg/mailclient"
 	stdlog "log"
 	"os"
 	"path/filepath"
@@ -46,22 +45,6 @@ func initStdLog() {
 }
 
 func main() {
-	// 获取邮箱配置
-	emailConfig, err := mailclient.GetEmailConfig()
-	if err != nil {
-		stdlog.Fatalf("无法加载邮箱配置: %v", err)
-	}
-
-	// 初始化邮件客户端
-	api.InitMailClient(
-		emailConfig.IMAPServer,
-		emailConfig.SMTPServer,
-		emailConfig.EmailAddress,
-		emailConfig.Password,
-		emailConfig.IMAPPort,
-		emailConfig.SMTPPort,
-		emailConfig.UseSSL,
-	)
 
 	env := flag.String("env", "", "环境名称（如 debug, prod）")
 	flag.Parse()
@@ -89,7 +72,7 @@ func main() {
 
 	// 连接数据库
 
-	err = g.Run(viper.GetString("addr1"))
+	err := g.Run(viper.GetString("addr1"))
 	if err != nil {
 		panic(err)
 	}
