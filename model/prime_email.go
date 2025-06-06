@@ -12,6 +12,7 @@ import (
 type PrimeEmail struct {
 	ID            uint           `gorm:"primarykey;column:id" json:"id"`
 	EmailID       int            `gorm:"column:email_id" json:"email_id"`
+	AccountId     int            `gorm:"column:account_id" json:"account_id"`
 	FromEmail     string         `gorm:"column:from_email;size:255" json:"from_email"` // 发送者
 	Subject       string         `gorm:"column:subject;size:255" json:"subject"`       // 主题
 	Date          string         `gorm:"column:date;size:255" json:"date"`             // 邮件日期

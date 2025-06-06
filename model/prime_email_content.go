@@ -14,6 +14,7 @@ import (
 type PrimeEmailContent struct {
 	ID            uint           `gorm:"primarykey;column:id" json:"id"`
 	EmailID       int            `gorm:"column:email_id" json:"email_id"`
+	AccountId     int            `gorm:"column:account_id" json:"account_id"`
 	Subject       string         `gorm:"column:subject;size:255" json:"subject"`                // 主题
 	FromEmail     string         `gorm:"column:from_email;size:255" json:"from_email"`          // 发送者
 	ToEmail       string         `gorm:"column:to_email;size:255" json:"to_email"`              // 接收者

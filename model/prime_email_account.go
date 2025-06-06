@@ -1,0 +1,14 @@
+package model
+
+import "time"
+
+// PrimeEmailAccount 表示邮箱账号表结构
+type PrimeEmailAccount struct {
+	ID        int       `json:"id" gorm:"primaryKey;autoIncrement"`
+	Account   string    `json:"account" gorm:"type:varchar(255)"`
+	Password  string    `json:"password" gorm:"type:varchar(255)"`
+	Status    int       `json:"status" gorm:"comment:'-1:删除 0:未启用 1:已启用'"`
+	Type      int       `json:"type" gorm:"comment:'0:op账号'"`
+	CreatedAt time.Time `json:"created_at" gorm:"type:datetime"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"type:datetime"`
+}

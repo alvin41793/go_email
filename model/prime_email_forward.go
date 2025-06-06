@@ -12,6 +12,7 @@ type PrimeEmailForward struct {
 	ID            int             `json:"id"`
 	ForwardRuleId int             `json:"forward_rule_Id"`
 	EmailID       int             `json:"email_id" gorm:"type:int"`
+	AccountId     int             `gorm:"column:account_id" json:"account_id"`
 	PrimeOp       string          `json:"prime_op" gorm:"type:varchar(255)"`
 	Mbl           string          `json:"mbl" gorm:"type:varchar(255)"`
 	Hbl           string          `json:"hbl" gorm:"type:varchar(255)"`

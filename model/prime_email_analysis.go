@@ -10,6 +10,7 @@ import (
 type PrimeEmailAnalysis struct {
 	ID           int             `gorm:"primarykey;column:id" json:"id"`
 	EmailID      int             `gorm:"column:email_id" json:"email_id"`
+	AccountId    int             `gorm:"column:account_id" json:"account_id"`
 	ModelType    string          `gorm:"column:model_type;size:255" json:"model_type"` // 模型类型
 	Mbl          string          `gorm:"column:mbl;size:255" json:"mbl"`               // MBL号
 	Hbl          string          `gorm:"column:hbl;size:255" json:"hbl"`               // HBL号

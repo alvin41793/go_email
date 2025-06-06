@@ -9,6 +9,7 @@ import (
 type PrimeEmailIdentifyLog struct {
 	ID            uint           `gorm:"primarykey;column:id" json:"id"`
 	EmailID       int            `gorm:"column:email_id" json:"email_id"`
+	AccountId     int            `gorm:"column:account_id" json:"account_id"`
 	BeginTime     utils.JsonTime `gorm:"column:begin_time" json:"begin_time"`
 	EndTime       utils.JsonTime `gorm:"column:end_time" json:"end_time"`
 	RunTime       int            `gorm:"column:run_time" json:"run_time"`
