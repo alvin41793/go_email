@@ -77,11 +77,6 @@ func newMailClient(account model.PrimeEmailAccount) (*mailclient.MailClient, err
 
 // 获取邮件列表
 func ListEmails(c *gin.Context) {
-	// 使用互斥锁确保同一时间只有一个请求在处理邮件列表
-	// 注意：这种方式会阻塞所有请求，可能影响性能
-	// 如果需要更好的性能，可以考虑使用数据库事务和条件更新
-	listEmailsMutex.Lock()
-	defer listEmailsMutex.Unlock()
 	account, err := model.GetActiveAccount()
 	if err != nil {
 		utils.SendResponse(c, err, "获取邮箱配置失败")
@@ -111,7 +106,7 @@ func ListEmails(c *gin.Context) {
 		}
 	}()
 
-	lastEmail, err := model.GetLatestEmailWithTx(tx)
+	lastEmail, err := model.GetLatestEmailWithTx(tx, account.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// 如果没有记录，设置最大ID为0
@@ -150,6 +145,7 @@ func ListEmails(c *gin.Context) {
 		emailInfo.Subject = utils.SanitizeUTF8(email.Subject)
 		emailInfo.Date = utils.SanitizeUTF8(email.Date)
 		emailInfo.HasAttachment = 0
+		emailInfo.AccountId = account.ID
 		emailInfo.Status = -1
 		if email.HasAttachments == true {
 			emailInfo.HasAttachment = 1

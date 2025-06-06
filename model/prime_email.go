@@ -112,9 +112,9 @@ func GetLatestEmail() (PrimeEmail, error) {
 }
 
 // GetLatestEmailWithTx 使用事务获取最新的邮件记录
-func GetLatestEmailWithTx(tx *gorm.DB) (PrimeEmail, error) {
+func GetLatestEmailWithTx(tx *gorm.DB, accountId int) (PrimeEmail, error) {
 	var email PrimeEmail
-	err := tx.Order("email_id desc").First(&email).Error
+	err := tx.Where("account_id=?", accountId).Order("email_id desc").First(&email).Error
 	return email, err
 }
 
