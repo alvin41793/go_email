@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"go_email/db"
+	"time"
+)
 
 // PrimeEmailAccount 表示邮箱账号表结构
 type PrimeEmailAccount struct {
@@ -11,4 +14,11 @@ type PrimeEmailAccount struct {
 	Type      int       `json:"type" gorm:"comment:'0:op账号'"`
 	CreatedAt time.Time `json:"created_at" gorm:"type:datetime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"type:datetime"`
+}
+
+// GetActiveAccount 获取一个状态为启用的账号
+func GetActiveAccount() (PrimeEmailAccount, error) {
+	var account PrimeEmailAccount
+	result := db.DB().Where("status = ?", 1).First(&account)
+	return account, result.Error
 }

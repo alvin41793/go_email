@@ -2,6 +2,9 @@ package mailclient
 
 import (
 	"fmt"
+
+	"go_email/model"
+
 	"github.com/emersion/go-imap/client"
 )
 
@@ -120,14 +123,18 @@ func (m *MailClient) ConnectIMAP() (*client.Client, error) {
 	return c, nil
 }
 
-// GetEmailConfig 获取邮箱配置
+// GetEmailConfig 从数据库获取邮箱配置
 func GetEmailConfig() (*EmailConfigInfo, error) {
+	account, err := model.GetActiveAccount()
+	if err != nil {
+		return nil, fmt.Errorf("查询邮箱账号失败: %w", err)
+	}
 
 	return &EmailConfigInfo{
 		IMAPServer:   "imap.ipage.com",
 		SMTPServer:   "smtp.ipage.com",
-		EmailAddress: "operator@primeagencygroup.com",
-		password: REDACTED,
+		EmailAddress: account.Account,
+		password: REDACTED
 		IMAPPort:     993,
 		SMTPPort:     587,
 		UseSSL:       true,
