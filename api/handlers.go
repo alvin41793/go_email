@@ -55,16 +55,25 @@ func InitMailClient(imapServer, smtpServer, emailAddress, password string, imapP
 }
 
 // 获取新的邮件客户端实例
-func newMailClient() *mailclient.MailClient {
+func newMailClient() (*mailclient.MailClient, error) {
+	// 每次都从数据库获取最新的邮箱配置
+	emailConfig, err := mailclient.GetEmailConfig()
+	if err != nil {
+		log.Printf("获取邮箱配置失败: %v", err)
+		// 获取失败时使用全局配置作为备选
+		return nil, err
+	}
+
+	// 使用从数据库获取的最新配置
 	return mailclient.NewMailClient(
-		mailConfig.IMAPServer,
-		mailConfig.SMTPServer,
-		mailConfig.EmailAddress,
-		mailConfig.Password,
-		mailConfig.IMAPPort,
-		mailConfig.SMTPPort,
-		mailConfig.UseSSL,
-	)
+		emailConfig.IMAPServer,
+		emailConfig.SMTPServer,
+		emailConfig.EmailAddress,
+		emailConfig.Password,
+		emailConfig.IMAPPort,
+		emailConfig.SMTPPort,
+		emailConfig.UseSSL,
+	), nil
 }
 
 // 获取邮件列表
@@ -76,8 +85,11 @@ func ListEmails(c *gin.Context) {
 	defer listEmailsMutex.Unlock()
 
 	// 为每个请求创建独立的邮件客户端实例
-	mailClient := newMailClient()
-
+	mailClient, err := newMailClient()
+	if err != nil {
+		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
+	}
 	var req ListEmailsRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.SendResponse(c, err, "无效的参数")
@@ -164,8 +176,11 @@ func ListEmailsByUid(c *gin.Context) {
 	defer listEmailsByUidMutex.Unlock()
 
 	// 为每个请求创建独立的邮件客户端实例
-	mailClient := newMailClient()
-
+	mailClient, err := newMailClient()
+	if err != nil {
+		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
+	}
 	var req ListEmailsByUidRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.SendResponse(c, err, "无效的参数")
@@ -186,7 +201,7 @@ func ListEmailsByUid(c *gin.Context) {
 
 	count := int(endUID - startUID)
 	// 使用UID范围获取邮件
-	emailsResult, err := mailClient.ListEmails("INBOX", count, uint32(startUID), uint32(endUID))
+	emailsResult, err = mailClient.ListEmails("INBOX", count, uint32(startUID), uint32(endUID))
 
 	if err != nil {
 		tx.Rollback()
@@ -326,7 +341,12 @@ func GetEmailContent(limit int) error {
 		return nil
 	}
 	// 为每个请求创建独立的邮件客户端实例
-	mailClient := newMailClient()
+	mailClient, err := newMailClient()
+	if err != nil {
+		log.Printf("获取邮箱配置失败", err)
+		fmt.Println("获取邮箱配置失败", err)
+		return err
+	}
 	log.Printf("[邮件处理] 开始处理 %d 封邮件, 文件夹: %s", len(emailIDs), folder)
 	fmt.Printf("\n========== 开始处理 %d 封邮件，文件夹: %s ==========\n", len(emailIDs), folder)
 
@@ -550,8 +570,12 @@ func GetEmailContent(limit int) error {
 // 列出邮件附件
 func ListAttachments(c *gin.Context) {
 	// 为每个请求创建独立的邮件客户端实例
-	mailClient := newMailClient()
+	mailClient, err := newMailClient()
+	if err != nil {
+		log.Printf("获取邮箱配置失败: %v", err)
+		utils.SendResponse(c, err, "获取邮箱配置失败")
 
+	}
 	uidStr := c.Param("uid")
 	folder := c.DefaultQuery("folder", "INBOX")
 
@@ -597,8 +621,11 @@ type SendEmailRequest struct {
 // 发送邮件
 func SendEmail(c *gin.Context) {
 	// 为每个请求创建独立的邮件客户端实例
-	mailClient := newMailClient()
-
+	mailClient, err := newMailClient()
+	if err != nil {
+		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
+	}
 	var req SendEmailRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.SendResponse(c, err, "无效的参数")
@@ -610,7 +637,7 @@ func SendEmail(c *gin.Context) {
 		contentType = "text"
 	}
 
-	err := mailClient.SendEmail(req.To, req.Subject, req.Body, contentType)
+	err = mailClient.SendEmail(req.To, req.Subject, req.Body, contentType)
 	if err != nil {
 		utils.SendResponse(c, err, nil)
 
@@ -621,8 +648,11 @@ func SendEmail(c *gin.Context) {
 
 func GetForwardOriginalEmail(c *gin.Context) {
 	startTime := time.Now() // 开始计时
-	mailClient := newMailClient()
-
+	mailClient, err := newMailClient()
+	if err != nil {
+		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
+	}
 	// 创建请求结构体
 	type ForwardRequest struct {
 		EmailID int `json:"email_id"`
@@ -630,7 +660,7 @@ func GetForwardOriginalEmail(c *gin.Context) {
 	}
 
 	var req ForwardRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err = c.ShouldBindJSON(&req); err != nil {
 		utils.SendResponse(c, err, "参数错误")
 		return
 	}
