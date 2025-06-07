@@ -41,6 +41,7 @@ var (
 	maxTotalGoroutines int32 = 1 // 全局最大协程数
 	goroutinesPerReq   int32 = 3 // 每次请求创建的协程数
 	sleepTime          int   = 3
+	processingAccounts map[int]bool
 )
 
 // 初始化邮件配置
@@ -931,13 +932,37 @@ func SyncMultipleAccounts(c *gin.Context) {
 		return
 	}
 
-	// 使用互斥锁保护并发访问
+	// 使用互斥锁保护并发访问和处理中账号集合
 	emailProcessMutex.Lock()
 
 	// 检查是否已达到最大全局协程数
 	if atomic.LoadInt32(&currentGoroutines) >= maxTotalGoroutines {
 		emailProcessMutex.Unlock()
 		utils.SendResponse(c, nil, "已达到全局最大处理协程数量，请等待当前任务完成")
+		return
+	}
+
+	// 使用一个全局map来跟踪正在处理的账号ID
+	// 如果不存在，创建一个空map
+	if processingAccounts == nil {
+		processingAccounts = make(map[int]bool)
+	}
+
+	// 过滤掉正在处理中的账号
+	var filteredAccounts []model.PrimeEmailAccount
+	var skippedAccounts []int
+	for _, account := range accounts {
+		if _, isProcessing := processingAccounts[account.ID]; !isProcessing {
+			filteredAccounts = append(filteredAccounts, account)
+		} else {
+			skippedAccounts = append(skippedAccounts, account.ID)
+		}
+	}
+
+	// 如果所有账号都在处理中，返回提示信息
+	if len(filteredAccounts) == 0 {
+		emailProcessMutex.Unlock()
+		utils.SendResponse(c, nil, fmt.Sprintf("所有账号(%d个)都在处理中，请等待当前任务完成", len(skippedAccounts)))
 		return
 	}
 
@@ -956,8 +981,8 @@ func SyncMultipleAccounts(c *gin.Context) {
 	}
 
 	// 确保不创建过多无用的worker
-	if len(accounts) < maxWorkers {
-		maxWorkers = len(accounts)
+	if len(filteredAccounts) < maxWorkers {
+		maxWorkers = len(filteredAccounts)
 	}
 
 	// 如果没有可用的协程槽位
@@ -970,10 +995,16 @@ func SyncMultipleAccounts(c *gin.Context) {
 	// 更新全局协程计数
 	atomic.AddInt32(&currentGoroutines, int32(maxWorkers))
 
-	log.Printf("[邮件同步] 当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号",
-		atomic.LoadInt32(&currentGoroutines), maxWorkers, len(accounts))
-	fmt.Printf("[邮件同步] 当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号\n",
-		atomic.LoadInt32(&currentGoroutines), maxWorkers, len(accounts))
+	// 标记这些账号为正在处理
+	for _, account := range filteredAccounts {
+		processingAccounts[account.ID] = true
+	}
+
+	log.Printf("[邮件同步] 当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号, 跳过 %d 个正在处理的账号",
+		atomic.LoadInt32(&currentGoroutines), maxWorkers, len(filteredAccounts), len(skippedAccounts))
+	fmt.Printf("[邮件同步] 当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号, 跳过 %d 个正在处理的账号\n",
+		atomic.LoadInt32(&currentGoroutines), maxWorkers, len(filteredAccounts), len(skippedAccounts))
+
 	emailProcessMutex.Unlock()
 
 	limit := req.Limit
@@ -982,20 +1013,20 @@ func SyncMultipleAccounts(c *gin.Context) {
 	}
 
 	// 创建任务通道
-	tasks := make(chan model.PrimeEmailAccount, len(accounts))
+	tasks := make(chan model.PrimeEmailAccount, len(filteredAccounts))
 
 	// 创建结果通道
 	results := make(chan struct {
 		AccountID int
 		Error     error
 		Count     int
-	}, len(accounts))
+	}, len(filteredAccounts))
 
 	// 启动工作池
 	var wg sync.WaitGroup
 
-	log.Printf("[邮件同步] 启动 %d 个工作协程处理 %d 个账号", maxWorkers, len(accounts))
-	fmt.Printf("[邮件同步] 启动 %d 个工作协程处理 %d 个账号\n", maxWorkers, len(accounts))
+	log.Printf("[邮件同步] 启动 %d 个工作协程处理 %d 个账号", maxWorkers, len(filteredAccounts))
+	fmt.Printf("[邮件同步] 启动 %d 个工作协程处理 %d 个账号\n", maxWorkers, len(filteredAccounts))
 
 	// 启动worker goroutines
 	for i := 0; i < maxWorkers; i++ {
@@ -1009,11 +1040,11 @@ func SyncMultipleAccounts(c *gin.Context) {
 					workerID, atomic.LoadInt32(&currentGoroutines))
 				fmt.Printf("[邮件同步] 工作协程 %d 完成，剩余全局协程数: %d\n",
 					workerID, atomic.LoadInt32(&currentGoroutines))
+
 				// 捕获panic，防止worker崩溃导致计数不准确
 				if r := recover(); r != nil {
 					log.Printf("[邮件同步] 工作协程 %d 发生panic: %v", workerID, r)
 					fmt.Printf("[邮件同步] 工作协程 %d 发生panic: %v\n", workerID, r)
-
 				}
 			}()
 
@@ -1022,6 +1053,12 @@ func SyncMultipleAccounts(c *gin.Context) {
 				fmt.Printf("[邮件同步] 工作协程 %d 开始处理账号: %s\n", workerID, account.Account)
 
 				count, err := syncSingleAccount(account, limit)
+
+				// 同步完成后，从处理中账号集合移除
+				emailProcessMutex.Lock()
+				delete(processingAccounts, account.ID)
+				emailProcessMutex.Unlock()
+
 				results <- struct {
 					AccountID int
 					Error     error
@@ -1040,7 +1077,7 @@ func SyncMultipleAccounts(c *gin.Context) {
 
 	// 发送所有任务
 	go func() {
-		for _, account := range accounts {
+		for _, account := range filteredAccounts {
 			tasks <- account
 		}
 		close(tasks) // 关闭任务通道，表示没有更多任务
@@ -1052,9 +1089,18 @@ func SyncMultipleAccounts(c *gin.Context) {
 		close(results) // 关闭结果通道
 	}()
 
+	// 构造返回消息
+	var responseMsg string
+	if len(skippedAccounts) > 0 {
+		responseMsg = fmt.Sprintf("正在同步 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d，跳过 %d 个正在处理的账号",
+			len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentGoroutines), len(skippedAccounts))
+	} else {
+		responseMsg = fmt.Sprintf("正在同步 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d",
+			len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentGoroutines))
+	}
+
 	// 返回正在处理的信息
-	utils.SendResponse(c, nil, fmt.Sprintf("正在同步 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d",
-		len(accounts), maxWorkers, atomic.LoadInt32(&currentGoroutines)))
+	utils.SendResponse(c, nil, responseMsg)
 
 	// 后台处理结果
 	go func() {
