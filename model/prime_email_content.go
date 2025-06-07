@@ -82,6 +82,7 @@ func (e *PrimeEmailContent) CreateWithTransaction(tx *gorm.DB) error {
 	e.Content = utils.SanitizeUTF8(e.Content)
 	e.HTMLContent = utils.SanitizeUTF8(e.HTMLContent)
 	e.HasAttachment = e.HasAttachment
+	e.AccountId = e.AccountId
 	e.Status = -1
 	err := tx.Create(e).Error
 	if err != nil {

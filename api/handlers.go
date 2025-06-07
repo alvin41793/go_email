@@ -183,6 +183,7 @@ func GetEmailContent(limit int) error {
 	// 存储所有邮件内容和附件，以便后续批量存储
 	type EmailData struct {
 		EmailID      int
+		AccountId    int
 		EmailContent *model.PrimeEmailContent
 		Attachments  []*model.PrimeEmailContentAttachment
 	}
@@ -224,6 +225,7 @@ func GetEmailContent(limit int) error {
 		// 创建邮件内容记录
 		emailContent := &model.PrimeEmailContent{
 			EmailID:       emailOne.EmailID,
+			AccountId:     emailOne.AccountId,
 			Subject:       utils.SanitizeUTF8(email.Subject),
 			FromEmail:     utils.SanitizeUTF8(email.From),
 			ToEmail:       utils.SanitizeUTF8(email.To),
@@ -310,6 +312,7 @@ func GetEmailContent(limit int) error {
 				// 创建附件记录
 				attachmentRecord := &model.PrimeEmailContentAttachment{
 					EmailID:   emailOne.EmailID,
+					AccountId: emailOne.AccountId,
 					FileName:  utils.SanitizeUTF8(attachment.Filename),
 					SizeKb:    attachment.SizeKB,
 					MimeType:  utils.SanitizeUTF8(attachment.MimeType),
@@ -328,6 +331,7 @@ func GetEmailContent(limit int) error {
 		// 添加到待处理列表
 		allEmailData = append(allEmailData, EmailData{
 			EmailID:      emailOne.EmailID,
+			AccountId:    emailOne.AccountId,
 			EmailContent: emailContent,
 			Attachments:  attachmentRecords,
 		})
