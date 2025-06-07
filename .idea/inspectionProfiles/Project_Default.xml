@@ -4,6 +4,7 @@
     <inspection_tool class="GoDfaErrorMayBeNotNil" enabled="true" level="WARNING" enabled_by_default="true">
       <functions>
         <function importPath="go_email/model" name="GetEmailByEmailID" />
+        <function importPath="go_email/model" name="GetAccountByID" />
       </functions>
     </inspection_tool>
   </profile>
