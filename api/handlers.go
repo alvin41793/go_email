@@ -35,10 +35,10 @@ var (
 	// 添加获取邮件列表处理相关的全局变量
 	emailListProcessMutex          sync.Mutex
 	currentEmailListGoroutines     int32     // 当前获取邮件列表运行的协程总数
-	maxEmailListTotalGoroutines    int32 = 1 // 全局获取邮件列表最大协程数
+	maxEmailListTotalGoroutines    int32 = 5 // 全局获取邮件列表最大协程数
 	emailContentProcessMutex       sync.Mutex
 	currentEmailContentGoroutines  int32     // 当前获取邮件内容运行的协程总数
-	maxEmailContentTotalGoroutines int32 = 1 // 全局获取邮件内容最大协程数
+	maxEmailContentTotalGoroutines int32 = 5 // 全局获取邮件内容最大协程数
 	listEmailsByUidMutex           sync.Mutex
 	goroutinesPerReq               int32 = 3 // 每次请求创建的协程数
 	sleepTime                      int   = 3
