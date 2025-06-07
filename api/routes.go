@@ -44,7 +44,7 @@ func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 			//转发邮件
 			emails.POST("/tr_send", GetForwardOriginalEmail)
 			// 发送邮件
-			emails.POST("/send", SendEmail)
+			//emails.POST("/send", SendEmail)
 		}
 	}
 

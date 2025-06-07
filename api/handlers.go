@@ -474,40 +474,40 @@ type SyncMultipleAccountsRequest struct {
 	Limit      int `json:"limit"`       // 每个账号同步的邮件数量限制
 }
 
-// 发送邮件
-func SendEmail(c *gin.Context) {
-	accounts, err := model.GetActiveAccount()
-	if err != nil {
-		utils.SendResponse(c, err, "获取邮箱配置失败")
-		return
-	}
-	account := accounts[0]
-
-	// 为每个请求创建独立的邮件客户端实例
-	mailClient, err := newMailClient(account)
-	if err != nil {
-		utils.SendResponse(c, err, "获取邮箱配置失败")
-		return
-	}
-	var req SendEmailRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.SendResponse(c, err, "无效的参数")
-		return
-	}
-
-	contentType := req.ContentType
-	if contentType != "html" {
-		contentType = "text"
-	}
-
-	err = mailClient.SendEmail(req.To, req.Subject, req.Body, contentType)
-	if err != nil {
-		utils.SendResponse(c, err, nil)
-
-		return
-	}
-	utils.SendResponse(c, err, "邮件发送成功")
-}
+//// 发送邮件
+//func SendEmail(c *gin.Context) {
+//	accounts, err := model.GetActiveAccount()
+//	if err != nil {
+//		utils.SendResponse(c, err, "获取邮箱配置失败")
+//		return
+//	}
+//	account := accounts[0]
+//
+//	// 为每个请求创建独立的邮件客户端实例
+//	mailClient, err := newMailClient(account)
+//	if err != nil {
+//		utils.SendResponse(c, err, "获取邮箱配置失败")
+//		return
+//	}
+//	var req SendEmailRequest
+//	if err := c.ShouldBindJSON(&req); err != nil {
+//		utils.SendResponse(c, err, "无效的参数")
+//		return
+//	}
+//
+//	contentType := req.ContentType
+//	if contentType != "html" {
+//		contentType = "text"
+//	}
+//
+//	err = mailClient.SendEmail(req.To, req.Subject, req.Body, contentType)
+//	if err != nil {
+//		utils.SendResponse(c, err, nil)
+//
+//		return
+//	}
+//	utils.SendResponse(c, err, "邮件发送成功")
+//}
 
 func GetForwardOriginalEmail(c *gin.Context) {
 	startTime := time.Now() // 开始计时
