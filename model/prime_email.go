@@ -125,6 +125,20 @@ func BatchCreateEmailsWithTx(emails []*PrimeEmail, tx *gorm.DB) error {
 	}
 
 	for _, email := range emails {
+		// 先检查是否已存在相同的email_id和account_id记录
+		var count int64
+		if err := tx.Model(&PrimeEmail{}).
+			Where("email_id = ? AND account_id = ?", email.EmailID, email.AccountId).
+			Count(&count).Error; err != nil {
+			return err
+		}
+
+		// 如果记录已存在，则跳过此条记录的创建
+		if count > 0 {
+			continue
+		}
+
+		// 记录不存在，创建新记录
 		if err := tx.Create(email).Error; err != nil {
 			return err
 		}
