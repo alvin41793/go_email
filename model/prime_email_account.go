@@ -22,3 +22,9 @@ func GetActiveAccount() ([]PrimeEmailAccount, error) {
 	result := db.DB().Where("status = ?", 1).Find(&account)
 	return account, result.Error
 }
+
+func GetAccountByID(id int) (PrimeEmailAccount, error) {
+	var account PrimeEmailAccount
+	result := db.DB().Where("id = ?", id).First(&account)
+	return account, result.Error
+}

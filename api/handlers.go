@@ -32,13 +32,14 @@ var mailConfig struct {
 
 // 添加邮件列表操作的互斥锁
 var (
-	listEmailsMutex      sync.Mutex
-	listEmailsByUidMutex sync.Mutex
+	// 添加获取邮件列表处理相关的全局变量
+	emailListProcessMutex          sync.Mutex
+	currentEmailListGoroutines     int32     // 当前获取邮件列表运行的协程总数
+	maxEmailListTotalGoroutines    int32 = 1 // 全局获取邮件列表最大协程数
+	emailContentProcessMutex       sync.Mutex
+	currentEmailContentGoroutines  int32     // 当前获取邮件内容运行的协程总数
+	maxEmailContentTotalGoroutines int32 = 1 // 全局获取邮件内容最大协程数
 
-	// 添加邮件处理相关的全局变量
-	emailProcessMutex  sync.Mutex
-	currentGoroutines  int32     // 当前运行的协程总数
-	maxTotalGoroutines int32 = 1 // 全局最大协程数
 	goroutinesPerReq   int32 = 3 // 每次请求创建的协程数
 	sleepTime          int   = 3
 	processingAccounts map[int]bool
@@ -76,214 +77,35 @@ func newMailClient(account model.PrimeEmailAccount) (*mailclient.MailClient, err
 	), nil
 }
 
-// 获取邮件列表
-func ListEmails(c *gin.Context) {
-	accounts, err := model.GetActiveAccount()
-	if err != nil {
-		fmt.Printf("获取邮箱配置失败 %s", err)
-		return
-	}
-	account := accounts[0]
-	// 为每个请求创建独立的邮件客户端实例
-	mailClient, err := newMailClient(account)
-	if err != nil {
-		fmt.Printf("获取邮箱配置失败 %s", err)
-		return
-	}
-	var req ListEmailsRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.SendResponse(c, err, "无效的参数")
-		return
-	}
-
-	folder := "INBOX"
-	limit := req.Limit
-
-	// 使用数据库事务获取最新邮件ID并处理邮件
-	tx := db.DB().Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	lastEmail, err := model.GetLatestEmailWithTx(tx, account.ID)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// 如果没有记录，设置最大ID为0
-			fmt.Println("数据库中没有邮件记录，可能为第一次同步")
-		} else {
-			// 其他错误
-			tx.Rollback()
-			utils.SendResponse(c, fmt.Errorf("获取最大email_id失败: %v", err), nil)
-			return
-		}
-	}
-
-	var emailsResult []mailclient.EmailInfo
-	if lastEmail.EmailID > 0 {
-		fmt.Printf("当前数据库最大email_id: %d\n", lastEmail.EmailID)
-		startUID := lastEmail.EmailID + 1
-		endUID := startUID + limit
-		// 使用UID范围获取邮件
-		emailsResult, err = mailClient.ListEmails(folder, limit, uint32(startUID), uint32(endUID))
-	} else {
-		// 获取最新邮件（原有功能）
-		emailsResult, err = mailClient.ListEmails(folder, limit)
-	}
-
-	if err != nil {
-		tx.Rollback()
-		utils.SendResponse(c, err, nil)
-		return
-	}
-
-	var emailList []*model.PrimeEmail
-	for _, email := range emailsResult {
-		var emailInfo model.PrimeEmail
-		emailInfo.EmailID, _ = strconv.Atoi(email.EmailID)
-		emailInfo.FromEmail = utils.SanitizeUTF8(email.From)
-		emailInfo.Subject = utils.SanitizeUTF8(email.Subject)
-		emailInfo.Date = utils.SanitizeUTF8(email.Date)
-		emailInfo.HasAttachment = 0
-		emailInfo.AccountId = account.ID
-		emailInfo.Status = -1
-		if email.HasAttachments == true {
-			emailInfo.HasAttachment = 1
-		}
-		emailInfo.CreatedAt = utils.JsonTime{Time: time.Now()}
-
-		emailList = append(emailList, &emailInfo)
-	}
-
-	err = model.BatchCreateEmailsWithTx(emailList, tx)
-	if err != nil {
-		tx.Rollback()
-		utils.SendResponse(c, err, nil)
-		return
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		utils.SendResponse(c, err, nil)
-		return
-	}
-
-	utils.SendResponse(c, nil, emailsResult)
-}
-
-func ListEmailsByUid(c *gin.Context) {
-	// 使用互斥锁确保同一时间只有一个请求在处理邮件列表
-	listEmailsByUidMutex.Lock()
-	defer listEmailsByUidMutex.Unlock()
-
-	accounts, err := model.GetActiveAccount()
-	if err != nil {
-		utils.SendResponse(c, err, "获取邮箱配置失败")
-		return
-	}
-	account := accounts[0]
-
-	// 为每个请求创建独立的邮件客户端实例
-	mailClient, err := newMailClient(account)
-	if err != nil {
-		utils.SendResponse(c, err, "获取邮箱配置失败")
-		return
-	}
-	var req ListEmailsByUidRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.SendResponse(c, err, "无效的参数")
-		return
-	}
-
-	// 使用数据库事务
-	tx := db.DB().Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
-
-	var emailsResult []mailclient.EmailInfo
-	startUID := req.StartUID
-	endUID := req.EndUID
-
-	count := int(endUID - startUID)
-	// 使用UID范围获取邮件
-	emailsResult, err = mailClient.ListEmails("INBOX", count, uint32(startUID), uint32(endUID))
-
-	if err != nil {
-		tx.Rollback()
-		utils.SendResponse(c, err, nil)
-		return
-	}
-
-	var emailList []*model.PrimeEmail
-	for _, email := range emailsResult {
-		var emailInfo model.PrimeEmail
-		emailInfo.EmailID, _ = strconv.Atoi(email.EmailID)
-		emailInfo.FromEmail = utils.SanitizeUTF8(email.From)
-		emailInfo.Subject = utils.SanitizeUTF8(email.Subject)
-		emailInfo.Date = utils.SanitizeUTF8(email.Date)
-		emailInfo.HasAttachment = 0
-		emailInfo.Status = -1
-		if email.HasAttachments == true {
-			emailInfo.HasAttachment = 1
-		}
-		emailInfo.CreatedAt = utils.JsonTime{Time: time.Now()}
-
-		emailList = append(emailList, &emailInfo)
-	}
-
-	err = model.BatchCreateEmailsWithTx(emailList, tx)
-	if err != nil {
-		tx.Rollback()
-		utils.SendResponse(c, err, nil)
-		return
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		utils.SendResponse(c, err, nil)
-		return
-	}
-
-	utils.SendResponse(c, nil, emailsResult)
-}
-
 func GetEmailContentList(c *gin.Context) {
 	var req GetEmailContentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.SendResponse(c, err, "无效的参数")
 		return
 	}
-	accounts, err := model.GetActiveAccount()
-	if err != nil {
-		utils.SendResponse(c, err, "获取邮箱配置失败")
-		return
-	}
-	account := accounts[0]
 
 	// 使用互斥锁保护并发访问
-	emailProcessMutex.Lock()
+	emailContentProcessMutex.Lock()
 
 	// 检查是否已达到最大协程数
-	if atomic.LoadInt32(&currentGoroutines) >= maxTotalGoroutines {
-		emailProcessMutex.Unlock()
+	if atomic.LoadInt32(&currentEmailContentGoroutines) >= maxEmailContentTotalGoroutines {
+		emailContentProcessMutex.Unlock()
 		utils.SendResponse(c, nil, "已达到最大处理协程数量，请等待当前任务完成")
 		return
 	}
 
 	// 计算本次请求可以创建的协程数量
-	remainingSlots := maxTotalGoroutines - atomic.LoadInt32(&currentGoroutines)
+	remainingSlots := maxEmailContentTotalGoroutines - atomic.LoadInt32(&currentEmailContentGoroutines)
 	createCount := goroutinesPerReq
 	if remainingSlots < goroutinesPerReq {
 		createCount = remainingSlots
 	}
 
 	log.Printf("[邮件处理] 当前已有 %d 个协程，本次请求将创建 %d 个新协程",
-		atomic.LoadInt32(&currentGoroutines), createCount)
+		atomic.LoadInt32(&currentEmailContentGoroutines), createCount)
 
 	// 释放互斥锁，允许其他请求继续
-	emailProcessMutex.Unlock()
+	emailContentProcessMutex.Unlock()
 
 	// 使用WaitGroup来等待本次创建的协程完成
 	var wg sync.WaitGroup
@@ -306,24 +128,24 @@ func GetEmailContentList(c *gin.Context) {
 			wg.Add(1)
 
 			// 增加全局协程计数
-			currentCount := atomic.AddInt32(&currentGoroutines, 1)
+			currentCount := atomic.AddInt32(&currentEmailContentGoroutines, 1)
 
 			log.Printf("[邮件处理] 创建第 %d 个协程 (总计: %d/%d)",
-				i+1, currentCount, maxTotalGoroutines)
+				i+1, currentCount, maxEmailContentTotalGoroutines)
 
 			// 启动协程处理邮件
 			go func(goroutineNum int32, globalNum int32) {
 				defer wg.Done()
 				defer func() {
 					// 完成时减少计数
-					newCount := atomic.AddInt32(&currentGoroutines, -1)
+					newCount := atomic.AddInt32(&currentEmailContentGoroutines, -1)
 					log.Printf("[邮件处理] 协程 %d 完成处理，剩余协程: %d",
 						goroutineNum, newCount)
 				}()
 
 				log.Printf("[邮件处理] 协程 %d (全局 %d) 开始处理邮件，限制为 %d 封",
 					goroutineNum, globalNum, req.Limit)
-				err := GetEmailContent(req.Limit, account)
+				err := GetEmailContent(req.Limit)
 				results <- err
 			}(i+1, currentCount)
 
@@ -341,7 +163,7 @@ func GetEmailContentList(c *gin.Context) {
 }
 
 // GetEmailContent 获取邮件内容
-func GetEmailContent(limit int, account model.PrimeEmailAccount) error {
+func GetEmailContent(limit int) error {
 	// 获取状态为-1的邮件ID，并将其状态更新为0（处理中）
 	emailIDs, err := model.GetEmailByStatus(-1, limit)
 	if err != nil {
@@ -354,6 +176,7 @@ func GetEmailContent(limit int, account model.PrimeEmailAccount) error {
 		fmt.Println("没有需要处理的新邮件")
 		return nil
 	}
+	account := model.GetAccountByID(emailIDs)
 	// 为每个请求创建独立的邮件客户端实例
 	mailClient, err := newMailClient(account)
 	if err != nil {
@@ -933,11 +756,11 @@ func SyncMultipleAccounts(c *gin.Context) {
 	}
 
 	// 使用互斥锁保护并发访问和处理中账号集合
-	emailProcessMutex.Lock()
+	emailListProcessMutex.Lock()
 
 	// 检查是否已达到最大全局协程数
-	if atomic.LoadInt32(&currentGoroutines) >= maxTotalGoroutines {
-		emailProcessMutex.Unlock()
+	if atomic.LoadInt32(&currentEmailListGoroutines) >= maxEmailListTotalGoroutines {
+		emailListProcessMutex.Unlock()
 		utils.SendResponse(c, nil, "已达到全局最大处理协程数量，请等待当前任务完成")
 		return
 	}
@@ -961,13 +784,13 @@ func SyncMultipleAccounts(c *gin.Context) {
 
 	// 如果所有账号都在处理中，返回提示信息
 	if len(filteredAccounts) == 0 {
-		emailProcessMutex.Unlock()
+		emailListProcessMutex.Unlock()
 		utils.SendResponse(c, nil, fmt.Sprintf("所有账号(%d个)都在处理中，请等待当前任务完成", len(skippedAccounts)))
 		return
 	}
 
 	// 计算本次请求可以创建的协程数量
-	remainingSlots := maxTotalGoroutines - atomic.LoadInt32(&currentGoroutines)
+	remainingSlots := maxEmailListTotalGoroutines - atomic.LoadInt32(&currentEmailListGoroutines)
 
 	// 设置默认值
 	maxWorkers := req.MaxWorkers
@@ -987,13 +810,13 @@ func SyncMultipleAccounts(c *gin.Context) {
 
 	// 如果没有可用的协程槽位
 	if maxWorkers <= 0 {
-		emailProcessMutex.Unlock()
+		emailListProcessMutex.Unlock()
 		utils.SendResponse(c, nil, "无法创建工作协程，请等待当前任务完成")
 		return
 	}
 
 	// 更新全局协程计数
-	atomic.AddInt32(&currentGoroutines, int32(maxWorkers))
+	atomic.AddInt32(&currentEmailListGoroutines, int32(maxWorkers))
 
 	// 标记这些账号为正在处理
 	for _, account := range filteredAccounts {
@@ -1001,11 +824,11 @@ func SyncMultipleAccounts(c *gin.Context) {
 	}
 
 	log.Printf("[邮件同步] 当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号, 跳过 %d 个正在处理的账号",
-		atomic.LoadInt32(&currentGoroutines), maxWorkers, len(filteredAccounts), len(skippedAccounts))
+		atomic.LoadInt32(&currentEmailListGoroutines), maxWorkers, len(filteredAccounts), len(skippedAccounts))
 	fmt.Printf("[邮件同步] 当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号, 跳过 %d 个正在处理的账号\n",
-		atomic.LoadInt32(&currentGoroutines), maxWorkers, len(filteredAccounts), len(skippedAccounts))
+		atomic.LoadInt32(&currentEmailListGoroutines), maxWorkers, len(filteredAccounts), len(skippedAccounts))
 
-	emailProcessMutex.Unlock()
+	emailListProcessMutex.Unlock()
 
 	limit := req.Limit
 	if limit <= 0 {
@@ -1035,11 +858,11 @@ func SyncMultipleAccounts(c *gin.Context) {
 			defer wg.Done()
 			defer func() {
 				// 完成时减少全局计数
-				atomic.AddInt32(&currentGoroutines, -1)
+				atomic.AddInt32(&currentEmailListGoroutines, -1)
 				log.Printf("[邮件同步] 工作协程 %d 完成，剩余全局协程数: %d",
-					workerID, atomic.LoadInt32(&currentGoroutines))
+					workerID, atomic.LoadInt32(&currentEmailListGoroutines))
 				fmt.Printf("[邮件同步] 工作协程 %d 完成，剩余全局协程数: %d\n",
-					workerID, atomic.LoadInt32(&currentGoroutines))
+					workerID, atomic.LoadInt32(&currentEmailListGoroutines))
 
 				// 捕获panic，防止worker崩溃导致计数不准确
 				if r := recover(); r != nil {
@@ -1055,9 +878,9 @@ func SyncMultipleAccounts(c *gin.Context) {
 				count, err := syncSingleAccount(account, limit)
 
 				// 同步完成后，从处理中账号集合移除
-				emailProcessMutex.Lock()
+				emailListProcessMutex.Lock()
 				delete(processingAccounts, account.ID)
-				emailProcessMutex.Unlock()
+				emailListProcessMutex.Unlock()
 
 				results <- struct {
 					AccountID int
@@ -1093,10 +916,10 @@ func SyncMultipleAccounts(c *gin.Context) {
 	var responseMsg string
 	if len(skippedAccounts) > 0 {
 		responseMsg = fmt.Sprintf("正在同步 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d，跳过 %d 个正在处理的账号",
-			len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentGoroutines), len(skippedAccounts))
+			len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentEmailListGoroutines), len(skippedAccounts))
 	} else {
 		responseMsg = fmt.Sprintf("正在同步 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d",
-			len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentGoroutines))
+			len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentEmailListGoroutines))
 	}
 
 	// 返回正在处理的信息
@@ -1228,3 +1051,81 @@ func syncSingleAccount(account model.PrimeEmailAccount, limit int) (int, error) 
 
 	return len(emailsResult), nil
 }
+
+//func ListEmailsByUid(c *gin.Context) {
+//	// 使用互斥锁确保同一时间只有一个请求在处理邮件列表
+//	listEmailsByUidMutex.Lock()
+//	defer listEmailsByUidMutex.Unlock()
+//
+//	accounts, err := model.GetActiveAccount()
+//	if err != nil {
+//		utils.SendResponse(c, err, "获取邮箱配置失败")
+//		return
+//	}
+//	account := accounts[0]
+//
+//	// 为每个请求创建独立的邮件客户端实例
+//	mailClient, err := newMailClient(account)
+//	if err != nil {
+//		utils.SendResponse(c, err, "获取邮箱配置失败")
+//		return
+//	}
+//	var req ListEmailsByUidRequest
+//	if err := c.ShouldBindJSON(&req); err != nil {
+//		utils.SendResponse(c, err, "无效的参数")
+//		return
+//	}
+//
+//	// 使用数据库事务
+//	tx := db.DB().Begin()
+//	defer func() {
+//		if r := recover(); r != nil {
+//			tx.Rollback()
+//		}
+//	}()
+//
+//	var emailsResult []mailclient.EmailInfo
+//	startUID := req.StartUID
+//	endUID := req.EndUID
+//
+//	count := int(endUID - startUID)
+//	// 使用UID范围获取邮件
+//	emailsResult, err = mailClient.ListEmails("INBOX", count, uint32(startUID), uint32(endUID))
+//
+//	if err != nil {
+//		tx.Rollback()
+//		utils.SendResponse(c, err, nil)
+//		return
+//	}
+//
+//	var emailList []*model.PrimeEmail
+//	for _, email := range emailsResult {
+//		var emailInfo model.PrimeEmail
+//		emailInfo.EmailID, _ = strconv.Atoi(email.EmailID)
+//		emailInfo.FromEmail = utils.SanitizeUTF8(email.From)
+//		emailInfo.Subject = utils.SanitizeUTF8(email.Subject)
+//		emailInfo.Date = utils.SanitizeUTF8(email.Date)
+//		emailInfo.HasAttachment = 0
+//		emailInfo.Status = -1
+//		if email.HasAttachments == true {
+//			emailInfo.HasAttachment = 1
+//		}
+//		emailInfo.CreatedAt = utils.JsonTime{Time: time.Now()}
+//
+//		emailList = append(emailList, &emailInfo)
+//	}
+//
+//	err = model.BatchCreateEmailsWithTx(emailList, tx)
+//	if err != nil {
+//		tx.Rollback()
+//		utils.SendResponse(c, err, nil)
+//		return
+//	}
+//
+//	if err := tx.Commit().Error; err != nil {
+//		utils.SendResponse(c, err, nil)
+//		return
+//	}
+//
+//	utils.SendResponse(c, nil, emailsResult)
+//}

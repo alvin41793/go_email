@@ -30,17 +30,11 @@ func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		// 邮件相关路由
 		emails := v1.Group("/emails")
 		{
-			// 获取邮件列表
-			emails.POST("/list", ListEmails)
-
-			// 通过指定uid获取邮件列表
-			emails.POST("/list_by_uid", ListEmailsByUid)
+			// 同步多账号邮件
+			emails.POST("/sync_multiple", SyncMultipleAccounts)
 
 			// 获取邮件内容
 			emails.POST("/content", GetEmailContentList)
-
-			// 同步多账号邮件
-			emails.POST("/sync_multiple", SyncMultipleAccounts)
 
 			// 获取附件列表
 			//emails.GET("/attachments/:uid", ListAttachments)
