@@ -39,10 +39,10 @@ var (
 	emailContentProcessMutex       sync.Mutex
 	currentEmailContentGoroutines  int32     // 当前获取邮件内容运行的协程总数
 	maxEmailContentTotalGoroutines int32 = 1 // 全局获取邮件内容最大协程数
-
-	goroutinesPerReq   int32 = 3 // 每次请求创建的协程数
-	sleepTime          int   = 3
-	processingAccounts map[int]bool
+	listEmailsByUidMutex           sync.Mutex
+	goroutinesPerReq               int32 = 3 // 每次请求创建的协程数
+	sleepTime                      int   = 3
+	processingAccounts             map[int]bool
 )
 
 // 初始化邮件配置
@@ -450,8 +450,9 @@ type ListEmailsRequest struct {
 
 // ListEmailsByUidRequest 根据UID获取邮件列表请求结构
 type ListEmailsByUidRequest struct {
-	StartUID uint64 `json:"start_uid" binding:"required"`
-	EndUID   uint64 `json:"end_uid" binding:"required"`
+	StartUID  uint64 `json:"start_uid" binding:"required"`
+	EndUID    uint64 `json:"end_uid" binding:"required"`
+	AccountId int    `json:"account_id" binding:"required"`
 }
 
 // GetEmailContentRequest 获取邮件内容请求结构
@@ -1057,80 +1058,77 @@ func syncSingleAccount(account model.PrimeEmailAccount, limit int) (int, error) 
 	return len(emailsResult), nil
 }
 
-//func ListEmailsByUid(c *gin.Context) {
-//	// 使用互斥锁确保同一时间只有一个请求在处理邮件列表
-//	listEmailsByUidMutex.Lock()
-//	defer listEmailsByUidMutex.Unlock()
-//
-//	accounts, err := model.GetActiveAccount()
-//	if err != nil {
-//		utils.SendResponse(c, err, "获取邮箱配置失败")
-//		return
-//	}
-//	account := accounts[0]
-//
-//	// 为每个请求创建独立的邮件客户端实例
-//	mailClient, err := newMailClient(account)
-//	if err != nil {
-//		utils.SendResponse(c, err, "获取邮箱配置失败")
-//		return
-//	}
-//	var req ListEmailsByUidRequest
-//	if err := c.ShouldBindJSON(&req); err != nil {
-//		utils.SendResponse(c, err, "无效的参数")
-//		return
-//	}
-//
-//	// 使用数据库事务
-//	tx := db.DB().Begin()
-//	defer func() {
-//		if r := recover(); r != nil {
-//			tx.Rollback()
-//		}
-//	}()
-//
-//	var emailsResult []mailclient.EmailInfo
-//	startUID := req.StartUID
-//	endUID := req.EndUID
-//
-//	count := int(endUID - startUID)
-//	// 使用UID范围获取邮件
-//	emailsResult, err = mailClient.ListEmails("INBOX", count, uint32(startUID), uint32(endUID))
-//
-//	if err != nil {
-//		tx.Rollback()
-//		utils.SendResponse(c, err, nil)
-//		return
-//	}
-//
-//	var emailList []*model.PrimeEmail
-//	for _, email := range emailsResult {
-//		var emailInfo model.PrimeEmail
-//		emailInfo.EmailID, _ = strconv.Atoi(email.EmailID)
-//		emailInfo.FromEmail = utils.SanitizeUTF8(email.From)
-//		emailInfo.Subject = utils.SanitizeUTF8(email.Subject)
-//		emailInfo.Date = utils.SanitizeUTF8(email.Date)
-//		emailInfo.HasAttachment = 0
-//		emailInfo.Status = -1
-//		if email.HasAttachments == true {
-//			emailInfo.HasAttachment = 1
-//		}
-//		emailInfo.CreatedAt = utils.JsonTime{Time: time.Now()}
-//
-//		emailList = append(emailList, &emailInfo)
-//	}
-//
-//	err = model.BatchCreateEmailsWithTx(emailList, tx)
-//	if err != nil {
-//		tx.Rollback()
-//		utils.SendResponse(c, err, nil)
-//		return
-//	}
-//
-//	if err := tx.Commit().Error; err != nil {
-//		utils.SendResponse(c, err, nil)
-//		return
-//	}
-//
-//	utils.SendResponse(c, nil, emailsResult)
-//}
+func ListEmailsByUid(c *gin.Context) {
+	// 使用互斥锁确保同一时间只有一个请求在处理邮件列表
+	listEmailsByUidMutex.Lock()
+	defer listEmailsByUidMutex.Unlock()
+
+	var req ListEmailsByUidRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.SendResponse(c, err, "无效的参数")
+		return
+	}
+	account, err := model.GetAccountByID(req.AccountId)
+	if err != nil && err != gorm.ErrRecordNotFound {
+		log.Printf("获取邮件账号失败，ID: %d", account.ID)
+		fmt.Printf("获取邮件账号失败，ID: %d", account.ID)
+	}
+	// 为每个请求创建独立的邮件客户端实例
+	mailClient, err := newMailClient(account)
+	if err != nil {
+		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
+	}
+	// 使用数据库事务
+	tx := db.DB().Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	var emailsResult []mailclient.EmailInfo
+	startUID := req.StartUID
+	endUID := req.EndUID
+
+	count := int(endUID - startUID)
+	// 使用UID范围获取邮件
+	emailsResult, err = mailClient.ListEmails("INBOX", count, uint32(startUID), uint32(endUID))
+
+	if err != nil {
+		tx.Rollback()
+		utils.SendResponse(c, err, nil)
+		return
+	}
+
+	var emailList []*model.PrimeEmail
+	for _, email := range emailsResult {
+		var emailInfo model.PrimeEmail
+		emailInfo.EmailID, _ = strconv.Atoi(email.EmailID)
+		emailInfo.FromEmail = utils.SanitizeUTF8(email.From)
+		emailInfo.Subject = utils.SanitizeUTF8(email.Subject)
+		emailInfo.Date = utils.SanitizeUTF8(email.Date)
+		emailInfo.HasAttachment = 0
+		emailInfo.Status = -1
+		if email.HasAttachments == true {
+			emailInfo.HasAttachment = 1
+		}
+		emailInfo.CreatedAt = utils.JsonTime{Time: time.Now()}
+
+		emailList = append(emailList, &emailInfo)
+	}
+
+	err = model.BatchCreateEmailsWithTx(emailList, tx)
+	if err != nil {
+		tx.Rollback()
+		utils.SendResponse(c, err, nil)
+		return
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		utils.SendResponse(c, err, nil)
+		return
+	}
+
+	utils.SendResponse(c, nil, emailsResult)
+}
