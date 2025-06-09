@@ -528,21 +528,6 @@ func GetForwardOriginalEmail(c *gin.Context) {
 		return
 	}
 
-	// 获取邮箱配置
-	accounts, err := model.GetActiveAccount()
-	if err != nil {
-		utils.SendResponse(c, err, "获取邮箱配置失败")
-		return
-	}
-	account := accounts[0]
-
-	// 为每个请求创建独立的邮件客户端实例
-	mailClient, err := newMailClient(account)
-	if err != nil {
-		utils.SendResponse(c, err, "获取邮箱配置失败")
-		return
-	}
-
 	// 如果请求中有email_id，则直接转发该邮件
 	if req.EmailID > 0 {
 		// 查询这条记录以获取PrimeOp邮箱地址
@@ -551,10 +536,23 @@ func GetForwardOriginalEmail(c *gin.Context) {
 			utils.SendResponse(c, err, "未找到对应的转发记录")
 			return
 		}
+		// 获取邮箱配置
+		account, err := model.GetAccountByID(forward.AccountId)
+		if err != nil {
+			utils.SendResponse(c, err, "获取邮箱配置失败")
+			return
+		}
+
+		// 为每个请求创建独立的邮件客户端实例
+		mailClient, err := newMailClient(account)
+		if err != nil {
+			utils.SendResponse(c, err, "获取邮箱配置失败")
+			return
+		}
 
 		// 执行转发
 		forwardStartTime := time.Now() // 转发开始时间
-		err := mailClient.ForwardStructuredEmail(uint32(req.EmailID), "INBOX", forward.PrimeOp)
+		err = mailClient.ForwardStructuredEmail(uint32(req.EmailID), "INBOX", forward.PrimeOp)
 		forwardDuration := time.Since(forwardStartTime) // 转发耗时
 
 		if err != nil {
@@ -591,7 +589,17 @@ func GetForwardOriginalEmail(c *gin.Context) {
 	for _, record := range records {
 		// 执行转发
 		forwardStartTime := time.Now() // 单封邮件转发开始时间
-		err := mailClient.ForwardStructuredEmail(uint32(record.EmailID), "INBOX", record.PrimeOp)
+		account, err := model.GetAccountByID(record.AccountId)
+		if err != nil {
+			utils.SendResponse(c, err, "获取邮箱配置失败")
+			return
+		}
+		mailClient, err := newMailClient(account)
+		if err != nil {
+			utils.SendResponse(c, err, "获取邮箱配置失败")
+			return
+		}
+		err = mailClient.ForwardStructuredEmail(uint32(record.EmailID), "INBOX", record.PrimeOp)
 		forwardDuration := time.Since(forwardStartTime) // 单封邮件转发耗时
 		totalForwardTime += forwardDuration
 
