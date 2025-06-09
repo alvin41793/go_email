@@ -146,7 +146,7 @@ func BatchCreateEmailsWithTx(emails []*PrimeEmail, tx *gorm.DB) error {
 	return nil
 }
 
-// GetEmailByStatus 获取指定状态的邮件ID并更新其状态为"处理中"
+// GetEmailByStatus 获取指定状态的邮件ID并更新其状态为"处理中"，平均分配给不同的AccountId
 func GetEmailByStatus(status, limit int) ([]PrimeEmail, error) {
 	var emails []PrimeEmail
 
@@ -158,32 +158,78 @@ func GetEmailByStatus(status, limit int) ([]PrimeEmail, error) {
 		}
 	}()
 
-	// 第一步：使用事务查询指定状态的邮件记录
+	// 第一步：查询所有不同的AccountId
+	var accountIds []int
 	err := tx.Model(&PrimeEmail{}).
 		Where("status = ?", status).
-		Limit(limit).
-		Find(&emails).Error
+		Distinct("account_id").
+		Pluck("account_id", &accountIds).Error
 
 	if err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
-	// 如果没有找到邮件，直接返回
-	if len(emails) == 0 {
-		tx.Rollback() // 没有更新操作，回滚事务
+	// 如果没有找到任何账户，直接返回
+	if len(accountIds) == 0 {
+		tx.Rollback()
 		return emails, nil
 	}
 
-	// 获取所有email_id
-	var emailIDs []int
-	for _, email := range emails {
-		emailIDs = append(emailIDs, email.EmailID)
+	// 第二步：计算每个AccountId应该分配的数量
+	perAccountLimit := limit / len(accountIds)
+	remainder := limit % len(accountIds)
+
+	log.Printf("[邮件分配] 总限制: %d, 账户数量: %d, 每账户基础分配: %d, 余数: %d",
+		limit, len(accountIds), perAccountLimit, remainder)
+
+	var allEmailIDs []int
+
+	// 第三步：对每个AccountId分别查询相应数量的记录
+	for i, accountId := range accountIds {
+		var accountEmails []PrimeEmail
+		currentLimit := perAccountLimit
+
+		// 将余数分配给前几个账户
+		if i < remainder {
+			currentLimit++
+		}
+
+		// 如果当前账户分配数量为0，跳过
+		if currentLimit == 0 {
+			continue
+		}
+
+		err := tx.Model(&PrimeEmail{}).
+			Where("status = ? AND account_id = ?", status, accountId).
+			Limit(currentLimit).
+			Find(&accountEmails).Error
+
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+
+		log.Printf("[邮件分配] 账户ID %d 分配到 %d 封邮件", accountId, len(accountEmails))
+
+		// 将此账户的邮件添加到总结果中
+		emails = append(emails, accountEmails...)
+
+		// 收集email_id用于后续状态更新
+		for _, email := range accountEmails {
+			allEmailIDs = append(allEmailIDs, email.EmailID)
+		}
 	}
 
-	// 第二步：更新这些邮件的状态为"处理中"(0)
+	// 如果没有找到邮件，直接返回
+	if len(emails) == 0 {
+		tx.Rollback()
+		return emails, nil
+	}
+
+	// 第四步：更新这些邮件的状态为"处理中"(0)
 	err = tx.Model(&PrimeEmail{}).
-		Where("email_id IN (?)", emailIDs).
+		Where("email_id IN (?)", allEmailIDs).
 		Update("status", 0).Error
 
 	if err != nil {
@@ -196,6 +242,7 @@ func GetEmailByStatus(status, limit int) ([]PrimeEmail, error) {
 		return nil, err
 	}
 
+	log.Printf("[邮件分配] 成功分配 %d 封邮件给 %d 个账户", len(emails), len(accountIds))
 	return emails, nil
 }
 
