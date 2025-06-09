@@ -45,9 +45,10 @@ func GetExistingForward(emailID int, primeOp string) (*PrimeEmailForward, error)
 }
 
 // GetAndUpdatePendingForwards 获取待转发记录并更新状态为处理中
+// 根据不同的account_id平均分配limit数量
 // 返回记录列表和错误信息
 func GetAndUpdatePendingForwards(limit int) ([]PrimeEmailForward, error) {
-	var records []PrimeEmailForward
+	var allRecords []PrimeEmailForward
 	tx := db.DB().Begin()
 
 	// 确保事务会被适当处理
@@ -57,21 +58,57 @@ func GetAndUpdatePendingForwards(limit int) ([]PrimeEmailForward, error) {
 		}
 	}()
 
-	// 查询前limit条状态为-1的记录
-	if err := tx.Where("status = ?", -1).Limit(limit).Find(&records).Error; err != nil {
+	// 首先查询有哪些不同的account_id（状态为-1的记录）
+	var accountIDs []int
+	if err := tx.Model(&PrimeEmailForward{}).
+		Where("status = ?", -1).
+		Distinct("account_id").
+		Pluck("account_id", &accountIDs).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
 
-	// 如果没有找到记录，提交事务并返回空结果
-	if len(records) == 0 {
+	// 如果没有找到任何account_id，提交事务并返回空结果
+	if len(accountIDs) == 0 {
 		tx.Commit()
-		return records, nil
+		return allRecords, nil
+	}
+
+	// 计算每个account_id应该分配的记录数量
+	limitPerAccount := limit / len(accountIDs)
+	remainder := limit % len(accountIDs)
+
+	// 按account_id分别查询记录
+	for i, accountID := range accountIDs {
+		var records []PrimeEmailForward
+		currentLimit := limitPerAccount
+
+		// 将余数分配给前面的几个account_id
+		if i < remainder {
+			currentLimit++
+		}
+
+		// 查询当前account_id的记录
+		if err := tx.Where("status = ? AND account_id = ?", -1, accountID).
+			Limit(currentLimit).
+			Find(&records).Error; err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+
+		// 将记录添加到总列表中
+		allRecords = append(allRecords, records...)
+	}
+
+	// 如果没有找到任何记录，提交事务并返回空结果
+	if len(allRecords) == 0 {
+		tx.Commit()
+		return allRecords, nil
 	}
 
 	// 更新这些记录的状态为处理中(0)
 	var ids []int
-	for _, record := range records {
+	for _, record := range allRecords {
 		ids = append(ids, record.ID)
 	}
 
@@ -85,7 +122,7 @@ func GetAndUpdatePendingForwards(limit int) ([]PrimeEmailForward, error) {
 		return nil, err
 	}
 
-	return records, nil
+	return allRecords, nil
 }
 
 // UpdateForwardFailureStatus 更新转发失败状态和错误信息
