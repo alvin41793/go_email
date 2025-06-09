@@ -515,6 +515,20 @@ type SyncMultipleAccountsRequest struct {
 
 func GetForwardOriginalEmail(c *gin.Context) {
 	startTime := time.Now() // 开始计时
+
+	// 创建请求结构体
+	type ForwardRequest struct {
+		EmailID int `json:"email_id"`
+		Limit   int `json:"limit"`
+	}
+
+	var req ForwardRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.SendResponse(c, err, "参数错误")
+		return
+	}
+
+	// 获取邮箱配置
 	accounts, err := model.GetActiveAccount()
 	if err != nil {
 		utils.SendResponse(c, err, "获取邮箱配置失败")
@@ -526,17 +540,6 @@ func GetForwardOriginalEmail(c *gin.Context) {
 	mailClient, err := newMailClient(account)
 	if err != nil {
 		utils.SendResponse(c, err, "获取邮箱配置失败")
-		return
-	}
-	// 创建请求结构体
-	type ForwardRequest struct {
-		EmailID int `json:"email_id"`
-		Limit   int `json:"limit"`
-	}
-
-	var req ForwardRequest
-	if err = c.ShouldBindJSON(&req); err != nil {
-		utils.SendResponse(c, err, "参数错误")
 		return
 	}
 
@@ -568,38 +571,18 @@ func GetForwardOriginalEmail(c *gin.Context) {
 		return
 	}
 
-	// 如果没有指定email_id，则查找PrimeEmailForward表中状态为-1的前10条记录
-	var records []model.PrimeEmailForward
-	tx := db.DB().Begin()
-
-	// 查询前10条状态为-1的记录
-	if err := tx.Where("status = ?", -1).Limit(req.Limit).Find(&records).Error; err != nil {
-		tx.Rollback()
+	// 如果没有指定email_id，则使用封装的函数获取待转发记录
+	records, err := model.GetAndUpdatePendingForwards(req.Limit)
+	if err != nil {
 		utils.SendResponse(c, err, "查询待转发记录失败")
 		return
 	}
 
 	// 如果没有找到记录
 	if len(records) == 0 {
-		tx.Rollback()
 		utils.SendResponse(c, nil, "没有找到待转发的记录")
 		return
 	}
-
-	// 更新这些记录的状态为处理中(0)
-	var ids []int
-	for _, record := range records {
-		ids = append(ids, record.ID)
-	}
-
-	if err := tx.Model(&model.PrimeEmailForward{}).Where("id IN ?", ids).Update("status", 0).Error; err != nil {
-		tx.Rollback()
-		utils.SendResponse(c, err, "更新记录状态失败")
-		return
-	}
-
-	// 提交事务
-	tx.Commit()
 
 	// 转发邮件
 	var successCount, failCount int
@@ -614,14 +597,19 @@ func GetForwardOriginalEmail(c *gin.Context) {
 
 		if err != nil {
 			failCount++
-			// 更新状态为失败(-1)
-			db.DB().Model(&model.PrimeEmailForward{}).Where("id = ?", record.ID).Update("status", -1)
+			// 使用封装的函数更新失败状态
+			if updateErr := model.UpdateForwardFailureStatus(record.ID, err); updateErr != nil {
+				log.Printf("[邮件转发] 更新失败状态失败: %v", updateErr)
+			}
 			log.Printf("[邮件转发] 邮件ID: %d 转发失败, 耗时: %v, 错误: %v", record.EmailID, forwardDuration, err)
 		} else {
 			successCount++
-			// 更新状态为成功(1)
-			db.DB().Model(&model.PrimeEmailForward{}).Where("id = ?", record.ID).Update("status", 1)
+			// 使用封装的函数更新成功状态
+			if updateErr := model.UpdateForwardSuccessStatus(record.ID); updateErr != nil {
+				log.Printf("[邮件转发] 更新成功状态失败: %v", updateErr)
+			}
 			log.Printf("[邮件转发] 邮件ID: %d 转发成功, 耗时: %v", record.EmailID, forwardDuration)
+
 		}
 	}
 
