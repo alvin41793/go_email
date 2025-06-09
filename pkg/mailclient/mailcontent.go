@@ -888,7 +888,9 @@ func parseAddressList(addresses []*imap.Address) string {
 	var addrList []string
 	for _, addr := range addresses {
 		if addr.PersonalName != "" {
-			addrList = append(addrList, fmt.Sprintf("%s <%s@%s>", addr.PersonalName, addr.MailboxName, addr.HostName))
+			// 解码MIME编码的个人姓名
+			decodedName := DecodeMIMESubject(addr.PersonalName)
+			addrList = append(addrList, fmt.Sprintf("%s <%s@%s>", decodedName, addr.MailboxName, addr.HostName))
 		} else {
 			addrList = append(addrList, fmt.Sprintf("%s@%s", addr.MailboxName, addr.HostName))
 		}
