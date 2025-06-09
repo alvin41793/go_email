@@ -11,9 +11,10 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/google/go-querystring v1.1.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/spf13/viper v1.20.1
 	github.com/zxmrlc/log v0.0.0-20200612082315-9e0c7ff11ddb
-	golang.org/x/text v0.25.0
+	golang.org/x/text v0.26.0
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.30.0
 )
@@ -43,7 +44,6 @@ require (
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.37.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
-	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.12.0 // indirect

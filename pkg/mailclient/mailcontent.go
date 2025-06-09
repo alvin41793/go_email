@@ -23,6 +23,79 @@ import (
 	"golang.org/x/text/transform"
 )
 
+// 中文编码解码器的导入 - 临时解决方案
+var (
+	gbkDecoder = func() transform.Transformer {
+		// 动态导入以避免循环导入
+		return nil // 将在运行时设置
+	}
+	gb18030Decoder = func() transform.Transformer {
+		return nil // 将在运行时设置
+	}
+)
+
+// getGBKDecoder 获取GBK解码器
+func getGBKDecoder() transform.Transformer {
+	// 这里我们直接使用字符串来避免循环导入问题
+	// 在实际使用中，这将通过反射或其他方式解决
+	e, _ := ianaindex.MIME.Encoding("gbk")
+	if e != nil {
+		return e.NewDecoder()
+	}
+	// 备用方案：返回nil将使用原始输入
+	return transform.Nop
+}
+
+// getGB18030Decoder 获取GB18030解码器
+func getGB18030Decoder() transform.Transformer {
+	e, _ := ianaindex.MIME.Encoding("gb18030")
+	if e != nil {
+		return e.NewDecoder()
+	}
+	return transform.Nop
+}
+
+// DecodeMIMESubject 解码MIME编码的邮件主题 (公共函数用于测试)
+func DecodeMIMESubject(subject string) string {
+	if subject == "" {
+		return subject
+	}
+
+	// 使用WordDecoder解码RFC 2047编码的主题
+	decoder := &mime.WordDecoder{
+		CharsetReader: func(charset string, input io.Reader) (io.Reader, error) {
+			// 处理常见的中文字符集别名
+			switch strings.ToLower(charset) {
+			case "gb2312", "gb_2312", "gb_2312-80":
+				// 使用GBK解码器来处理GB2312（GBK是GB2312的超集）
+				return transform.NewReader(input, getGBKDecoder()), nil
+			case "gbk":
+				return transform.NewReader(input, getGBKDecoder()), nil
+			case "gb18030":
+				return transform.NewReader(input, getGB18030Decoder()), nil
+			}
+
+			// 尝试使用golang.org/x/text/encoding/ianaindex来处理其他字符集
+			e, err := ianaindex.MIME.Encoding(charset)
+			if err != nil || e == nil {
+				// 如果找不到编码，返回输入流（可能是ASCII或UTF-8）
+				return input, nil
+			}
+
+			// 使用找到的编码器将输入转换为UTF-8
+			return transform.NewReader(input, e.NewDecoder()), nil
+		},
+	}
+
+	decoded, err := decoder.DecodeHeader(subject)
+	if err != nil {
+		log.Printf("解码邮件主题失败: %v, 原始主题: %s", err, subject)
+		return subject // 如果解码失败，返回原始主题
+	}
+
+	return decoded
+}
+
 // ListEmails 获取指定文件夹中的邮件列表
 func (m *MailClient) ListEmails(folder string, limit int, fromUID ...uint32) ([]EmailInfo, error) {
 	if folder == "" {
@@ -118,7 +191,7 @@ func (m *MailClient) ListEmails(folder string, limit int, fromUID ...uint32) ([]
 
 			info := EmailInfo{
 				EmailID:        fmt.Sprint(msg.SeqNum),
-				Subject:        msg.Envelope.Subject,
+				Subject:        DecodeMIMESubject(msg.Envelope.Subject),
 				From:           parseAddressList(msg.Envelope.From),
 				Date:           msg.Envelope.Date.Format(time.RFC1123Z),
 				UID:            msg.Uid,
@@ -195,7 +268,7 @@ func (m *MailClient) ListEmails(folder string, limit int, fromUID ...uint32) ([]
 
 		info := EmailInfo{
 			EmailID:        fmt.Sprint(msg.SeqNum),
-			Subject:        msg.Envelope.Subject,
+			Subject:        DecodeMIMESubject(msg.Envelope.Subject),
 			From:           parseAddressList(msg.Envelope.From),
 			Date:           msg.Envelope.Date.Format(time.RFC1123Z),
 			UID:            msg.Uid,
@@ -275,7 +348,7 @@ func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) 
 	// 创建Email结构体
 	email := &Email{
 		EmailID:     fmt.Sprint(msg.SeqNum),
-		Subject:     msg.Envelope.Subject,
+		Subject:     DecodeMIMESubject(msg.Envelope.Subject),
 		From:        parseAddressList(msg.Envelope.From),
 		To:          parseAddressList(msg.Envelope.To),
 		Date:        msg.Envelope.Date.Format(time.RFC1123Z),
@@ -986,7 +1059,7 @@ func (m *MailClient) ForwardOriginalEmail(uid uint32, sourceFolder string, toAdd
 	// 设置邮件头
 	fmt.Fprintf(&newEmail, "From: %s\r\n", m.EmailAddress)
 	fmt.Fprintf(&newEmail, "To: %s\r\n", toAddress)
-	fmt.Fprintf(&newEmail, "Subject: Fwd: %s\r\n", mime.QEncoding.Encode("utf-8", msg.Envelope.Subject))
+	fmt.Fprintf(&newEmail, "Subject: Fwd: %s\r\n", mime.QEncoding.Encode("utf-8", DecodeMIMESubject(msg.Envelope.Subject)))
 	fmt.Fprintf(&newEmail, "MIME-Version: 1.0\r\n")
 
 	// 创建多部分邮件
@@ -999,7 +1072,7 @@ func (m *MailClient) ForwardOriginalEmail(uid uint32, sourceFolder string, toAdd
 	fmt.Fprintf(&newEmail, "---------- 转发的原始邮件 ----------\r\n")
 	fmt.Fprintf(&newEmail, "发件人: %s\r\n", parseAddressList(msg.Envelope.From))
 	fmt.Fprintf(&newEmail, "日期: %s\r\n", msg.Envelope.Date.Format(time.RFC1123Z))
-	fmt.Fprintf(&newEmail, "主题: %s\r\n", msg.Envelope.Subject)
+	fmt.Fprintf(&newEmail, "主题: %s\r\n", DecodeMIMESubject(msg.Envelope.Subject))
 	fmt.Fprintf(&newEmail, "收件人: %s\r\n\r\n", parseAddressList(msg.Envelope.To))
 
 	// 添加原始邮件作为附件
@@ -1041,7 +1114,7 @@ func (m *MailClient) ForwardStructuredEmail(uid uint32, sourceFolder string, toA
 		return fmt.Errorf("获取原始邮件失败: %w", err)
 	}
 
-	// 准备转发邮件
+	// 准备转发邮件（email.Subject已经在GetEmailContent中解码过了）
 	forwardSubject := "Fwd: " + email.Subject
 
 	// 构建转发邮件
