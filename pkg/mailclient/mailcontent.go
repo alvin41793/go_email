@@ -1117,7 +1117,7 @@ func (m *MailClient) ForwardStructuredEmail(uid uint32, sourceFolder string, toA
 	}
 
 	// 准备转发邮件（email.Subject已经在GetEmailContent中解码过了）
-	forwardSubject := "Fwd: " + email.Subject
+	forwardSubject := "PrimeFwd: " + email.Subject
 
 	// 构建转发邮件
 	buildStartTime := time.Now()
