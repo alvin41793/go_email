@@ -74,7 +74,7 @@ case $env_choice in
 esac
 
 # 构建输出文件名
-output_file="${output_dir}/app_${os_name}_${env_name}${suffix}"
+output_file="${output_dir}/go_mail_${os_name}_${env_name}${suffix}"
 
 echo "正在编译Go应用(${os_name}/${env_name})..."
 GOOS=$GOOS GOARCH=$GOARCH go build -o $output_file
