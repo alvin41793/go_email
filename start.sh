@@ -24,12 +24,12 @@ esac
 # 检测系统类型
 if [[ "$(uname)" == "Darwin" ]]; then
     if [[ "$(uname -m)" == "arm64" ]]; then
-        app_file="./app_mac_arm_${env_name}"
+        app_file="./go_mail_mac_arm_${env_name}"
     else
-        app_file="./app_mac_${env_name}"
+        app_file="./go_mail_mac_${env_name}"
     fi
 elif [[ "$(uname)" == "Linux" ]]; then
-    app_file="./app_linux_${env_name}"
+    app_file="./go_mail_linux_${env_name}"
 else
     echo "不支持的系统"
     exit 1
