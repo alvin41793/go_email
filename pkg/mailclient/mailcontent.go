@@ -537,6 +537,9 @@ func (m *MailClient) parseMultipartMessage(msg *imap.Message, email *Email, read
 					}
 
 					if filename != "" {
+						// 解码RFC 2047编码的文件名
+						decodedFilename := DecodeMIMESubject(filename)
+
 						// 读取附件内容以获取大小
 						attachBytes, err := io.ReadAll(p)
 						if err != nil {
@@ -548,7 +551,7 @@ func (m *MailClient) parseMultipartMessage(msg *imap.Message, email *Email, read
 						//attachBytes = bytes.ReplaceAll(attachBytes, []byte("\r\n"), []byte(""))
 
 						email.Attachments = append(email.Attachments, AttachmentInfo{
-							Filename:   filename,
+							Filename:   decodedFilename, // 使用解码后的文件名
 							SizeKB:     float64(len(attachBytes)) / 1024.0,
 							MimeType:   partMediaType,
 							Base64Data: string(attachBytes),
@@ -734,7 +737,9 @@ func (m *MailClient) GetAttachment(uid uint32, filename string, folder string) (
 			if attachmentFilename == "" {
 				attachmentFilename = bs.Params["name"]
 			}
-			if attachmentFilename == filename {
+			// 解码RFC 2047编码的文件名
+			decodedAttachmentFilename := DecodeMIMESubject(attachmentFilename)
+			if decodedAttachmentFilename == filename {
 				return parentPath, bs.MIMEType + "/" + bs.MIMESubType
 			}
 		}
