@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"go_email/db"
 	"go_email/pkg/utils"
 	"log"
@@ -118,11 +119,15 @@ func GetLatestEmailWithTx(tx *gorm.DB, accountId int) (PrimeEmail, error) {
 	return email, err
 }
 
-// BatchCreateEmailsWithTx 使用事务批量创建邮件记录
+// BatchCreateEmailsWithTx 使用事务批量创建邮件记录，支持容错处理
 func BatchCreateEmailsWithTx(emails []*PrimeEmail, tx *gorm.DB) error {
 	if len(emails) == 0 {
 		return nil
 	}
+
+	successCount := 0
+	failCount := 0
+	var failedEmails []string
 
 	for _, email := range emails {
 		// 先检查是否已存在相同的email_id和account_id记录
@@ -130,19 +135,38 @@ func BatchCreateEmailsWithTx(emails []*PrimeEmail, tx *gorm.DB) error {
 		if err := tx.Model(&PrimeEmail{}).
 			Where("email_id = ? AND account_id = ?", email.EmailID, email.AccountId).
 			Count(&count).Error; err != nil {
-			return err
+			log.Printf("[邮件批量插入] 检查记录是否存在时出错: email_id=%d, account_id=%d, 错误=%v",
+				email.EmailID, email.AccountId, err)
+			failCount++
+			failedEmails = append(failedEmails, fmt.Sprintf("email_id=%d(检查失败)", email.EmailID))
+			continue // 跳过这条记录，继续处理下一条
 		}
 
 		// 如果记录已存在，则跳过此条记录的创建
 		if count > 0 {
+			log.Printf("[邮件批量插入] 记录已存在，跳过: email_id=%d, account_id=%d", email.EmailID, email.AccountId)
 			continue
 		}
 
 		// 记录不存在，创建新记录
 		if err := tx.Create(email).Error; err != nil {
-			return err
+			log.Printf("[邮件批量插入] 创建记录失败，跳过: email_id=%d, account_id=%d, 错误=%v",
+				email.EmailID, email.AccountId, err)
+			failCount++
+			failedEmails = append(failedEmails, fmt.Sprintf("email_id=%d(插入失败)", email.EmailID))
+			continue // 跳过这条记录，继续处理下一条
 		}
+
+		successCount++
 	}
+
+	log.Printf("[邮件批量插入] 批量处理完成: 成功=%d, 失败=%d, 总计=%d",
+		successCount, failCount, len(emails))
+
+	if failCount > 0 {
+		log.Printf("[邮件批量插入] 失败的记录: %v", failedEmails)
+	}
+
 	return nil
 }
 
@@ -251,4 +275,69 @@ func ResetEmailStatus(emailID int, status int) error {
 	return db.DB().Model(&PrimeEmail{}).
 		Where("email_id = ?", emailID).
 		Update("status", status).Error
+}
+
+// BatchCreateResult 批量创建结果统计
+type BatchCreateResult struct {
+	TotalCount   int      `json:"total_count"`   // 总记录数
+	SuccessCount int      `json:"success_count"` // 成功插入数
+	SkippedCount int      `json:"skipped_count"` // 跳过数（已存在）
+	FailedCount  int      `json:"failed_count"`  // 失败数
+	FailedEmails []string `json:"failed_emails"` // 失败的邮件ID列表
+}
+
+// BatchCreateEmailsWithStats 使用事务批量创建邮件记录，返回详细统计信息
+func BatchCreateEmailsWithStats(emails []*PrimeEmail, tx *gorm.DB) (*BatchCreateResult, error) {
+	result := &BatchCreateResult{
+		TotalCount:   len(emails),
+		SuccessCount: 0,
+		SkippedCount: 0,
+		FailedCount:  0,
+		FailedEmails: make([]string, 0),
+	}
+
+	if len(emails) == 0 {
+		return result, nil
+	}
+
+	for _, email := range emails {
+		// 先检查是否已存在相同的email_id和account_id记录
+		var count int64
+		if err := tx.Model(&PrimeEmail{}).
+			Where("email_id = ? AND account_id = ?", email.EmailID, email.AccountId).
+			Count(&count).Error; err != nil {
+			log.Printf("[邮件批量插入] 检查记录是否存在时出错: email_id=%d, account_id=%d, 错误=%v",
+				email.EmailID, email.AccountId, err)
+			result.FailedCount++
+			result.FailedEmails = append(result.FailedEmails, fmt.Sprintf("email_id=%d(检查失败:%v)", email.EmailID, err))
+			continue // 跳过这条记录，继续处理下一条
+		}
+
+		// 如果记录已存在，则跳过此条记录的创建
+		if count > 0 {
+			log.Printf("[邮件批量插入] 记录已存在，跳过: email_id=%d, account_id=%d", email.EmailID, email.AccountId)
+			result.SkippedCount++
+			continue
+		}
+
+		// 记录不存在，创建新记录
+		if err := tx.Create(email).Error; err != nil {
+			log.Printf("[邮件批量插入] 创建记录失败，跳过: email_id=%d, account_id=%d, 错误=%v",
+				email.EmailID, email.AccountId, err)
+			result.FailedCount++
+			result.FailedEmails = append(result.FailedEmails, fmt.Sprintf("email_id=%d(插入失败:%v)", email.EmailID, err))
+			continue // 跳过这条记录，继续处理下一条
+		}
+
+		result.SuccessCount++
+	}
+
+	log.Printf("[邮件批量插入] 批量处理完成: 总计=%d, 成功=%d, 跳过=%d, 失败=%d",
+		result.TotalCount, result.SuccessCount, result.SkippedCount, result.FailedCount)
+
+	if result.FailedCount > 0 {
+		log.Printf("[邮件批量插入] 失败的记录: %v", result.FailedEmails)
+	}
+
+	return result, nil
 }

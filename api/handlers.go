@@ -721,12 +721,17 @@ func SyncEmails() {
 	}
 
 	if len(emailList) > 0 {
-		err = model.BatchCreateEmailsWithTx(emailList, tx)
+		// 使用容错批量插入
+		result, err := model.BatchCreateEmailsWithStats(emailList, tx)
 		if err != nil {
 			tx.Rollback()
 			log.Printf("批量创建邮件记录失败: %v", err)
 			return
 		}
+
+		// 记录批量插入结果
+		log.Printf("SyncEmails - 批量插入结果: 总计:%d, 成功:%d, 跳过:%d, 失败:%d",
+			result.TotalCount, result.SuccessCount, result.SkippedCount, result.FailedCount)
 
 		if err := tx.Commit().Error; err != nil {
 			log.Printf("提交事务失败: %v", err)
@@ -1043,19 +1048,25 @@ func syncSingleAccount(account model.PrimeEmailAccount, limit int) (int, error) 
 		emailList = append(emailList, emailInfo)
 	}
 
-	// 批量创建邮件记录
-	err = model.BatchCreateEmailsWithTx(emailList, tx)
+	// 批量创建邮件记录（容错处理）
+	result, err := model.BatchCreateEmailsWithStats(emailList, tx)
 	if err != nil {
 		tx.Rollback()
 		return 0, fmt.Errorf("批量创建邮件记录失败: %v", err)
 	}
+
+	// 记录批量插入的结果
+	log.Printf("账号ID %d: 批量插入结果 - 总计:%d, 成功:%d, 跳过:%d, 失败:%d",
+		account.ID, result.TotalCount, result.SuccessCount, result.SkippedCount, result.FailedCount)
+	fmt.Printf("账号ID %d: 批量插入结果 - 总计:%d, 成功:%d, 跳过:%d, 失败:%d\n",
+		account.ID, result.TotalCount, result.SuccessCount, result.SkippedCount, result.FailedCount)
 
 	// 提交事务
 	if err := tx.Commit().Error; err != nil {
 		return 0, fmt.Errorf("提交事务失败: %v", err)
 	}
 
-	return len(emailsResult), nil
+	return result.SuccessCount, nil
 }
 
 func ListEmailsByUid(c *gin.Context) {
@@ -1119,12 +1130,17 @@ func ListEmailsByUid(c *gin.Context) {
 		emailList = append(emailList, &emailInfo)
 	}
 
-	err = model.BatchCreateEmailsWithTx(emailList, tx)
+	// 使用容错批量插入
+	result, err := model.BatchCreateEmailsWithStats(emailList, tx)
 	if err != nil {
 		tx.Rollback()
 		utils.SendResponse(c, err, nil)
 		return
 	}
+
+	// 记录批量插入结果
+	log.Printf("ListEmailsByUid - 批量插入结果: 总计:%d, 成功:%d, 跳过:%d, 失败:%d",
+		result.TotalCount, result.SuccessCount, result.SkippedCount, result.FailedCount)
 
 	if err := tx.Commit().Error; err != nil {
 		utils.SendResponse(c, err, nil)
