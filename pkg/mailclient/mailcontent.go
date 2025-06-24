@@ -365,12 +365,12 @@ func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) 
 		if len(rawBytes) > 0 {
 			rawContent = string(rawBytes)
 		}
-		//fmt.Println("邮件内容====================================", rawContent)
+		// fmt.Println("邮件内容====================================", rawContent)
 
-		// 将原始邮件内容保存到文件
-		//if err := saveRawContentToFile(uid, rawContent); err != nil {
-		//	log.Printf("保存原始邮件内容到文件失败: %v", err)
-		//}
+		// //将原始邮件内容保存到文件
+		// if err := saveRawContentToFile(uid, rawContent); err != nil {
+		// 	log.Printf("保存原始邮件内容到文件失败: %v", err)
+		// }
 
 		// 尝试获取原始邮件数据进行备用
 		// 这是为了保证在解析失败时，我们仍然有数据返回
@@ -378,12 +378,61 @@ func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) 
 
 		// 如果是简单的文本邮件，直接解析
 		if msg.BodyStructure.MIMEType == "text" {
-			if msg.BodyStructure.MIMESubType == "plain" {
-				email.Body = rawContent
-			} else if msg.BodyStructure.MIMESubType == "html" {
-				email.BodyHTML = rawContent
+			fmt.Printf("[邮件解析调试] UID: %d, MIME类型: %s/%s\n", uid, msg.BodyStructure.MIMEType, msg.BodyStructure.MIMESubType)
+			// 使用mail包解析邮件以正确处理编码
+			mr, err := mail.ReadMessage(bytes.NewReader(rawBytes))
+			if err == nil {
+				// 创建临时的textproto.MIMEHeader
+				header := textproto.MIMEHeader(mr.Header)
+				fmt.Printf("[邮件解析调试] UID: %d, Content-Type: %s, Content-Transfer-Encoding: %s\n",
+					uid, header.Get("Content-Type"), header.Get("Content-Transfer-Encoding"))
+
+				// 读取邮件正文
+				bodyBytes, err := io.ReadAll(mr.Body)
+				if err == nil {
+					fmt.Printf("[邮件解析调试] UID: %d, 原始正文长度: %d\n", uid, len(bodyBytes))
+					// 解码内容（处理quoted-printable和字符集）
+					decodedBody, err := decodeContent(header, bodyBytes)
+					if err == nil && decodedBody != "" {
+						fmt.Printf("[邮件解析调试] UID: %d, 解码成功，内容长度: %d\n", uid, len(decodedBody))
+						if msg.BodyStructure.MIMESubType == "plain" {
+							email.Body = decodedBody
+						} else if msg.BodyStructure.MIMESubType == "html" {
+							// 保留HTML原始格式
+							email.BodyHTML = decodedBody
+							// 清除Body字段的默认错误消息，因为这是HTML邮件
+							email.Body = "html格式邮件，没有正文"
+						}
+					} else {
+						fmt.Printf("[邮件解析调试] UID: %d, 解码失败，错误: %v\n", uid, err)
+						// 如果解码失败，使用原始内容
+						if msg.BodyStructure.MIMESubType == "plain" {
+							email.Body = string(bodyBytes)
+						} else if msg.BodyStructure.MIMESubType == "html" {
+							email.BodyHTML = string(bodyBytes)
+							// 清除Body字段的默认错误消息，因为这是HTML邮件
+							email.Body = fmt.Sprintf("[邮件解析调试] UID: %d, 解码失败，错误: %v\n", uid, err)
+
+						}
+					}
+				}
+			} else {
+				fmt.Printf("[邮件解析调试] UID: %d, mail.ReadMessage解析失败，错误: %v\n", uid, err)
+			}
+
+			// 如果上面的解析都失败了，使用原始内容作为备用
+			if email.Body == "" && email.BodyHTML == "" {
+				fmt.Printf("[邮件解析调试] UID: %d, 所有解析方法都失败，使用原始内容\n", uid)
+				if msg.BodyStructure.MIMESubType == "plain" {
+					email.Body = rawContent
+				} else if msg.BodyStructure.MIMESubType == "html" {
+					email.BodyHTML = rawContent
+					// 清除Body字段的默认错误消息，因为这是HTML邮件
+					email.Body = ""
+				}
 			}
 		} else if msg.BodyStructure.MIMEType == "multipart" {
+			fmt.Printf("[邮件解析调试] UID: %d, 进入多部分邮件解析分支\n", uid)
 			// 对于多部分邮件，使用特殊的解析逻辑
 			// 重新构建一个Reader
 			r = bytes.NewReader(rawBytes)
@@ -402,15 +451,21 @@ func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) 
 					email.BodyHTML = extractHTML(rawContent)
 				}
 			}
+		} else {
+			fmt.Printf("[邮件解析调试] UID: %d, 未知MIME类型: %s\n", uid, msg.BodyStructure.MIMEType)
 		}
 
 		// 确保至少有一部分内容能够返回
 		if (email.Body == "" || email.Body == "无法解析邮件内容，可能是格式复杂或不支持的格式") &&
 			(email.BodyHTML == "" || email.BodyHTML == "无法解析HTML内容，邮件可能是复杂格式。") {
+			// 只有在两个字段都没有内容时才使用备用方案
 			email.Body = extractPlainText(rawContent)
 			if email.Body == "" {
 				email.Body = "邮件内容解析失败，原始内容:\n" + rawContent
 			}
+		} else if email.BodyHTML != "" && (email.Body == "" || email.Body == "无法解析邮件内容，可能是格式复杂或不支持的格式") {
+			// 如果HTML内容存在但Body字段仍然是错误消息，清空Body字段
+			email.Body = ""
 		}
 	}
 

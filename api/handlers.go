@@ -1110,6 +1110,7 @@ func ListEmailsByUid(c *gin.Context) {
 		emailInfo.Date = utils.SanitizeUTF8(email.Date)
 		emailInfo.HasAttachment = 0
 		emailInfo.Status = -1
+		emailInfo.AccountId = account.ID
 		if email.HasAttachments == true {
 			emailInfo.HasAttachment = 1
 		}
