@@ -170,9 +170,14 @@ func BatchCreateEmailsWithTx(emails []*PrimeEmail, tx *gorm.DB) error {
 	return nil
 }
 
-// GetEmailByStatus 获取指定状态的邮件ID并更新其状态为"处理中"，平均分配给不同的AccountId
-func GetEmailByStatus(status, limit int) ([]PrimeEmail, error) {
+// GetEmailByStatusAndNode 获取指定状态和指定节点的邮件ID并更新其状态为"处理中"，平均分配给不同的AccountId
+func GetEmailByStatusAndNode(status, limit, node int) ([]PrimeEmail, error) {
 	var emails []PrimeEmail
+
+	// 检查节点参数是否有效
+	if node <= 0 {
+		return nil, fmt.Errorf("节点编号必须大于0，当前值: %d", node)
+	}
 
 	// 开始事务
 	tx := db.DB().Begin()
@@ -182,10 +187,28 @@ func GetEmailByStatus(status, limit int) ([]PrimeEmail, error) {
 		}
 	}()
 
-	// 第一步：查询所有不同的AccountId
+	// 第一步：先查询指定节点下的所有活跃账号ID（性能优化：避免大表JOIN）
+	var nodeAccountIds []int
+	err := tx.Model(&PrimeEmailAccount{}).
+		Where("node = ? AND status = 1", node).
+		Pluck("id", &nodeAccountIds).Error
+
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// 如果该节点下没有活跃账号，直接返回
+	if len(nodeAccountIds) == 0 {
+		tx.Rollback()
+		log.Printf("[邮件分配] 节点 %d 下没有找到活跃账号", node)
+		return emails, nil
+	}
+
+	// 第二步：查询这些账号中有指定状态邮件的账号ID
 	var accountIds []int
-	err := tx.Model(&PrimeEmail{}).
-		Where("status = ?", status).
+	err = tx.Model(&PrimeEmail{}).
+		Where("status = ? AND account_id IN (?)", status, nodeAccountIds).
 		Distinct("account_id").
 		Pluck("account_id", &accountIds).Error
 
@@ -194,9 +217,10 @@ func GetEmailByStatus(status, limit int) ([]PrimeEmail, error) {
 		return nil, err
 	}
 
-	// 如果没有找到任何账户，直接返回
+	// 如果没有找到任何有该状态邮件的账户，直接返回
 	if len(accountIds) == 0 {
 		tx.Rollback()
+		log.Printf("[邮件分配] 节点 %d 下没有找到状态为 %d 的邮件", node, status)
 		return emails, nil
 	}
 
@@ -204,8 +228,8 @@ func GetEmailByStatus(status, limit int) ([]PrimeEmail, error) {
 	perAccountLimit := limit / len(accountIds)
 	remainder := limit % len(accountIds)
 
-	log.Printf("[邮件分配] 总限制: %d, 账户数量: %d, 每账户基础分配: %d, 余数: %d",
-		limit, len(accountIds), perAccountLimit, remainder)
+	log.Printf("[邮件分配] 节点 %d - 总限制: %d, 账户数量: %d, 每账户基础分配: %d, 余数: %d",
+		node, limit, len(accountIds), perAccountLimit, remainder)
 
 	var allEmailIDs []int
 
@@ -234,7 +258,7 @@ func GetEmailByStatus(status, limit int) ([]PrimeEmail, error) {
 			return nil, err
 		}
 
-		log.Printf("[邮件分配] 账户ID %d 分配到 %d 封邮件", accountId, len(accountEmails))
+		log.Printf("[邮件分配] 节点 %d - 账户ID %d 分配到 %d 封邮件", node, accountId, len(accountEmails))
 
 		// 将此账户的邮件添加到总结果中
 		emails = append(emails, accountEmails...)
@@ -248,6 +272,7 @@ func GetEmailByStatus(status, limit int) ([]PrimeEmail, error) {
 	// 如果没有找到邮件，直接返回
 	if len(emails) == 0 {
 		tx.Rollback()
+		log.Printf("[邮件分配] 节点 %d 下没有找到需要处理的邮件", node)
 		return emails, nil
 	}
 
@@ -266,7 +291,7 @@ func GetEmailByStatus(status, limit int) ([]PrimeEmail, error) {
 		return nil, err
 	}
 
-	log.Printf("[邮件分配] 成功分配 %d 封邮件给 %d 个账户", len(emails), len(accountIds))
+	log.Printf("[邮件分配] 节点 %d - 成功分配 %d 封邮件给 %d 个账户", node, len(emails), len(accountIds))
 	return emails, nil
 }
 

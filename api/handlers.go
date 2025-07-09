@@ -101,8 +101,13 @@ func GetEmailContentList(c *gin.Context) {
 		createCount = remainingSlots
 	}
 
-	log.Printf("[邮件处理] 当前已有 %d 个协程，本次请求将创建 %d 个新协程",
-		atomic.LoadInt32(&currentEmailContentGoroutines), createCount)
+	nodeInfo := ""
+	if req.Node > 0 {
+		nodeInfo = fmt.Sprintf("节点 %d ", req.Node)
+	}
+
+	log.Printf("[邮件处理] %s当前已有 %d 个协程，本次请求将创建 %d 个新协程",
+		nodeInfo, atomic.LoadInt32(&currentEmailContentGoroutines), createCount)
 
 	// 释放互斥锁，允许其他请求继续
 	emailContentProcessMutex.Unlock()
@@ -143,9 +148,13 @@ func GetEmailContentList(c *gin.Context) {
 						goroutineNum, newCount)
 				}()
 
-				log.Printf("[邮件处理] 协程 %d (全局 %d) 开始处理邮件，限制为 %d 封",
-					goroutineNum, globalNum, req.Limit)
-				err := GetEmailContent(req.Limit)
+				nodeInfo := ""
+				if req.Node > 0 {
+					nodeInfo = fmt.Sprintf("节点 %d ", req.Node)
+				}
+				log.Printf("[邮件处理] %s协程 %d (全局 %d) 开始处理邮件，限制为 %d 封",
+					nodeInfo, goroutineNum, globalNum, req.Limit)
+				err := GetEmailContent(req.Limit, req.Node)
 				results <- err
 			}(i+1, currentCount)
 
@@ -156,19 +165,36 @@ func GetEmailContentList(c *gin.Context) {
 		// 等待所有协程完成
 		wg.Wait()
 		close(results)
-		log.Printf("[邮件处理] 本次请求创建的 %d 个协程已全部完成", createCount)
+		nodeInfoForComplete := ""
+		if req.Node > 0 {
+			nodeInfoForComplete = fmt.Sprintf("节点 %d ", req.Node)
+		}
+		log.Printf("[邮件处理] %s本次请求创建的 %d 个协程已全部完成", nodeInfoForComplete, createCount)
 	}()
 
-	utils.SendResponse(c, nil, fmt.Sprintf("邮件处理任务已启动，创建了 %d 个处理协程", createCount))
+	// 构造返回消息
+	var responseMsg string
+	if req.Node > 0 {
+		responseMsg = fmt.Sprintf("节点 %d 的邮件处理任务已启动，创建了 %d 个处理协程", req.Node, createCount)
+	} else {
+		responseMsg = fmt.Sprintf("邮件处理任务已启动，创建了 %d 个处理协程", createCount)
+	}
+
+	utils.SendResponse(c, nil, responseMsg)
 }
 
 // GetEmailContent 获取邮件内容
-func GetEmailContent(limit int) error {
-	// 获取状态为-1的邮件ID，并将其状态更新为0（处理中）
-	emailIDs, err := model.GetEmailByStatus(-1, limit)
+func GetEmailContent(limit int, node int) error {
+	// 根据节点获取状态为-1的邮件ID，并将其状态更新为0（处理中）
+	var emailIDs []model.PrimeEmail
+	var err error
+
+	// 必须指定节点编号
+	emailIDs, err = model.GetEmailByStatusAndNode(-1, limit, node)
 	if err != nil {
 		return err
 	}
+	log.Printf("[邮件处理] 节点 %d - 获取到 %d 封待处理邮件", node, len(emailIDs))
 	folder := "INBOX"
 	// 检查是否有邮件需要处理
 	if len(emailIDs) == 0 {
@@ -461,7 +487,8 @@ type ListEmailsByUidRequest struct {
 
 // GetEmailContentRequest 获取邮件内容请求结构
 type GetEmailContentRequest struct {
-	Limit int `json:"limit" binding:"required"`
+	Limit int `json:"limit" binding:"required"` // 每个账号同步的邮件数量限制
+	Node  int `json:"node" binding:"required"`  // 节点编号，用于筛选特定节点的账号（必填）
 }
 
 // SendEmailRequest 发送邮件请求结构体
