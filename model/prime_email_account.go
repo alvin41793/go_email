@@ -24,7 +24,7 @@ type PrimeEmailAccount struct {
 func GetActiveAccount() ([]PrimeEmailAccount, error) {
 	var account []PrimeEmailAccount
 	// 按last_sync_time升序排列，NULL值排在最前面（从未同步的账户优先）
-	result := db.DB().Where("status = ?", 1).Order("last_sync_time ASC NULLS FIRST").Find(&account)
+	result := db.DB().Where("status = ?", 1).Order("ISNULL(last_sync_time) DESC, last_sync_time ASC").Find(&account)
 	return account, result.Error
 }
 
@@ -32,7 +32,8 @@ func GetActiveAccount() ([]PrimeEmailAccount, error) {
 func GetActiveAccountByNode(node int) ([]PrimeEmailAccount, error) {
 	var account []PrimeEmailAccount
 	// 按node和last_sync_time筛选排序
-	result := db.DB().Where("status = ? AND node = ?", 1, node).Order("last_sync_time ASC NULLS FIRST").Find(&account)
+	result := db.DB().Where("status = ? AND node = ?", 1, node).Order("ISNULL(last_sync_time) DESC, last_sync_time ASC").Find(&account)
+
 	return account, result.Error
 }
 
