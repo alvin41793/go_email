@@ -8,8 +8,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/handlers.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/corn.sh" beforeDir="false" afterPath="$PROJECT_DIR$/corn.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/last_sync_time_feature.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/prime_email.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/prime_email.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
