@@ -14,6 +14,7 @@ type PrimeEmailAccount struct {
 	Password     string     `json:"password" gorm:"type:varchar(255)"`
 	Status       int        `json:"status" gorm:"comment:'-1:删除 0:未启用 1:已启用'"`
 	Type         int        `json:"type" gorm:"comment:'0:op账号'"`
+	Node         int        `json:"node" gorm:"type:int;default:1;comment:'节点编号，用于区分不同服务器'"`
 	LastSyncTime *time.Time `json:"last_sync_time" gorm:"type:datetime;comment:'最后同步时间'"`
 	CreatedAt    time.Time  `json:"created_at" gorm:"type:datetime"`
 	UpdatedAt    time.Time  `json:"updated_at" gorm:"type:datetime"`
@@ -24,6 +25,14 @@ func GetActiveAccount() ([]PrimeEmailAccount, error) {
 	var account []PrimeEmailAccount
 	// 按last_sync_time升序排列，NULL值排在最前面（从未同步的账户优先）
 	result := db.DB().Where("status = ?", 1).Order("last_sync_time ASC NULLS FIRST").Find(&account)
+	return account, result.Error
+}
+
+// GetActiveAccountByNode 根据节点编号获取状态为启用的账号，按最后同步时间排序
+func GetActiveAccountByNode(node int) ([]PrimeEmailAccount, error) {
+	var account []PrimeEmailAccount
+	// 按node和last_sync_time筛选排序
+	result := db.DB().Where("status = ? AND node = ?", 1, node).Order("last_sync_time ASC NULLS FIRST").Find(&account)
 	return account, result.Error
 }
 

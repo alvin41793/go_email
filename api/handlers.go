@@ -476,6 +476,7 @@ type SendEmailRequest struct {
 type SyncMultipleAccountsRequest struct {
 	MaxWorkers int `json:"max_workers"` // 最大worker数量
 	Limit      int `json:"limit"`       // 每个账号同步的邮件数量限制
+	Node       int `json:"node"`        // 节点编号，用于筛选特定节点的账号
 }
 
 //// 发送邮件
@@ -772,16 +773,38 @@ func SyncMultipleAccounts(c *gin.Context) {
 		return
 	}
 
-	// 获取所有活跃的邮箱账号
-	accounts, err := model.GetActiveAccount()
-	if err != nil {
-		utils.SendResponse(c, err, "获取邮箱配置失败")
-		return
-	}
+	// 根据节点获取活跃的邮箱账号
+	var accounts []model.PrimeEmailAccount
+	var err error
 
-	if len(accounts) == 0 {
-		utils.SendResponse(c, nil, "没有找到活跃的邮箱账号")
-		return
+	if req.Node > 0 {
+		// 按指定节点筛选账号
+		accounts, err = model.GetActiveAccountByNode(req.Node)
+		if err != nil {
+			utils.SendResponse(c, err, "获取邮箱配置失败")
+			return
+		}
+
+		if len(accounts) == 0 {
+			utils.SendResponse(c, nil, fmt.Sprintf("没有找到节点 %d 的活跃邮箱账号", req.Node))
+			return
+		}
+
+		log.Printf("[邮件同步] 节点 %d 找到 %d 个活跃账号", req.Node, len(accounts))
+	} else {
+		// 获取所有活跃的邮箱账号
+		accounts, err = model.GetActiveAccount()
+		if err != nil {
+			utils.SendResponse(c, err, "获取邮箱配置失败")
+			return
+		}
+
+		if len(accounts) == 0 {
+			utils.SendResponse(c, nil, "没有找到活跃的邮箱账号")
+			return
+		}
+
+		log.Printf("[邮件同步] 找到 %d 个活跃账号", len(accounts))
 	}
 
 	// 使用互斥锁保护并发访问和处理中账号集合
@@ -852,10 +875,15 @@ func SyncMultipleAccounts(c *gin.Context) {
 		processingAccounts[account.ID] = true
 	}
 
-	log.Printf("[邮件同步] 当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号, 跳过 %d 个正在处理的账号",
-		atomic.LoadInt32(&currentEmailListGoroutines), maxWorkers, len(filteredAccounts), len(skippedAccounts))
-	fmt.Printf("[邮件同步] 当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号, 跳过 %d 个正在处理的账号\n",
-		atomic.LoadInt32(&currentEmailListGoroutines), maxWorkers, len(filteredAccounts), len(skippedAccounts))
+	nodeInfo := ""
+	if req.Node > 0 {
+		nodeInfo = fmt.Sprintf("节点 %d ", req.Node)
+	}
+
+	log.Printf("[邮件同步] %s当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号, 跳过 %d 个正在处理的账号",
+		nodeInfo, atomic.LoadInt32(&currentEmailListGoroutines), maxWorkers, len(filteredAccounts), len(skippedAccounts))
+	fmt.Printf("[邮件同步] %s当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号, 跳过 %d 个正在处理的账号\n",
+		nodeInfo, atomic.LoadInt32(&currentEmailListGoroutines), maxWorkers, len(filteredAccounts), len(skippedAccounts))
 
 	emailListProcessMutex.Unlock()
 
@@ -944,11 +972,21 @@ func SyncMultipleAccounts(c *gin.Context) {
 	// 构造返回消息
 	var responseMsg string
 	if len(skippedAccounts) > 0 {
-		responseMsg = fmt.Sprintf("正在同步 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d，跳过 %d 个正在处理的账号",
-			len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentEmailListGoroutines), len(skippedAccounts))
+		if req.Node > 0 {
+			responseMsg = fmt.Sprintf("正在同步节点 %d 的 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d，跳过 %d 个正在处理的账号",
+				req.Node, len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentEmailListGoroutines), len(skippedAccounts))
+		} else {
+			responseMsg = fmt.Sprintf("正在同步 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d，跳过 %d 个正在处理的账号",
+				len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentEmailListGoroutines), len(skippedAccounts))
+		}
 	} else {
-		responseMsg = fmt.Sprintf("正在同步 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d",
-			len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentEmailListGoroutines))
+		if req.Node > 0 {
+			responseMsg = fmt.Sprintf("正在同步节点 %d 的 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d",
+				req.Node, len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentEmailListGoroutines))
+		} else {
+			responseMsg = fmt.Sprintf("正在同步 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d",
+				len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentEmailListGoroutines))
+		}
 	}
 
 	// 返回正在处理的信息
