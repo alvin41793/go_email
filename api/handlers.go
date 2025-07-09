@@ -733,15 +733,33 @@ func SyncEmails() {
 		log.Printf("SyncEmails - 批量插入结果: 总计:%d, 成功:%d, 跳过:%d, 失败:%d",
 			result.TotalCount, result.SuccessCount, result.SkippedCount, result.FailedCount)
 
+		// 更新账号的最后同步时间
+		if err := model.UpdateLastSyncTimeWithTx(tx, account.ID); err != nil {
+			tx.Rollback()
+			log.Printf("SyncEmails - 账号ID %d: 更新最后同步时间失败: %v", account.ID, err)
+			return
+		}
+
 		if err := tx.Commit().Error; err != nil {
 			log.Printf("提交事务失败: %v", err)
 			return
 		}
 
-		log.Printf("成功同步 %d 封新邮件", len(emailList))
+		log.Printf("成功同步 %d 封新邮件，已更新最后同步时间", len(emailList))
 	} else {
-		tx.Rollback() // 没有邮件时回滚事务
-		log.Printf("没有新邮件需要同步")
+		// 即使没有新邮件，也要更新最后同步时间
+		if err := model.UpdateLastSyncTimeWithTx(tx, account.ID); err != nil {
+			tx.Rollback()
+			log.Printf("SyncEmails - 账号ID %d: 更新最后同步时间失败: %v", account.ID, err)
+			return
+		}
+
+		if err := tx.Commit().Error; err != nil {
+			log.Printf("提交事务失败: %v", err)
+			return
+		}
+
+		log.Printf("没有新邮件需要同步，但已更新最后同步时间")
 	}
 }
 
@@ -1018,8 +1036,18 @@ func syncSingleAccount(account model.PrimeEmailAccount, limit int) (int, error) 
 		return 0, fmt.Errorf("获取邮件列表失败: %v", err)
 	}
 
-	// 如果没有新邮件，提交事务并返回
+	// 如果没有新邮件，更新同步时间后提交事务并返回
 	if len(emailsResult) == 0 {
+		// 即使没有新邮件，也要更新最后同步时间
+		if err := model.UpdateLastSyncTimeWithTx(tx, account.ID); err != nil {
+			tx.Rollback()
+			log.Printf("账号ID %d: 更新最后同步时间失败: %v", account.ID, err)
+			return 0, fmt.Errorf("更新最后同步时间失败: %v", err)
+		}
+
+		log.Printf("账号ID %d: 没有新邮件，但已更新最后同步时间", account.ID)
+		fmt.Printf("账号ID %d: 没有新邮件，但已更新最后同步时间\n", account.ID)
+
 		if err := tx.Commit().Error; err != nil {
 			return 0, fmt.Errorf("提交事务失败: %v", err)
 		}
@@ -1060,6 +1088,16 @@ func syncSingleAccount(account model.PrimeEmailAccount, limit int) (int, error) 
 		account.ID, result.TotalCount, result.SuccessCount, result.SkippedCount, result.FailedCount)
 	fmt.Printf("账号ID %d: 批量插入结果 - 总计:%d, 成功:%d, 跳过:%d, 失败:%d\n",
 		account.ID, result.TotalCount, result.SuccessCount, result.SkippedCount, result.FailedCount)
+
+	// 更新账号的最后同步时间
+	if err := model.UpdateLastSyncTimeWithTx(tx, account.ID); err != nil {
+		tx.Rollback()
+		log.Printf("账号ID %d: 更新最后同步时间失败: %v", account.ID, err)
+		return 0, fmt.Errorf("更新最后同步时间失败: %v", err)
+	}
+
+	log.Printf("账号ID %d: 更新最后同步时间成功", account.ID)
+	fmt.Printf("账号ID %d: 更新最后同步时间成功\n", account.ID)
 
 	// 提交事务
 	if err := tx.Commit().Error; err != nil {
