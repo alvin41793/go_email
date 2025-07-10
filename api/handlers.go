@@ -65,16 +65,8 @@ func newMailClient(account model.PrimeEmailAccount) (*mailclient.MailClient, err
 		return nil, err
 	}
 
-	// 使用从数据库获取的最新配置
-	return mailclient.NewMailClient(
-		emailConfig.IMAPServer,
-		emailConfig.SMTPServer,
-		emailConfig.EmailAddress,
-		emailConfig.Password,
-		emailConfig.IMAPPort,
-		emailConfig.SMTPPort,
-		emailConfig.UseSSL,
-	), nil
+	// 使用从数据库获取的最新配置创建邮件客户端
+	return mailclient.NewMailClient(emailConfig), nil
 }
 
 func GetEmailContentList(c *gin.Context) {
@@ -216,37 +208,57 @@ func GetEmailContent(limit int, node int) error {
 
 	allEmailData := make([]EmailData, 0, len(emailIDs))
 
+	// 添加计数器
+	var successCount, failureCount int
+
 	// 第一步：获取所有邮件内容
 	fmt.Printf("\n【第1阶段】获取所有邮件内容...\n")
-	for _, emailOne := range emailIDs {
+	for i, emailOne := range emailIDs {
 		log.Printf("[邮件处理] 正在获取邮件内容，ID: %d", emailOne.EmailID)
 		fmt.Printf("  • 获取邮件 ID: %d 内容... ", emailOne.EmailID)
+
+		// 在处理每个邮件之间添加延迟，避免连接过于频繁
+		if i > 0 {
+			time.Sleep(time.Millisecond * 500) // 500毫秒延迟
+		}
+
 		account, err := model.GetAccountByID(emailOne.AccountId)
 		if err != nil && err != gorm.ErrRecordNotFound {
 			log.Printf("[邮件处理] 获取邮件账号失败，ID: %d", emailOne.AccountId)
 			fmt.Printf("  • 获取邮件账号失败，ID: %d", emailOne.AccountId)
+			failureCount++
+			continue
 		}
 		// 为每个请求创建独立的邮件客户端实例
 		mailClient, err := newMailClient(account)
 		if err != nil {
-			log.Printf("获取邮箱配置失败", err)
-			fmt.Println("获取邮箱配置失败", err)
-			return err
+			log.Printf("获取邮箱配置失败: %v", err)
+			fmt.Printf("❌ 失败: %v\n", err)
+			failureCount++
+			// 设置邮件状态为失败
+			resetErr := model.ResetEmailStatus(emailOne.EmailID, -2)
+			if resetErr != nil {
+				log.Printf("[邮件处理] 设置邮件状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
+			}
+			continue
 		}
 		email, err := mailClient.GetEmailContent(uint32(emailOne.EmailID), folder)
 		if err != nil {
 			log.Printf("[邮件处理] 获取邮件内容失败，邮件ID: %d, 错误: %v", emailOne.EmailID, err)
 			fmt.Printf("❌ 失败: %v\n", err)
+			failureCount++
 			// 如果获取失败，将邮件状态置为-2.
 			resetErr := model.ResetEmailStatus(emailOne.EmailID, -2)
 			if resetErr != nil {
-				log.Printf("[邮件处理] 设置邮件状态失败，邮件ID: %d, 错误: %v", email.EmailID, resetErr)
+				log.Printf("[邮件处理] 设置邮件状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
 			}
-			return err
+			// 继续处理下一个邮件，而不是直接返回错误
+			continue
 		}
 
 		log.Printf("[邮件处理] 成功获取邮件内容，邮件ID: %d, 主题: %s, 发件人: %s", emailOne.EmailID, email.Subject, email.From)
 		fmt.Printf("✅ 成功，主题: %s\n", email.Subject)
+		successCount++
 
 		// 创建邮件内容记录
 		emailContent := &model.PrimeEmailContent{
@@ -363,6 +375,17 @@ func GetEmailContent(limit int, node int) error {
 		})
 	}
 
+	// 检查处理结果
+	fmt.Printf("\n【处理结果】成功: %d, 失败: %d, 总计: %d\n", successCount, failureCount, len(emailIDs))
+	log.Printf("[邮件处理] 处理结果 - 成功: %d, 失败: %d, 总计: %d", successCount, failureCount, len(emailIDs))
+
+	// 如果没有成功处理任何邮件，直接返回
+	if successCount == 0 {
+		log.Printf("[邮件处理] 没有成功处理任何邮件，终止流程")
+		fmt.Printf("❌ 没有成功处理任何邮件，终止流程\n")
+		return fmt.Errorf("所有 %d 封邮件都处理失败", len(emailIDs))
+	}
+
 	// 第二步：将所有数据保存到数据库
 	fmt.Printf("\n【第2阶段】将所有数据保存到数据库...\n")
 
@@ -433,9 +456,13 @@ func GetEmailContent(limit int, node int) error {
 		return err
 	}
 
-	log.Printf("[邮件处理] 成功提交事务，完成处理 %d 封邮件", len(emailIDs))
+	log.Printf("[邮件处理] 成功提交事务，完成处理 %d 封邮件", len(allEmailData))
 	fmt.Printf("✅ 成功\n")
-	fmt.Printf("========== 成功完成处理 %d 封邮件 ==========\n\n", len(allEmailData))
+	fmt.Printf("========== 邮件处理完成 ==========\n")
+	fmt.Printf("成功: %d 封邮件\n", successCount)
+	fmt.Printf("失败: %d 封邮件\n", failureCount)
+	fmt.Printf("总计: %d 封邮件\n", len(emailIDs))
+	fmt.Printf("================================\n\n")
 	return nil
 }
 
@@ -1032,6 +1059,12 @@ func SyncMultipleAccounts(c *gin.Context) {
 		fmt.Printf("[邮件同步] 所有账号同步完成: 成功 %d 个, 失败 %d 个\n", successCount, failCount)
 
 	}()
+}
+
+// GetConnectionPoolStatus 获取连接池状态
+func GetConnectionPoolStatus(c *gin.Context) {
+	stats := mailclient.GetConnectionPoolStats()
+	utils.SendResponse(c, nil, stats)
 }
 
 // syncSingleAccount 同步单个账号的邮件

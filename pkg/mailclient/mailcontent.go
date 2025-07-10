@@ -190,7 +190,7 @@ func (m *MailClient) ListEmails(folder string, limit int, fromUID ...uint32) ([]
 			}
 
 			info := EmailInfo{
-				EmailID:        fmt.Sprint(msg.SeqNum),
+				EmailID:        fmt.Sprint(msg.Uid),
 				Subject:        DecodeMIMESubject(msg.Envelope.Subject),
 				From:           parseAddressList(msg.Envelope.From),
 				Date:           msg.Envelope.Date.Format(time.RFC1123Z),
@@ -267,7 +267,7 @@ func (m *MailClient) ListEmails(folder string, limit int, fromUID ...uint32) ([]
 		}
 
 		info := EmailInfo{
-			EmailID:        fmt.Sprint(msg.SeqNum),
+			EmailID:        fmt.Sprint(msg.Uid),
 			Subject:        DecodeMIMESubject(msg.Envelope.Subject),
 			From:           parseAddressList(msg.Envelope.From),
 			Date:           msg.Envelope.Date.Format(time.RFC1123Z),
@@ -313,8 +313,8 @@ func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) 
 	criteria.Uid = new(imap.SeqSet)
 	criteria.Uid.AddNum(uid)
 
-	// 搜索邮件
-	ids, err := c.Search(criteria)
+	// 搜索邮件（使用 UidSearch 因为我们传入的是 UID）
+	ids, err := c.UidSearch(criteria)
 	if err != nil {
 		return nil, fmt.Errorf("搜索邮件失败: %w", err)
 	}
@@ -333,7 +333,7 @@ func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) 
 	messages := make(chan *imap.Message, 1)
 	done := make(chan error, 1)
 	go func() {
-		done <- c.Fetch(seqSet, items, messages)
+		done <- c.UidFetch(seqSet, items, messages)
 	}()
 
 	msg := <-messages
@@ -717,8 +717,8 @@ func (m *MailClient) GetAttachment(uid uint32, filename string, folder string) (
 	criteria.Uid = new(imap.SeqSet)
 	criteria.Uid.AddNum(uid)
 
-	// 搜索邮件
-	ids, err := c.Search(criteria)
+	// 搜索邮件（使用 UidSearch 因为我们传入的是 UID）
+	ids, err := c.UidSearch(criteria)
 	if err != nil {
 		return nil, "", fmt.Errorf("搜索邮件失败: %w", err)
 	}
@@ -759,7 +759,7 @@ func (m *MailClient) GetAttachment(uid uint32, filename string, folder string) (
 	messages := make(chan *imap.Message, 1)
 	done := make(chan error, 1)
 	go func() {
-		done <- c.Fetch(seqSet, items, messages)
+		done <- c.UidFetch(seqSet, items, messages)
 	}()
 
 	msg := <-messages
@@ -828,7 +828,7 @@ func (m *MailClient) GetAttachment(uid uint32, filename string, folder string) (
 		attachDone := make(chan error, 1)
 
 		go func() {
-			attachDone <- c.Fetch(seqSet, attachItems, attachMessages)
+			attachDone <- c.UidFetch(seqSet, attachItems, attachMessages)
 		}()
 
 		attachMsg := <-attachMessages
@@ -858,11 +858,11 @@ func (m *MailClient) GetAttachment(uid uint32, filename string, folder string) (
 // SendEmail 发送邮件
 func (m *MailClient) SendEmail(toAddress, subject, body, contentType string) error {
 	// 使用smtp包连接服务器
-	auth := smtp.PlainAuth("", m.EmailAddress, m.Password, m.SMTPServer)
+	auth := smtp.PlainAuth("", m.Config.EmailAddress, m.Config.Password, m.Config.SMTPServer)
 
 	// 设置标头
 	header := make(map[string]string)
-	header["From"] = m.EmailAddress
+	header["From"] = m.Config.EmailAddress
 	header["To"] = toAddress
 	header["Subject"] = mime.QEncoding.Encode("utf-8", subject)
 	header["MIME-Version"] = "1.0"
@@ -881,7 +881,7 @@ func (m *MailClient) SendEmail(toAddress, subject, body, contentType string) err
 	message += "\r\n" + body
 
 	// 连接SMTP服务器并发送
-	smtpAddr := fmt.Sprintf("%s:%d", m.SMTPServer, m.SMTPPort)
+	smtpAddr := fmt.Sprintf("%s:%d", m.Config.SMTPServer, m.Config.SMTPPort)
 
 	// 部分邮件服务器可能需要TLS
 	c, err := smtp.Dial(smtpAddr)
@@ -896,7 +896,7 @@ func (m *MailClient) SendEmail(toAddress, subject, body, contentType string) err
 
 	// 启用TLS
 	if ok, _ := c.Extension("STARTTLS"); ok {
-		config := &tls.Config{ServerName: m.SMTPServer}
+		config := &tls.Config{ServerName: m.Config.SMTPServer}
 		if err = c.StartTLS(config); err != nil {
 			return fmt.Errorf("StartTLS失败: %w", err)
 		}
@@ -908,7 +908,7 @@ func (m *MailClient) SendEmail(toAddress, subject, body, contentType string) err
 	}
 
 	// 设置发件人和收件人
-	if err = c.Mail(m.EmailAddress); err != nil {
+	if err = c.Mail(m.Config.EmailAddress); err != nil {
 		return fmt.Errorf("设置发件人失败: %w", err)
 	}
 
@@ -1070,8 +1070,8 @@ func (m *MailClient) ForwardOriginalEmail(uid uint32, sourceFolder string, toAdd
 	criteria.Uid = new(imap.SeqSet)
 	criteria.Uid.AddNum(uid)
 
-	// 搜索邮件
-	ids, err := c.Search(criteria)
+	// 搜索邮件（使用 UidSearch 因为我们传入的是 UID）
+	ids, err := c.UidSearch(criteria)
 	if err != nil {
 		return fmt.Errorf("搜索邮件失败: %w", err)
 	}
@@ -1090,7 +1090,7 @@ func (m *MailClient) ForwardOriginalEmail(uid uint32, sourceFolder string, toAdd
 	messages := make(chan *imap.Message, 1)
 	done := make(chan error, 1)
 	go func() {
-		done <- c.Fetch(seqSet, items, messages)
+		done <- c.UidFetch(seqSet, items, messages)
 	}()
 
 	msg := <-messages
@@ -1119,7 +1119,7 @@ func (m *MailClient) ForwardOriginalEmail(uid uint32, sourceFolder string, toAdd
 	var newEmail bytes.Buffer
 
 	// 设置邮件头
-	fmt.Fprintf(&newEmail, "From: %s\r\n", m.EmailAddress)
+	fmt.Fprintf(&newEmail, "From: %s\r\n", m.Config.EmailAddress)
 	fmt.Fprintf(&newEmail, "To: %s\r\n", toAddress)
 	fmt.Fprintf(&newEmail, "Subject: Fwd: %s\r\n", mime.QEncoding.Encode("utf-8", DecodeMIMESubject(msg.Envelope.Subject)))
 	fmt.Fprintf(&newEmail, "MIME-Version: 1.0\r\n")
@@ -1147,11 +1147,11 @@ func (m *MailClient) ForwardOriginalEmail(uid uint32, sourceFolder string, toAdd
 	fmt.Fprintf(&newEmail, "\r\n--%s--", boundary)
 
 	// 发送邮件
-	auth := smtp.PlainAuth("", m.EmailAddress, m.Password, m.SMTPServer)
+	auth := smtp.PlainAuth("", m.Config.EmailAddress, m.Config.Password, m.Config.SMTPServer)
 	err = smtp.SendMail(
-		fmt.Sprintf("%s:%d", m.SMTPServer, m.SMTPPort),
+		fmt.Sprintf("%s:%d", m.Config.SMTPServer, m.Config.SMTPPort),
 		auth,
-		m.EmailAddress,
+		m.Config.EmailAddress,
 		[]string{toAddress},
 		newEmail.Bytes(),
 	)
@@ -1186,7 +1186,7 @@ func (m *MailClient) ForwardStructuredEmail(uid uint32, sourceFolder string, toA
 
 	// 设置邮件头
 	header := make(map[string]string)
-	header["From"] = m.EmailAddress
+	header["From"] = m.Config.EmailAddress
 	header["To"] = toAddress
 	header["Subject"] = mime.QEncoding.Encode("utf-8", forwardSubject)
 	header["MIME-Version"] = "1.0"
@@ -1258,11 +1258,11 @@ func (m *MailClient) ForwardStructuredEmail(uid uint32, sourceFolder string, toA
 
 	// 发送邮件
 	sendStartTime := time.Now()
-	auth := smtp.PlainAuth("", m.EmailAddress, m.Password, m.SMTPServer)
+	auth := smtp.PlainAuth("", m.Config.EmailAddress, m.Config.Password, m.Config.SMTPServer)
 	err = smtp.SendMail(
-		fmt.Sprintf("%s:%d", m.SMTPServer, m.SMTPPort),
+		fmt.Sprintf("%s:%d", m.Config.SMTPServer, m.Config.SMTPPort),
 		auth,
-		m.EmailAddress,
+		m.Config.EmailAddress,
 		[]string{toAddress},
 		buf.Bytes(),
 	)

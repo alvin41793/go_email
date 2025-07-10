@@ -26,6 +26,13 @@ func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	// API 路由组
 	v1 := g.Group("/api/v1")
 	{
+		// 系统状态相关路由
+		system := v1.Group("/system")
+		{
+			// 获取连接池状态
+			system.GET("/connection-pool", GetConnectionPoolStatus)
+		}
+
 		// 邮件相关路由
 		emails := v1.Group("/emails")
 		{
