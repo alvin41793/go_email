@@ -96,144 +96,123 @@ func DecodeMIMESubject(subject string) string {
 	return decoded
 }
 
-// ListEmails 获取指定文件夹中的邮件列表
+// ListEmails 获取邮件列表
 func (m *MailClient) ListEmails(folder string, limit int, fromUID ...uint32) ([]EmailInfo, error) {
+	return m.listEmailsWithRetry(folder, limit, 5, fromUID...)
+}
+
+// 带重试的获取邮件列表
+func (m *MailClient) listEmailsWithRetry(folder string, limit int, maxRetries int, fromUID ...uint32) ([]EmailInfo, error) {
 	if folder == "" {
 		folder = "INBOX"
 	}
-	if limit <= 0 {
-		limit = 10
+
+	for attempt := 1; attempt <= maxRetries; attempt++ {
+		emails, err := m.tryListEmails(folder, limit, fromUID...)
+		if err == nil {
+			return emails, nil
+		}
+
+		// 检查是否是连接相关的错误（包括包装的错误）
+		if isConnectionError(err) || isWrappedConnectionError(err) {
+			log.Printf("[邮件列表] 连接错误 (尝试 %d/%d): 文件夹=%s, 错误: %v", attempt, maxRetries, folder, err)
+			if attempt < maxRetries {
+				// 强制关闭当前连接，下次会重新创建
+				globalPool.CloseConnection(m.Config.EmailAddress)
+				// 增加重试延迟，使用指数退避策略
+				delay := time.Second * time.Duration(attempt*2)
+				log.Printf("[邮件列表] 等待 %v 后重试", delay)
+				time.Sleep(delay)
+				continue
+			}
+		}
+
+		// 非连接错误，直接返回
+		log.Printf("[邮件列表] 非连接错误，直接返回: %v", err)
+		return nil, err
 	}
 
+	return nil, fmt.Errorf("获取邮件列表失败，已重试 %d 次", maxRetries)
+}
+
+// 尝试获取邮件列表（单次）
+func (m *MailClient) tryListEmails(folder string, limit int, fromUID ...uint32) ([]EmailInfo, error) {
 	// 连接IMAP服务器
 	c, err := m.ConnectIMAP()
 	if err != nil {
 		return nil, err
 	}
-	defer c.Logout()
+	defer func() {
+		// 不要在这里关闭连接，让连接池管理
+		// c.Logout()
+	}()
+
+	// 验证连接状态
+	state := c.State()
+	log.Printf("[邮件列表] 连接状态: %v, 文件夹: %s", state, folder)
+
+	// 确保连接处于正确的状态 (Auth=2 或 Selected=3)
+	if state != 2 && state != 3 {
+		return nil, fmt.Errorf("连接状态异常: %v，需要重新建立连接", state)
+	}
 
 	// 选择邮箱
-	_, err = c.Select(folder, false)
+	mbox, err := c.Select(folder, false)
 	if err != nil {
+		// 检查是否是IMAP命令错误
+		if strings.Contains(strings.ToLower(err.Error()), "command is not a valid imap command") {
+			log.Printf("[邮件列表] 检测到IMAP命令错误，重置连接: %v", err)
+			// 重置连接状态
+			globalPool.ResetConnection(m.Config.EmailAddress)
+			return nil, fmt.Errorf("IMAP命令错误，已重置连接: %w", err)
+		}
 		return nil, fmt.Errorf("选择邮箱失败: %w", err)
 	}
 
-	// 搜索邮件
-	criteria := imap.NewSearchCriteria()
-	criteria.WithoutFlags = []string{imap.DeletedFlag}
+	// 如果邮箱中没有邮件，返回空列表
+	if mbox.Messages == 0 {
+		return []EmailInfo{}, nil
+	}
 
-	// 如果指定了UID范围
-	if len(fromUID) >= 2 {
-		startUID := fromUID[0]
-		endUID := fromUID[1]
+	// 创建序列集
+	seqSet := new(imap.SeqSet)
 
-		// 创建UID范围
-		uidRange := new(imap.SeqSet)
-		uidRange.AddRange(startUID, endUID)
-		criteria.Uid = uidRange
+	// 如果指定了起始UID，则使用UID范围
+	if len(fromUID) > 0 && fromUID[0] > 0 {
+		var endUID uint32
+		if len(fromUID) > 1 {
+			endUID = fromUID[1]
+		} else {
+			endUID = fromUID[0] + uint32(limit) // 如果没有指定结束UID，计算一个
+		}
+		seqSet.AddRange(fromUID[0], endUID)
 
-		// 搜索指定UID范围的邮件
-		ids, err := c.UidSearch(criteria)
+		// 用UID搜索命令获取消息
+		ids, err := c.UidSearch(&imap.SearchCriteria{Uid: seqSet})
 		if err != nil {
-			return nil, fmt.Errorf("搜索邮件失败: %w", err)
+			return nil, fmt.Errorf("UID搜索失败: %w", err)
 		}
 
-		// 如果没有邮件，返回空列表
 		if len(ids) == 0 {
 			return []EmailInfo{}, nil
 		}
 
-		// 限制查询数量
-		if len(ids) > limit {
-			ids = ids[len(ids)-limit:]
+		// 重建序列集用于获取
+		seqSet = new(imap.SeqSet)
+		seqSet.AddNum(ids...)
+	} else {
+		// 默认行为：获取最新的邮件
+		start := uint32(1)
+		if mbox.Messages > uint32(limit) {
+			start = mbox.Messages - uint32(limit) + 1
 		}
-
-		// 设置UID查询集合
-		seqSet := new(imap.SeqSet)
-		for _, id := range ids {
-			seqSet.AddNum(id)
-		}
-
-		// 获取邮件信息（只获取标题等信息，不获取内容）
-		messages := make(chan *imap.Message, 10)
-		done := make(chan error, 1)
-		go func() {
-			done <- c.UidFetch(seqSet, []imap.FetchItem{imap.FetchEnvelope, imap.FetchFlags, imap.FetchBodyStructure, imap.FetchUid}, messages)
-		}()
-
-		var emails []EmailInfo
-		for msg := range messages {
-			hasAttachments := false
-
-			// 检查是否有附件
-			if msg.BodyStructure != nil {
-				var checkAttachments func(parts []*imap.BodyStructure) bool
-				checkAttachments = func(parts []*imap.BodyStructure) bool {
-					for _, part := range parts {
-						if part.Disposition == "attachment" || part.Disposition == "inline" && part.Params["filename"] != "" {
-							return true
-						}
-						if part.MIMEType == "multipart" {
-							if checkAttachments(part.Parts) {
-								return true
-							}
-						}
-					}
-					return false
-				}
-
-				if msg.BodyStructure.MIMEType == "multipart" {
-					hasAttachments = checkAttachments(msg.BodyStructure.Parts)
-				} else if msg.BodyStructure.Disposition == "attachment" {
-					hasAttachments = true
-				}
-			}
-
-			info := EmailInfo{
-				EmailID:        fmt.Sprint(msg.Uid),
-				Subject:        DecodeMIMESubject(msg.Envelope.Subject),
-				From:           parseAddressList(msg.Envelope.From),
-				Date:           msg.Envelope.Date.Format(time.RFC1123Z),
-				UID:            msg.Uid,
-				HasAttachments: hasAttachments,
-			}
-			emails = append(emails, info)
-		}
-
-		if err := <-done; err != nil {
-			return nil, fmt.Errorf("获取邮件失败: %w", err)
-		}
-
-		// 反转邮件列表，使最新的邮件在前面
-		for i, j := 0, len(emails)-1; i < j; i, j = i+1, j-1 {
-			emails[i], emails[j] = emails[j], emails[i]
-		}
-
-		return emails, nil
+		seqSet.AddRange(start, mbox.Messages)
 	}
 
-	// 默认行为：搜索所有邮件
-	ids, err := c.Search(criteria)
-	if err != nil {
-		return nil, fmt.Errorf("搜索邮件失败: %w", err)
-	}
-
-	// 如果没有邮件，返回空列表
-	if len(ids) == 0 {
-		return []EmailInfo{}, nil
-	}
-
-	// 限制查询数量
-	if len(ids) > limit {
-		ids = ids[len(ids)-limit:]
-	}
-
-	seqSet := new(imap.SeqSet)
-	seqSet.AddNum(ids...)
-
-	// 获取邮件信息（只获取标题等信息，不获取内容）
-	messages := make(chan *imap.Message, 10)
+	// 获取邮件信息
+	messages := make(chan *imap.Message, limit)
 	done := make(chan error, 1)
+
 	go func() {
 		done <- c.Fetch(seqSet, []imap.FetchItem{imap.FetchEnvelope, imap.FetchFlags, imap.FetchBodyStructure, imap.FetchUid}, messages)
 	}()
@@ -291,20 +270,74 @@ func (m *MailClient) ListEmails(folder string, limit int, fromUID ...uint32) ([]
 
 // GetEmailContent 获取邮件完整内容
 func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) {
+	return m.getEmailContentWithRetry(uid, folder, 5)
+}
+
+// 带重试的获取邮件内容
+func (m *MailClient) getEmailContentWithRetry(uid uint32, folder string, maxRetries int) (*Email, error) {
 	if folder == "" {
 		folder = "INBOX"
 	}
 
+	for attempt := 1; attempt <= maxRetries; attempt++ {
+		email, err := m.tryGetEmailContent(uid, folder)
+		if err == nil {
+			return email, nil
+		}
+
+		// 检查是否是连接相关的错误（包括包装的错误）
+		if isConnectionError(err) || isWrappedConnectionError(err) {
+			log.Printf("[邮件获取] 连接错误 (尝试 %d/%d): UID=%d, 错误: %v", attempt, maxRetries, uid, err)
+			if attempt < maxRetries {
+				// 强制关闭当前连接，下次会重新创建
+				globalPool.CloseConnection(m.Config.EmailAddress)
+				// 增加重试延迟，使用指数退避策略
+				delay := time.Second * time.Duration(attempt*2)
+				log.Printf("[邮件获取] 等待 %v 后重试", delay)
+				time.Sleep(delay)
+				continue
+			}
+		}
+
+		// 非连接错误，直接返回
+		log.Printf("[邮件获取] 非连接错误，直接返回: %v", err)
+		return nil, err
+	}
+
+	return nil, fmt.Errorf("获取邮件内容失败，已重试 %d 次", maxRetries)
+}
+
+// 尝试获取邮件内容（单次）
+func (m *MailClient) tryGetEmailContent(uid uint32, folder string) (*Email, error) {
 	// 连接IMAP服务器
 	c, err := m.ConnectIMAP()
 	if err != nil {
 		return nil, err
 	}
-	defer c.Logout()
+	defer func() {
+		// 不要在这里关闭连接，让连接池管理
+		// c.Logout()
+	}()
+
+	// 验证连接状态
+	state := c.State()
+	log.Printf("[邮件获取] 连接状态: %v, UID: %d", state, uid)
+
+	// 确保连接处于正确的状态 (Auth=2 或 Selected=3)
+	if state != 2 && state != 3 {
+		return nil, fmt.Errorf("连接状态异常: %v，需要重新建立连接", state)
+	}
 
 	// 选择邮箱
 	_, err = c.Select(folder, false)
 	if err != nil {
+		// 检查是否是IMAP命令错误
+		if strings.Contains(strings.ToLower(err.Error()), "command is not a valid imap command") {
+			log.Printf("[邮件获取] 检测到IMAP命令错误，重置连接: %v", err)
+			// 重置连接状态
+			globalPool.ResetConnection(m.Config.EmailAddress)
+			return nil, fmt.Errorf("IMAP命令错误，已重置连接: %w", err)
+		}
 		return nil, fmt.Errorf("选择邮箱失败: %w", err)
 	}
 
@@ -357,116 +390,37 @@ func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) 
 
 	// 获取完整邮件内容
 	r := msg.GetBody(section)
+	if r == nil {
+		return nil, fmt.Errorf("邮件正文为空")
+	}
 
-	if r != nil {
-		// 先保存原始内容，以便出现解析错误时使用
-		rawBytes, _ := io.ReadAll(r)
-		rawContent := ""
-		if len(rawBytes) > 0 {
-			rawContent = string(rawBytes)
+	// 将io.Reader转换为string
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, r); err != nil {
+		return nil, fmt.Errorf("读取邮件内容失败: %w", err)
+	}
+	rawContent := buf.String()
+
+	// 调试输出
+	log.Printf("[邮件解析调试] UID: %d, 解码成功，内容长度: %d", uid, len(rawContent))
+
+	// 保存原始内容到文件用于调试
+	if err := saveRawContentToFile(uid, rawContent); err != nil {
+		log.Printf("[邮件解析调试] 保存原始内容失败: %v", err)
+	}
+
+	// 解析邮件内容
+	if msg.BodyStructure.MIMEType == "multipart" {
+		// 多部分邮件
+		reader := strings.NewReader(rawContent)
+		err = m.parseMultipartMessage(msg, email, reader)
+		if err != nil {
+			log.Printf("[邮件解析] 解析多部分邮件失败: %v", err)
+			// 即使解析失败，也返回基本信息
 		}
-		// fmt.Println("邮件内容====================================", rawContent)
-
-		// //将原始邮件内容保存到文件
-		// if err := saveRawContentToFile(uid, rawContent); err != nil {
-		// 	log.Printf("保存原始邮件内容到文件失败: %v", err)
-		// }
-
-		// 尝试获取原始邮件数据进行备用
-		// 这是为了保证在解析失败时，我们仍然有数据返回
-		email.Body = "无法解析邮件内容，可能是格式复杂或不支持的格式"
-
-		// 如果是简单的文本邮件，直接解析
-		if msg.BodyStructure.MIMEType == "text" {
-			fmt.Printf("[邮件解析调试] UID: %d, MIME类型: %s/%s\n", uid, msg.BodyStructure.MIMEType, msg.BodyStructure.MIMESubType)
-			// 使用mail包解析邮件以正确处理编码
-			mr, err := mail.ReadMessage(bytes.NewReader(rawBytes))
-			if err == nil {
-				// 创建临时的textproto.MIMEHeader
-				header := textproto.MIMEHeader(mr.Header)
-				fmt.Printf("[邮件解析调试] UID: %d, Content-Type: %s, Content-Transfer-Encoding: %s\n",
-					uid, header.Get("Content-Type"), header.Get("Content-Transfer-Encoding"))
-
-				// 读取邮件正文
-				bodyBytes, err := io.ReadAll(mr.Body)
-				if err == nil {
-					fmt.Printf("[邮件解析调试] UID: %d, 原始正文长度: %d\n", uid, len(bodyBytes))
-					// 解码内容（处理quoted-printable和字符集）
-					decodedBody, err := decodeContent(header, bodyBytes)
-					if err == nil && decodedBody != "" {
-						fmt.Printf("[邮件解析调试] UID: %d, 解码成功，内容长度: %d\n", uid, len(decodedBody))
-						if msg.BodyStructure.MIMESubType == "plain" {
-							email.Body = decodedBody
-						} else if msg.BodyStructure.MIMESubType == "html" {
-							// 保留HTML原始格式
-							email.BodyHTML = decodedBody
-							// 清除Body字段的默认错误消息，因为这是HTML邮件
-							email.Body = "html格式邮件，没有正文"
-						}
-					} else {
-						fmt.Printf("[邮件解析调试] UID: %d, 解码失败，错误: %v\n", uid, err)
-						// 如果解码失败，使用原始内容
-						if msg.BodyStructure.MIMESubType == "plain" {
-							email.Body = string(bodyBytes)
-						} else if msg.BodyStructure.MIMESubType == "html" {
-							email.BodyHTML = string(bodyBytes)
-							// 清除Body字段的默认错误消息，因为这是HTML邮件
-							email.Body = fmt.Sprintf("[邮件解析调试] UID: %d, 解码失败，错误: %v\n", uid, err)
-
-						}
-					}
-				}
-			} else {
-				fmt.Printf("[邮件解析调试] UID: %d, mail.ReadMessage解析失败，错误: %v\n", uid, err)
-			}
-
-			// 如果上面的解析都失败了，使用原始内容作为备用
-			if email.Body == "" && email.BodyHTML == "" {
-				fmt.Printf("[邮件解析调试] UID: %d, 所有解析方法都失败，使用原始内容\n", uid)
-				if msg.BodyStructure.MIMESubType == "plain" {
-					email.Body = rawContent
-				} else if msg.BodyStructure.MIMESubType == "html" {
-					email.BodyHTML = rawContent
-					// 清除Body字段的默认错误消息，因为这是HTML邮件
-					email.Body = ""
-				}
-			}
-		} else if msg.BodyStructure.MIMEType == "multipart" {
-			fmt.Printf("[邮件解析调试] UID: %d, 进入多部分邮件解析分支\n", uid)
-			// 对于多部分邮件，使用特殊的解析逻辑
-			// 重新构建一个Reader
-			r = bytes.NewReader(rawBytes)
-			err = m.parseMultipartMessage(msg, email, r)
-			if err != nil {
-				log.Printf("解析多部分邮件失败: %v", err)
-
-				// 如果解析失败，尝试使用备选方法
-				if email.Body == "无法解析邮件内容，可能是格式复杂或不支持的格式" {
-					// 尝试提取纯文本内容
-					email.Body = extractPlainText(rawContent)
-				}
-
-				if email.BodyHTML == "" {
-					// 尝试提取HTML内容
-					email.BodyHTML = extractHTML(rawContent)
-				}
-			}
-		} else {
-			fmt.Printf("[邮件解析调试] UID: %d, 未知MIME类型: %s\n", uid, msg.BodyStructure.MIMEType)
-		}
-
-		// 确保至少有一部分内容能够返回
-		if (email.Body == "" || email.Body == "无法解析邮件内容，可能是格式复杂或不支持的格式") &&
-			(email.BodyHTML == "" || email.BodyHTML == "无法解析HTML内容，邮件可能是复杂格式。") {
-			// 只有在两个字段都没有内容时才使用备用方案
-			email.Body = extractPlainText(rawContent)
-			if email.Body == "" {
-				email.Body = "邮件内容解析失败，原始内容:\n" + rawContent
-			}
-		} else if email.BodyHTML != "" && (email.Body == "" || email.Body == "无法解析邮件内容，可能是格式复杂或不支持的格式") {
-			// 如果HTML内容存在但Body字段仍然是错误消息，清空Body字段
-			email.Body = ""
-		}
+	} else {
+		// 单部分邮件
+		email.Body = rawContent
 	}
 
 	return email, nil
@@ -693,22 +647,76 @@ func decodeContent(header textproto.MIMEHeader, content []byte) (string, error) 
 	return string(utf8Content), nil
 }
 
-// 获取特定邮件的特定附件
+// GetAttachment 获取邮件附件
 func (m *MailClient) GetAttachment(uid uint32, filename string, folder string) ([]byte, string, error) {
+	return m.getAttachmentWithRetry(uid, filename, folder, 5)
+}
+
+// 带重试的获取附件
+func (m *MailClient) getAttachmentWithRetry(uid uint32, filename string, folder string, maxRetries int) ([]byte, string, error) {
 	if folder == "" {
 		folder = "INBOX"
 	}
 
+	for attempt := 1; attempt <= maxRetries; attempt++ {
+		data, mimeType, err := m.tryGetAttachment(uid, filename, folder)
+		if err == nil {
+			return data, mimeType, nil
+		}
+
+		// 检查是否是连接相关的错误（包括包装的错误）
+		if isConnectionError(err) || isWrappedConnectionError(err) {
+			log.Printf("[附件获取] 连接错误 (尝试 %d/%d): UID=%d, 文件=%s, 错误: %v", attempt, maxRetries, uid, filename, err)
+			if attempt < maxRetries {
+				// 强制关闭当前连接，下次会重新创建
+				globalPool.CloseConnection(m.Config.EmailAddress)
+				// 增加重试延迟，使用指数退避策略
+				delay := time.Second * time.Duration(attempt*2)
+				log.Printf("[附件获取] 等待 %v 后重试", delay)
+				time.Sleep(delay)
+				continue
+			}
+		}
+
+		// 非连接错误，直接返回
+		log.Printf("[附件获取] 非连接错误，直接返回: %v", err)
+		return nil, "", err
+	}
+
+	return nil, "", fmt.Errorf("获取附件失败，已重试 %d 次", maxRetries)
+}
+
+// 尝试获取附件（单次）
+func (m *MailClient) tryGetAttachment(uid uint32, filename string, folder string) ([]byte, string, error) {
 	// 连接IMAP服务器
 	c, err := m.ConnectIMAP()
 	if err != nil {
 		return nil, "", err
 	}
-	defer c.Logout()
+	defer func() {
+		// 不要在这里关闭连接，让连接池管理
+		// c.Logout()
+	}()
+
+	// 验证连接状态
+	state := c.State()
+	log.Printf("[附件获取] 连接状态: %v, UID: %d, 文件: %s", state, uid, filename)
+
+	// 确保连接处于正确的状态 (Auth=2 或 Selected=3)
+	if state != 2 && state != 3 {
+		return nil, "", fmt.Errorf("连接状态异常: %v，需要重新建立连接", state)
+	}
 
 	// 选择邮箱
 	_, err = c.Select(folder, false)
 	if err != nil {
+		// 检查是否是IMAP命令错误
+		if strings.Contains(strings.ToLower(err.Error()), "command is not a valid imap command") {
+			log.Printf("[附件获取] 检测到IMAP命令错误，重置连接: %v", err)
+			// 重置连接状态
+			globalPool.ResetConnection(m.Config.EmailAddress)
+			return nil, "", fmt.Errorf("IMAP命令错误，已重置连接: %w", err)
+		}
 		return nil, "", fmt.Errorf("选择邮箱失败: %w", err)
 	}
 
@@ -727,28 +735,6 @@ func (m *MailClient) GetAttachment(uid uint32, filename string, folder string) (
 		return nil, "", fmt.Errorf("未找到邮件")
 	}
 
-	// 获取完整邮件内容并解析附件
-	email, err := m.GetEmailContent(uid, folder)
-	if err != nil {
-		return nil, "", fmt.Errorf("获取邮件内容失败: %w", err)
-	}
-
-	// 查找指定的附件
-	for _, attachment := range email.Attachments {
-		if attachment.Filename == filename {
-			// 如果已经保存了base64数据，直接解码并返回
-			if attachment.Base64Data != "" {
-				data, err := base64.StdEncoding.DecodeString(attachment.Base64Data)
-				if err != nil {
-					return nil, "", fmt.Errorf("解码附件内容失败: %w", err)
-				}
-				return data, attachment.MimeType, nil
-			}
-		}
-	}
-
-	// 如果在Email对象中找不到附件或base64数据，尝试使用旧方法获取
-	// 获取完整邮件
 	seqSet := new(imap.SeqSet)
 	seqSet.AddNum(ids...)
 
@@ -764,95 +750,108 @@ func (m *MailClient) GetAttachment(uid uint32, filename string, folder string) (
 
 	msg := <-messages
 	if err := <-done; err != nil {
-		return nil, "", fmt.Errorf("获取邮件内容失败: %w", err)
+		return nil, "", fmt.Errorf("获取邮件结构失败: %w", err)
 	}
 
-	if msg == nil || msg.BodyStructure == nil {
-		return nil, "", fmt.Errorf("邮件不存在或结构无效")
+	if msg == nil {
+		return nil, "", fmt.Errorf("邮件不存在")
 	}
 
-	// 完整获取邮件内容
-	reader := msg.GetBody(section)
-	if reader == nil {
-		return nil, "", fmt.Errorf("无法获取邮件内容")
-	}
+	// 查找指定的附件
+	var attachmentSection *imap.BodySectionName
+	var attachmentMimeType string
 
-	// 确保关闭reader
-	_, err = io.ReadAll(reader)
-	if err != nil {
-		return nil, "", fmt.Errorf("读取邮件内容失败: %w", err)
-	}
+	var findAttachment func(parts []*imap.BodyStructure, path []int) bool
+	findAttachment = func(parts []*imap.BodyStructure, path []int) bool {
+		for i, part := range parts {
+			currentPath := append(path, i+1)
 
-	// 递归查找附件部分及其MIME类型
-	var findAttachment func(bs *imap.BodyStructure, parentPath []int) ([]int, string)
-	findAttachment = func(bs *imap.BodyStructure, parentPath []int) ([]int, string) {
-		// 检查该部分是否为所需附件
-		if bs.Disposition == "attachment" {
-			attachmentFilename := bs.DispositionParams["filename"]
-			if attachmentFilename == "" {
-				attachmentFilename = bs.Params["name"]
+			// 检查是否是附件
+			if part.Disposition == "attachment" || part.Disposition == "inline" {
+				attachmentFilename := part.Params["filename"]
+				if attachmentFilename == "" {
+					attachmentFilename = part.Params["name"]
+				}
+
+				if attachmentFilename == filename {
+					// 找到了匹配的附件
+					attachmentSection = &imap.BodySectionName{
+						BodyPartName: imap.BodyPartName{
+							Specifier: imap.TextSpecifier,
+							Path:      currentPath,
+						},
+						Peek: true,
+					}
+					attachmentMimeType = part.MIMEType + "/" + part.MIMESubType
+					return true
+				}
 			}
-			// 解码RFC 2047编码的文件名
-			decodedAttachmentFilename := DecodeMIMESubject(attachmentFilename)
-			if decodedAttachmentFilename == filename {
-				return parentPath, bs.MIMEType + "/" + bs.MIMESubType
-			}
-		}
 
-		// 如果是多部分邮件，检查所有子部分
-		if bs.MIMEType == "multipart" {
-			for i, part := range bs.Parts {
-				// 构建子部分路径
-				path := append(append([]int{}, parentPath...), i+1)
-				if resultPath, mimeType := findAttachment(part, path); resultPath != nil {
-					return resultPath, mimeType
+			// 递归查找子部分
+			if part.MIMEType == "multipart" && len(part.Parts) > 0 {
+				if findAttachment(part.Parts, currentPath) {
+					return true
 				}
 			}
 		}
-		return nil, ""
+		return false
 	}
 
-	// 查找附件信息
-	attachmentPath, attachmentMimeType := findAttachment(msg.BodyStructure, []int{})
-
-	// 如果找到附件，尝试直接获取其内容
-	if attachmentPath != nil && len(attachmentPath) > 0 {
-		// 尝试通过特定路径获取附件内容
-		attachmentSection := &imap.BodySectionName{
-			Peek: true,
+	// 开始查找附件
+	if msg.BodyStructure.MIMEType == "multipart" {
+		found := findAttachment(msg.BodyStructure.Parts, []int{})
+		if !found {
+			return nil, "", fmt.Errorf("未找到附件: %s", filename)
 		}
-
-		// 再次获取指定附件
-		attachItems := []imap.FetchItem{attachmentSection.FetchItem()}
-		attachMessages := make(chan *imap.Message, 1)
-		attachDone := make(chan error, 1)
-
-		go func() {
-			attachDone <- c.UidFetch(seqSet, attachItems, attachMessages)
-		}()
-
-		attachMsg := <-attachMessages
-		if attachError := <-attachDone; attachError != nil {
-			return nil, "", fmt.Errorf("获取附件内容失败: %w", attachError)
-		}
-
-		// 读取附件内容
-		if attachmentContent := attachMsg.GetBody(attachmentSection); attachmentContent != nil {
-			data, err := io.ReadAll(attachmentContent)
-			if err != nil {
-				return nil, "", fmt.Errorf("读取附件内容失败: %w", err)
-			}
-			return data, attachmentMimeType, nil
-		}
+	} else {
+		return nil, "", fmt.Errorf("邮件不包含附件")
 	}
 
-	// 如果无法通过常规方式获取附件，返回一个占位内容
+	// 再次获取指定附件
+	attachItems := []imap.FetchItem{attachmentSection.FetchItem()}
+	attachMessages := make(chan *imap.Message, 1)
+	attachDone := make(chan error, 1)
+
+	go func() {
+		attachDone <- c.UidFetch(seqSet, attachItems, attachMessages)
+	}()
+
+	attachMsg := <-attachMessages
+	if err := <-attachDone; err != nil {
+		return nil, "", fmt.Errorf("获取附件内容失败: %w", err)
+	}
+
+	if attachMsg == nil {
+		return nil, "", fmt.Errorf("附件不存在")
+	}
+
+	// 读取附件内容
+	r := attachMsg.GetBody(attachmentSection)
+	if r == nil {
+		return nil, "", fmt.Errorf("附件内容为空")
+	}
+
+	// 读取数据
+	data, err := io.ReadAll(r)
+	if err != nil {
+		return nil, "", fmt.Errorf("读取附件数据失败: %w", err)
+	}
+
+	// 解码base64（如果需要）
+	decoded, err := base64.StdEncoding.DecodeString(string(data))
+	if err == nil {
+		// 解码成功，使用解码后的数据
+		data = decoded
+	}
+	// 如果解码失败，使用原始数据
+
+	// 如果无法获取MIME类型，使用默认值
 	finalMimeType := "application/octet-stream"
 	if attachmentMimeType != "" {
 		finalMimeType = attachmentMimeType
 	}
 
-	return []byte("此附件内容无法解析。建议使用邮件客户端查看原始邮件。"), finalMimeType, nil
+	return data, finalMimeType, nil
 }
 
 // SendEmail 发送邮件
@@ -1052,16 +1051,74 @@ func cleanHTMLContent(html string) string {
 }
 
 func (m *MailClient) ForwardOriginalEmail(uid uint32, sourceFolder string, toAddress string) error {
+	return m.forwardOriginalEmailWithRetry(uid, sourceFolder, toAddress, 5)
+}
+
+// 带重试的转发原始邮件
+func (m *MailClient) forwardOriginalEmailWithRetry(uid uint32, sourceFolder string, toAddress string, maxRetries int) error {
+	if sourceFolder == "" {
+		sourceFolder = "INBOX"
+	}
+
+	for attempt := 1; attempt <= maxRetries; attempt++ {
+		err := m.tryForwardOriginalEmail(uid, sourceFolder, toAddress)
+		if err == nil {
+			return nil
+		}
+
+		// 检查是否是连接相关的错误（包括包装的错误）
+		if isConnectionError(err) || isWrappedConnectionError(err) {
+			log.Printf("[邮件转发] 连接错误 (尝试 %d/%d): UID=%d, 错误: %v", attempt, maxRetries, uid, err)
+			if attempt < maxRetries {
+				// 强制关闭当前连接，下次会重新创建
+				globalPool.CloseConnection(m.Config.EmailAddress)
+				// 增加重试延迟，使用指数退避策略
+				delay := time.Second * time.Duration(attempt*2)
+				log.Printf("[邮件转发] 等待 %v 后重试", delay)
+				time.Sleep(delay)
+				continue
+			}
+		}
+
+		// 非连接错误，直接返回
+		log.Printf("[邮件转发] 非连接错误，直接返回: %v", err)
+		return err
+	}
+
+	return fmt.Errorf("转发原始邮件失败，已重试 %d 次", maxRetries)
+}
+
+// 尝试转发原始邮件（单次）
+func (m *MailClient) tryForwardOriginalEmail(uid uint32, sourceFolder string, toAddress string) error {
 	// 连接IMAP服务器
 	c, err := m.ConnectIMAP()
 	if err != nil {
 		return err
 	}
-	defer c.Logout()
+	defer func() {
+		// 不要在这里关闭连接，让连接池管理
+		// c.Logout()
+	}()
+
+	// 验证连接状态
+	state := c.State()
+	log.Printf("[邮件转发] 连接状态: %v, UID: %d", state, uid)
+
+	// 确保连接处于正确的状态 (Auth=2 或 Selected=3)
+	if state != 2 && state != 3 {
+		return fmt.Errorf("连接状态异常: %v，需要重新建立连接", state)
+	}
 
 	// 选择邮箱
 	_, err = c.Select(sourceFolder, false)
 	if err != nil {
+		// 检查是否是IMAP命令错误
+		if strings.Contains(strings.ToLower(err.Error()), "command is not a valid imap command") {
+			log.Printf("[邮件转发] 检测到IMAP命令错误，重置连接: %v", err)
+			// 重置连接状态
+			globalPool.ResetConnection(m.Config.EmailAddress)
+			return fmt.Errorf("IMAP命令错误，已重置连接: %w", err)
+		}
 		return fmt.Errorf("选择邮箱失败: %w", err)
 	}
 
@@ -1278,4 +1335,93 @@ func (m *MailClient) ForwardStructuredEmail(uid uint32, sourceFolder string, toA
 		uid, totalDuration, fetchDuration, buildContentDuration, attachmentDuration, sendDuration)
 
 	return nil
+}
+
+// 检查是否是包装的连接错误（如 "选择邮箱失败: short write"）
+func isWrappedConnectionError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	errStr := strings.ToLower(err.Error())
+
+	// 检查是否包含常见的包装错误前缀和连接错误
+	wrappedPrefixes := []string{
+		"选择邮箱失败:",
+		"搜索邮件失败:",
+		"获取邮件失败:",
+		"获取邮件内容失败:",
+		"获取附件失败:",
+		"连接imap服务器失败:",
+		"imap登录失败:",
+		"获取邮件结构失败:",
+		"获取附件内容失败:",
+		"读取邮件内容失败:",
+		"读取下一部分失败:",
+		"读取附件数据失败:",
+		"读取响应失败:",
+		"发送邮件失败:",
+	}
+
+	connectionErrors := []string{
+		"short write",
+		"connection closed",
+		"connection reset",
+		"broken pipe",
+		"use of closed network connection",
+		"read tcp",
+		"write tcp",
+		"i/o timeout",
+		"connection lost",
+		"network error",
+		"socket closed",
+		"timeout",
+		"eof",
+		"network is unreachable",
+		"connection refused",
+		"connection timed out",
+		"no such host",
+		"dial tcp",
+		"wsarecv",
+		"wsasend",
+		"operation timed out",
+		"connection aborted",
+		"network down",
+		"host is down",
+		"interrupted system call",
+		"broken stream",
+		"protocol error",
+		"bad file descriptor",
+		"operation canceled",
+		"context canceled",
+		"context deadline exceeded",
+		"command is not a valid imap command",
+		"imap命令错误",
+		"连接状态异常",
+		"invalid connection state",
+		"connection in wrong state",
+		"bad connection",
+		"stale connection",
+		"connection not ready",
+	}
+
+	// 检查是否有包装前缀
+	hasWrapperPrefix := false
+	for _, prefix := range wrappedPrefixes {
+		if strings.Contains(errStr, prefix) {
+			hasWrapperPrefix = true
+			break
+		}
+	}
+
+	// 如果有包装前缀，检查是否包含连接错误
+	if hasWrapperPrefix {
+		for _, connErr := range connectionErrors {
+			if strings.Contains(errStr, connErr) {
+				return true
+			}
+		}
+	}
+
+	return false
 }
