@@ -352,6 +352,17 @@ func GetEmailContent(limit int, node int) error {
 				if resetErr != nil {
 					log.Printf("[邮件处理] 设置邮件已删除状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
 				}
+			} else if strings.Contains(strings.ToLower(err.Error()), "server error") ||
+				strings.Contains(strings.ToLower(err.Error()), "please try again later") ||
+				strings.Contains(strings.ToLower(err.Error()), "service unavailable") ||
+				strings.Contains(strings.ToLower(err.Error()), "temporary failure") ||
+				strings.Contains(strings.ToLower(err.Error()), "server busy") {
+				// SELECT服务器临时错误，将状态回滚为-1以便重新处理
+				log.Printf("[邮件处理] 检测到服务器临时错误，回滚状态为待处理: 邮件ID=%d, 错误=%v", emailOne.EmailID, err)
+				resetErr := model.ResetEmailStatus(emailOne.EmailID, -1) // -1表示待处理，可以重新尝试
+				if resetErr != nil {
+					log.Printf("[邮件处理] 回滚邮件状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
+				}
 			} else {
 				// 其他错误，设置为失败状态
 				resetErr := model.ResetEmailStatus(emailOne.EmailID, -2)
@@ -736,6 +747,17 @@ func GetEmailContentWithAccounts(limit int, node int, accounts []model.PrimeEmai
 				resetErr := model.ResetEmailStatus(emailOne.EmailID, -3) // -3表示已删除
 				if resetErr != nil {
 					log.Printf("[邮件处理] 设置邮件已删除状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
+				}
+			} else if strings.Contains(strings.ToLower(err.Error()), "server error") ||
+				strings.Contains(strings.ToLower(err.Error()), "please try again later") ||
+				strings.Contains(strings.ToLower(err.Error()), "service unavailable") ||
+				strings.Contains(strings.ToLower(err.Error()), "temporary failure") ||
+				strings.Contains(strings.ToLower(err.Error()), "server busy") {
+				// SELECT服务器临时错误，将状态回滚为-1以便重新处理
+				log.Printf("[邮件处理] 检测到服务器临时错误，回滚状态为待处理: 邮件ID=%d, 错误=%v", emailOne.EmailID, err)
+				resetErr := model.ResetEmailStatus(emailOne.EmailID, -1) // -1表示待处理，可以重新尝试
+				if resetErr != nil {
+					log.Printf("[邮件处理] 回滚邮件状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
 				}
 			} else {
 				// 其他错误，设置为失败状态
