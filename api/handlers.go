@@ -37,11 +37,11 @@ var (
 	currentEmailListGoroutines     int32     // 当前获取邮件列表运行的协程总数
 	maxEmailListTotalGoroutines    int32 = 5 // 全局获取邮件列表最大协程数
 	emailContentProcessMutex       sync.Mutex
-	currentEmailContentGoroutines  int32     // 当前获取邮件内容运行的协程总数
-	maxEmailContentTotalGoroutines int32 = 5 // 全局获取邮件内容最大协程数
+	currentEmailContentGoroutines  int32      // 当前获取邮件内容运行的协程总数
+	maxEmailContentTotalGoroutines int32 = 16 // 全局获取邮件内容最大协程数（支持16个账号）
 	listEmailsByUidMutex           sync.Mutex
-	goroutinesPerReq               int32 = 5 // 每次请求创建的协程数
-	sleepTime                      int   = 3
+	goroutinesPerReq               int32 = 5 // 每次请求创建的协程数（已废弃，现在动态创建）
+	sleepTime                      int   = 1 // 减少协程创建间隔时间
 	processingAccounts             map[int]bool
 )
 
@@ -88,25 +88,20 @@ func GetEmailContentList(c *gin.Context) {
 
 	// 计算本次请求可以创建的协程数量
 	remainingSlots := maxEmailContentTotalGoroutines - atomic.LoadInt32(&currentEmailContentGoroutines)
-	createCount := goroutinesPerReq
-	if remainingSlots < goroutinesPerReq {
-		createCount = remainingSlots
-	}
 
 	nodeInfo := ""
 	if req.Node > 0 {
 		nodeInfo = fmt.Sprintf("节点 %d ", req.Node)
 	}
 
-	log.Printf("[邮件处理] %s当前已有 %d 个协程，本次请求尝试创建 %d 个新协程",
-		nodeInfo, atomic.LoadInt32(&currentEmailContentGoroutines), createCount)
+	log.Printf("[邮件处理] %s当前已有 %d 个协程，剩余协程槽位: %d",
+		nodeInfo, atomic.LoadInt32(&currentEmailContentGoroutines), remainingSlots)
 
 	// 释放互斥锁，允许其他请求继续
 	emailContentProcessMutex.Unlock()
 
-	// 【关键修改】先获取账号，确认有可用账号后再返回响应
-	// 原子性地获取账号并立即更新同步时间，防止并发竞争
-	allAccounts, err := model.GetAndUpdateAccountsForContent(req.Node, int(createCount)*3) // 为每个协程预留5个账号
+	// 【关键修改】获取所有可用账号，每个账号将创建一个协程
+	allAccounts, err := model.GetAndUpdateAccountsForContent(req.Node, int(remainingSlots)) // 获取剩余槽位数量的账号
 	if err != nil {
 		log.Printf("[邮件处理] 获取账号失败: %v", err)
 		utils.SendResponse(c, err, "获取账号失败")
@@ -119,10 +114,13 @@ func GetEmailContentList(c *gin.Context) {
 		return
 	}
 
-	log.Printf("[邮件处理] 节点 %d - 原子性获取并更新了 %d 个账号的同步时间", req.Node, len(allAccounts))
+	// 协程数量 = 获取到的账号数量（每个账号一个协程）
+	createCount := int32(len(allAccounts))
+
+	log.Printf("[邮件处理] 节点 %d - 获取了 %d 个账号，将创建 %d 个协程（每个账号一个协程）", req.Node, len(allAccounts), createCount)
 
 	// 确认有账号可用后，返回准确的响应
-	responseMsg := fmt.Sprintf("节点 %d 的邮件处理任务已启动，获取了 %d 个账号，正在创建 %d 个处理协程", req.Node, len(allAccounts), createCount)
+	responseMsg := fmt.Sprintf("节点 %d 的邮件处理任务已启动，获取了 %d 个账号，正在创建 %d 个处理协程（每个账号一个协程）", req.Node, len(allAccounts), createCount)
 	utils.SendResponse(c, nil, responseMsg)
 
 	// 后台启动协程处理邮件
@@ -142,63 +140,40 @@ func GetEmailContentList(c *gin.Context) {
 			}
 		}()
 
-		log.Printf("[邮件处理] 节点 %d - 获取到 %d 个账号，准备分配给 %d 个协程", req.Node, len(allAccounts), createCount)
+		log.Printf("[邮件处理] 节点 %d - 开始为 %d 个账号分别创建协程", req.Node, len(allAccounts))
 
-		// 将账号分配给不同的协程
-		accountsPerGoroutine := len(allAccounts) / int(createCount)
-		remainder := len(allAccounts) % int(createCount)
-
-		var startIndex int
-		for i := int32(0); i < createCount; i++ {
+		// 【关键修改】为每个账号创建一个独立的协程
+		for i, account := range allAccounts {
 			wg.Add(1)
-
-			// 计算当前协程分配的账号数量
-			currentAccountCount := accountsPerGoroutine
-			if i < int32(remainder) {
-				currentAccountCount++
-			}
-
-			// 分配账号给当前协程
-			var assignedAccounts []model.PrimeEmailAccount
-			if currentAccountCount > 0 && startIndex < len(allAccounts) {
-				endIndex := startIndex + currentAccountCount
-				if endIndex > len(allAccounts) {
-					endIndex = len(allAccounts)
-				}
-				assignedAccounts = allAccounts[startIndex:endIndex]
-				startIndex = endIndex
-			}
 
 			// 增加全局协程计数
 			currentCount := atomic.AddInt32(&currentEmailContentGoroutines, 1)
 
-			log.Printf("[邮件处理] 创建第 %d 个协程 (总计: %d/%d)，分配 %d 个账号",
-				i+1, currentCount, maxEmailContentTotalGoroutines, len(assignedAccounts))
+			log.Printf("[邮件处理] 创建协程 %d/%d (全局: %d/%d) 处理账号: %s (ID: %d)",
+				i+1, len(allAccounts), currentCount, maxEmailContentTotalGoroutines, account.Account, account.ID)
 
-			// 启动协程处理邮件
-			go func(goroutineNum int32, globalNum int32, accounts []model.PrimeEmailAccount) {
+			// 启动协程处理单个账号的邮件
+			go func(goroutineNum int, account model.PrimeEmailAccount) {
 				defer wg.Done()
 				defer func() {
 					// 完成时减少计数
 					newCount := atomic.AddInt32(&currentEmailContentGoroutines, -1)
-					log.Printf("[邮件处理] 协程 %d 完成处理，剩余协程: %d",
-						goroutineNum, newCount)
+					log.Printf("[邮件处理] 协程 %d (账号: %s) 完成处理，剩余协程: %d",
+						goroutineNum, account.Account, newCount)
 				}()
 
 				// 【关键】添加panic处理，确保账号状态能被重置
 				defer func() {
 					if r := recover(); r != nil {
-						log.Printf("[邮件处理] 协程 %d 发生panic，正在重置账号状态: %v", goroutineNum, r)
-						// 发生panic时，重置所有分配给该协程的账号状态
-						for _, account := range accounts {
-							if err := model.ResetSyncContentTimeOnFailure(account.ID); err != nil {
-								log.Printf("[邮件处理] 重置账号 %d 状态失败: %v", account.ID, err)
-							} else {
-								log.Printf("[邮件处理] 已重置账号 %d 状态", account.ID)
-							}
+						log.Printf("[邮件处理] 协程 %d (账号: %s) 发生panic，正在重置账号状态: %v", goroutineNum, account.Account, r)
+						// 发生panic时，重置该账号的状态
+						if err := model.ResetSyncContentTimeOnFailure(account.ID); err != nil {
+							log.Printf("[邮件处理] 重置账号 %d 状态失败: %v", account.ID, err)
+						} else {
+							log.Printf("[邮件处理] 已重置账号 %d 状态", account.ID)
 						}
 						// 将panic作为错误发送到results通道
-						results <- fmt.Errorf("协程panic: %v", r)
+						results <- fmt.Errorf("协程panic (账号: %s): %v", account.Account, r)
 					}
 				}()
 
@@ -206,16 +181,19 @@ func GetEmailContentList(c *gin.Context) {
 				if req.Node > 0 {
 					nodeInfo = fmt.Sprintf("节点 %d ", req.Node)
 				}
-				log.Printf("[邮件处理] %s协程 %d (全局 %d) 开始处理 %d 个账号的邮件",
-					nodeInfo, goroutineNum, globalNum, len(accounts))
+				log.Printf("[邮件处理] %s协程 %d 开始处理账号: %s (ID: %d)",
+					nodeInfo, goroutineNum, account.Account, account.ID)
 
-				// 调用新的处理函数，传入分配的账号
-				err := GetEmailContentWithAccounts(req.Limit, req.Node, accounts)
+				// 调用处理函数，传入单个账号（包装成切片）
+				singleAccountSlice := []model.PrimeEmailAccount{account}
+				err := GetEmailContentWithAccounts(req.Limit, req.Node, singleAccountSlice)
 				results <- err
-			}(i+1, currentCount, assignedAccounts)
+			}(i+1, account)
 
-			// 等待3秒再创建下一个协程
-			time.Sleep(time.Duration(sleepTime) * time.Second)
+			// 减少协程创建间隔时间（现在是1秒）
+			if i < len(allAccounts)-1 { // 最后一个协程不需要等待
+				time.Sleep(time.Duration(sleepTime) * time.Second)
+			}
 		}
 
 		// 等待所有协程完成

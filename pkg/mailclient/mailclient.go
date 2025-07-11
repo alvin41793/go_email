@@ -445,11 +445,9 @@ func GetEmailConfig(account model.PrimeEmailAccount) (*EmailConfigInfo, error) {
 
 	return &EmailConfigInfo{
 		IMAPServer:   "imap.mail.yahoo.com",
-		SMTPServer:   "smtp.mail.yahoo.com",
 		EmailAddress: account.Account,
 		password: REDACTED
 		IMAPPort:     993,
-		SMTPPort:     587,
 		UseSSL:       true,
 	}, nil
 }
