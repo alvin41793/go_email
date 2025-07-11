@@ -101,6 +101,11 @@ func (m *MailClient) ListEmails(folder string, limit int, fromUID ...uint32) ([]
 	return m.listEmailsWithRetry(folder, limit, 5, fromUID...)
 }
 
+// ListEmailsFromUID 获取大于指定UID的邮件列表（修复版本）
+func (m *MailClient) ListEmailsFromUID(folder string, limit int, lastUID uint32) ([]EmailInfo, error) {
+	return m.listEmailsFromUIDWithRetry(folder, limit, lastUID, 5)
+}
+
 // 带重试的获取邮件列表
 func (m *MailClient) listEmailsWithRetry(folder string, limit int, maxRetries int, fromUID ...uint32) ([]EmailInfo, error) {
 	if folder == "" {
@@ -116,6 +121,40 @@ func (m *MailClient) listEmailsWithRetry(folder string, limit int, maxRetries in
 		// 检查是否是连接相关的错误（包括包装的错误）
 		if isConnectionError(err) || isWrappedConnectionError(err) {
 			log.Printf("[邮件列表] 连接错误 (尝试 %d/%d): 文件夹=%s, 错误: %v", attempt, maxRetries, folder, err)
+			if attempt < maxRetries {
+				// 强制关闭当前连接，下次会重新创建
+				globalPool.CloseConnection(m.Config.EmailAddress)
+				// 增加重试延迟，使用指数退避策略
+				delay := time.Second * time.Duration(attempt*2)
+				log.Printf("[邮件列表] 等待 %v 后重试", delay)
+				time.Sleep(delay)
+				continue
+			}
+		}
+
+		// 非连接错误，直接返回
+		log.Printf("[邮件列表] 非连接错误，直接返回: %v", err)
+		return nil, err
+	}
+
+	return nil, fmt.Errorf("获取邮件列表失败，已重试 %d 次", maxRetries)
+}
+
+// 带重试的获取大于指定UID的邮件列表
+func (m *MailClient) listEmailsFromUIDWithRetry(folder string, limit int, lastUID uint32, maxRetries int) ([]EmailInfo, error) {
+	if folder == "" {
+		folder = "INBOX"
+	}
+
+	for attempt := 1; attempt <= maxRetries; attempt++ {
+		emails, err := m.tryListEmailsFromUID(folder, limit, lastUID)
+		if err == nil {
+			return emails, nil
+		}
+
+		// 检查是否是连接相关的错误（包括包装的错误）
+		if isConnectionError(err) || isWrappedConnectionError(err) {
+			log.Printf("[邮件列表] 连接错误 (尝试 %d/%d): 文件夹=%s, lastUID=%d, 错误: %v", attempt, maxRetries, folder, lastUID, err)
 			if attempt < maxRetries {
 				// 强制关闭当前连接，下次会重新创建
 				globalPool.CloseConnection(m.Config.EmailAddress)
@@ -257,6 +296,14 @@ func (m *MailClient) tryListEmails(folder string, limit int, fromUID ...uint32) 
 	}
 
 	if err := <-done; err != nil {
+		// 检查是否是FETCH相关的错误
+		if strings.Contains(strings.ToLower(err.Error()), "bad sequence") {
+			log.Printf("[邮件列表] 检测到FETCH序列错误: %v", err)
+			// 重置连接状态，确保下次请求会创建新连接
+			globalPool.ResetConnection(m.Config.EmailAddress)
+			// 返回一个明确的连接错误，确保能被重试逻辑识别
+			return nil, fmt.Errorf("connection error: bad sequence detected, connection reset: %w", err)
+		}
 		return nil, fmt.Errorf("获取邮件失败: %w", err)
 	}
 
@@ -265,6 +312,140 @@ func (m *MailClient) tryListEmails(folder string, limit int, fromUID ...uint32) 
 		emails[i], emails[j] = emails[j], emails[i]
 	}
 
+	return emails, nil
+}
+
+// 尝试获取大于指定UID的邮件列表（单次）
+func (m *MailClient) tryListEmailsFromUID(folder string, limit int, lastUID uint32) ([]EmailInfo, error) {
+	// 连接IMAP服务器
+	c, err := m.ConnectIMAP()
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		// 不要在这里关闭连接，让连接池管理
+		// c.Logout()
+	}()
+
+	// 验证连接状态
+	state := c.State()
+	log.Printf("[邮件列表] 连接状态: %v, 文件夹: %s, lastUID: %d", state, folder, lastUID)
+
+	// 确保连接处于正确的状态 (Auth=2 或 Selected=3)
+	if state != 2 && state != 3 {
+		return nil, fmt.Errorf("连接状态异常: %v，需要重新建立连接", state)
+	}
+
+	// 选择邮箱
+	mbox, err := c.Select(folder, false)
+	if err != nil {
+		// 检查是否是IMAP命令错误
+		if strings.Contains(strings.ToLower(err.Error()), "command is not a valid imap command") {
+			log.Printf("[邮件列表] 检测到IMAP命令错误，重置连接: %v", err)
+			// 重置连接状态
+			globalPool.ResetConnection(m.Config.EmailAddress)
+			return nil, fmt.Errorf("IMAP命令错误，已重置连接: %w", err)
+		}
+		return nil, fmt.Errorf("选择邮箱失败: %w", err)
+	}
+
+	// 如果邮箱中没有邮件，返回空列表
+	if mbox.Messages == 0 {
+		return []EmailInfo{}, nil
+	}
+
+	// 使用SEARCH命令搜索大于指定UID的邮件
+	criteria := imap.NewSearchCriteria()
+	// 搜索UID大于lastUID的邮件
+	criteria.Uid = new(imap.SeqSet)
+	criteria.Uid.AddRange(lastUID+1, ^uint32(0)) // 从lastUID+1到最大值
+
+	log.Printf("[邮件列表] 搜索大于UID %d的邮件", lastUID)
+
+	// 使用UidSearch搜索邮件
+	uids, err := c.UidSearch(criteria)
+	if err != nil {
+		return nil, fmt.Errorf("搜索邮件失败: %w", err)
+	}
+
+	if len(uids) == 0 {
+		log.Printf("[邮件列表] 没有找到大于UID %d的新邮件", lastUID)
+		return []EmailInfo{}, nil
+	}
+
+	// 限制返回的邮件数量
+	if len(uids) > limit {
+		uids = uids[:limit]
+	}
+
+	log.Printf("[邮件列表] 找到 %d 个新邮件，UID范围: %d-%d", len(uids), uids[0], uids[len(uids)-1])
+
+	// 创建序列集用于获取邮件信息
+	seqSet := new(imap.SeqSet)
+	seqSet.AddNum(uids...)
+
+	// 获取邮件信息
+	messages := make(chan *imap.Message, len(uids))
+	done := make(chan error, 1)
+
+	go func() {
+		done <- c.UidFetch(seqSet, []imap.FetchItem{imap.FetchEnvelope, imap.FetchFlags, imap.FetchBodyStructure, imap.FetchUid}, messages)
+	}()
+
+	var emails []EmailInfo
+	for msg := range messages {
+		hasAttachments := false
+
+		// 检查是否有附件
+		if msg.BodyStructure != nil {
+			var checkAttachments func(parts []*imap.BodyStructure) bool
+			checkAttachments = func(parts []*imap.BodyStructure) bool {
+				for _, part := range parts {
+					if part.Disposition == "attachment" || part.Disposition == "inline" && part.Params["filename"] != "" {
+						return true
+					}
+					if part.MIMEType == "multipart" {
+						if checkAttachments(part.Parts) {
+							return true
+						}
+					}
+				}
+				return false
+			}
+
+			if msg.BodyStructure.MIMEType == "multipart" {
+				hasAttachments = checkAttachments(msg.BodyStructure.Parts)
+			} else if msg.BodyStructure.Disposition == "attachment" {
+				hasAttachments = true
+			}
+		}
+
+		info := EmailInfo{
+			EmailID:        fmt.Sprint(msg.Uid),
+			Subject:        DecodeMIMESubject(msg.Envelope.Subject),
+			From:           parseAddressList(msg.Envelope.From),
+			Date:           msg.Envelope.Date.Format(time.RFC1123Z),
+			UID:            msg.Uid,
+			HasAttachments: hasAttachments,
+		}
+		emails = append(emails, info)
+	}
+
+	if err := <-done; err != nil {
+		// 检查是否是FETCH相关的错误
+		if strings.Contains(strings.ToLower(err.Error()), "bad sequence") {
+			log.Printf("[邮件列表] 检测到FETCH序列错误: %v", err)
+			// 重置连接状态，确保下次请求会创建新连接
+			globalPool.ResetConnection(m.Config.EmailAddress)
+			// 返回一个明确的连接错误，确保能被重试逻辑识别
+			return nil, fmt.Errorf("connection error: bad sequence detected, connection reset: %w", err)
+		}
+		return nil, fmt.Errorf("获取邮件失败: %w", err)
+	}
+
+	// 按UID排序（确保按时间顺序）
+	// 由于uids已经是有序的，emails也应该是有序的
+	log.Printf("[邮件列表] 成功获取 %d 封新邮件", len(emails))
 	return emails, nil
 }
 
@@ -386,7 +567,10 @@ func (m *MailClient) tryGetEmailContent(uid uint32, folder string) (*Email, erro
 		// 检查是否是FETCH相关的错误
 		if strings.Contains(strings.ToLower(err.Error()), "bad sequence") {
 			log.Printf("[邮件获取] 检测到FETCH序列错误: UID=%d, 错误: %v", uid, err)
-			return nil, fmt.Errorf("邮件UID无效或已过期: UID=%d, 错误: %w", uid, err)
+			// 重置连接状态，确保下次请求会创建新连接
+			globalPool.ResetConnection(m.Config.EmailAddress)
+			// 返回一个明确的连接错误，确保能被重试逻辑识别
+			return nil, fmt.Errorf("connection error: bad sequence detected, connection reset: %w", err)
 		}
 		return nil, fmt.Errorf("获取邮件内容失败: %w", err)
 	}

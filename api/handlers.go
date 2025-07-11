@@ -1296,10 +1296,9 @@ func SyncEmails() {
 	var emailsResult []mailclient.EmailInfo
 	if lastEmail.EmailID > 0 {
 		log.Printf("当前数据库最大email_id: %d", lastEmail.EmailID)
-		startUID := lastEmail.EmailID + 1
-		endUID := startUID + limit
-		// 使用UID范围获取邮件
-		emailsResult, err = mailClient.ListEmails(folder, limit, uint32(startUID), uint32(endUID))
+		// 【修复】使用SEARCH命令搜索大于指定UID的邮件，而不是使用连续的UID范围
+		// 这样可以避免UID不连续导致的问题
+		emailsResult, err = mailClient.ListEmailsFromUID(folder, limit, uint32(lastEmail.EmailID))
 	} else {
 		// 获取最新邮件（原有功能）
 		emailsResult, err = mailClient.ListEmails(folder, limit)
@@ -1627,10 +1626,9 @@ func syncSingleAccount(account model.PrimeEmailAccount, limit int) (int, error) 
 		log.Printf("账号ID %d 当前数据库最大email_id: %d", account.ID, lastEmail.EmailID)
 		fmt.Printf("账号ID %d 当前数据库最大email_id: %d\n", account.ID, lastEmail.EmailID)
 
-		startUID := lastEmail.EmailID + 1
-		endUID := startUID + limit
-		// 使用UID范围获取邮件
-		emailsResult, err = mailClient.ListEmails(folder, limit, uint32(startUID), uint32(endUID))
+		// 【修复】使用SEARCH命令搜索大于指定UID的邮件，而不是使用连续的UID范围
+		// 这样可以避免UID不连续导致的问题
+		emailsResult, err = mailClient.ListEmailsFromUID(folder, limit, uint32(lastEmail.EmailID))
 	} else {
 		// 获取最新邮件（原有功能）
 		emailsResult, err = mailClient.ListEmails(folder, limit)

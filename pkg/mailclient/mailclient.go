@@ -171,6 +171,8 @@ func isConnectionError(err error) bool {
 		"connection lost",
 		"network error",
 		"socket closed",
+		"bad sequence",     // IMAP协议错误，通常由连接状态不一致引起
+		"connection error", // 明确标识的连接错误
 	}
 
 	for _, connErr := range connectionErrors {
