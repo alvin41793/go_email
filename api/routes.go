@@ -31,6 +31,8 @@ func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		{
 			// 获取连接池状态
 			system.GET("/connection-pool", GetConnectionPoolStatus)
+			// 清理卡死账号状态
+			system.POST("/cleanup-stuck-accounts", CleanupStuckAccounts)
 		}
 
 		// 邮件相关路由

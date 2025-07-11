@@ -177,17 +177,40 @@ func GetEmailContentList(c *gin.Context) {
 					}
 				}()
 
-				nodeInfo := ""
-				if req.Node > 0 {
-					nodeInfo = fmt.Sprintf("节点 %d ", req.Node)
-				}
-				log.Printf("[邮件处理] %s协程 %d 开始处理账号: %s (ID: %d)",
-					nodeInfo, goroutineNum, account.Account, account.ID)
+				// 【新增】协程超时控制
+				done := make(chan error, 1)
 
-				// 调用处理函数，传入单个账号（包装成切片）
-				singleAccountSlice := []model.PrimeEmailAccount{account}
-				err := GetEmailContentWithAccounts(req.Limit, req.Node, singleAccountSlice)
-				results <- err
+				// 启动实际的工作协程
+				go func() {
+					nodeInfo := ""
+					if req.Node > 0 {
+						nodeInfo = fmt.Sprintf("节点 %d ", req.Node)
+					}
+					log.Printf("[邮件处理] %s协程 %d 开始处理账号: %s (ID: %d)",
+						nodeInfo, goroutineNum, account.Account, account.ID)
+
+					// 调用处理函数，传入单个账号（包装成切片）
+					singleAccountSlice := []model.PrimeEmailAccount{account}
+					err := GetEmailContentWithAccounts(req.Limit, req.Node, singleAccountSlice)
+					done <- err
+				}()
+
+				// 等待完成或超时（15分钟超时）
+				select {
+				case err := <-done:
+					// 正常完成
+					results <- err
+				case <-time.After(15 * time.Minute):
+					// 超时处理
+					log.Printf("[邮件处理] 协程 %d (账号: %s) 超时，正在重置账号状态", goroutineNum, account.Account)
+					// 重置账号状态
+					if err := model.ResetSyncContentTimeOnFailure(account.ID); err != nil {
+						log.Printf("[邮件处理] 重置超时账号 %d 状态失败: %v", account.ID, err)
+					} else {
+						log.Printf("[邮件处理] 已重置超时账号 %d 状态", account.ID)
+					}
+					results <- fmt.Errorf("协程超时 (账号: %s): 处理时间超过15分钟", account.Account)
+				}
 			}(i+1, account)
 
 			// 减少协程创建间隔时间（现在是1秒）
@@ -1496,7 +1519,43 @@ func SyncMultipleAccounts(c *gin.Context) {
 				log.Printf("[邮件同步] 工作协程 %d 开始处理账号: %s", workerID, account.Account)
 				fmt.Printf("[邮件同步] 工作协程 %d 开始处理账号: %s\n", workerID, account.Account)
 
-				count, err := syncSingleAccount(account, limit)
+				// 【新增】为单个账号处理添加超时控制
+				done := make(chan struct {
+					count int
+					err   error
+				}, 1)
+
+				// 启动实际的处理协程
+				go func() {
+					count, err := syncSingleAccount(account, limit)
+					done <- struct {
+						count int
+						err   error
+					}{count: count, err: err}
+				}()
+
+				var count int
+				var err error
+
+				// 等待完成或超时（10分钟超时）
+				select {
+				case result := <-done:
+					// 正常完成
+					count = result.count
+					err = result.err
+				case <-time.After(10 * time.Minute):
+					// 超时处理
+					log.Printf("[邮件同步] 工作协程 %d (账号: %s) 超时，正在重置账号状态", workerID, account.Account)
+					fmt.Printf("[邮件同步] 工作协程 %d (账号: %s) 超时，正在重置账号状态\n", workerID, account.Account)
+					// 重置账号状态
+					if resetErr := model.ResetSyncListTimeOnFailure(account.ID); resetErr != nil {
+						log.Printf("[邮件同步] 重置超时账号 %d 状态失败: %v", account.ID, resetErr)
+					} else {
+						log.Printf("[邮件同步] 已重置超时账号 %d 状态", account.ID)
+					}
+					err = fmt.Errorf("账号同步超时: 处理时间超过10分钟")
+					count = 0
+				}
 
 				// 根据处理结果更新账号状态
 				if err != nil {
@@ -1639,7 +1698,7 @@ func syncSingleAccount(account model.PrimeEmailAccount, limit int) (int, error) 
 		return 0, fmt.Errorf("获取邮件列表失败: %v", err)
 	}
 
-	// 如果没有新邮件，更新同步时间后提交事务并返回
+	// 如果没有新邮件，也要更新同步时间后提交事务并返回
 	if len(emailsResult) == 0 {
 		// 即使没有新邮件，也要更新最后同步时间
 		if err := model.UpdateLastSyncTimeWithTx(tx, account.ID); err != nil {
@@ -1789,4 +1848,38 @@ func ListEmailsByUid(c *gin.Context) {
 	}
 
 	utils.SendResponse(c, nil, emailsResult)
+}
+
+// CleanupStuckAccounts 清理卡死的账号状态
+func CleanupStuckAccounts(c *gin.Context) {
+	// 获取参数，默认清理超过30分钟还在处理中的账号
+	timeoutMinutes := 30
+	if timeoutStr := c.Query("timeout_minutes"); timeoutStr != "" {
+		if t, err := strconv.Atoi(timeoutStr); err == nil && t > 0 {
+			timeoutMinutes = t
+		}
+	}
+
+	// 只清理指定节点的账号（可选）
+	node := 0
+	if nodeStr := c.Query("node"); nodeStr != "" {
+		if n, err := strconv.Atoi(nodeStr); err == nil && n > 0 {
+			node = n
+		}
+	}
+
+	cleaned, err := model.CleanupStuckProcessingAccounts(timeoutMinutes, node)
+	if err != nil {
+		log.Printf("[状态清理] 清理卡死账号失败: %v", err)
+		utils.SendResponse(c, err, "清理失败")
+		return
+	}
+
+	message := fmt.Sprintf("成功清理 %d 个卡死账号状态（超过 %d 分钟）", cleaned, timeoutMinutes)
+	if node > 0 {
+		message = fmt.Sprintf("成功清理节点 %d 的 %d 个卡死账号状态（超过 %d 分钟）", node, cleaned, timeoutMinutes)
+	}
+
+	log.Printf("[状态清理] %s", message)
+	utils.SendResponse(c, nil, message)
 }
