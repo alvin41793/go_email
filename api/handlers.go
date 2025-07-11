@@ -121,8 +121,8 @@ func GetEmailContentList(c *gin.Context) {
 
 	// 在启动协程前，先获取账号并分配
 	go func() {
-		// 获取可用的账号
-		allAccounts, err := model.GetActiveAccountByContentSyncTimeAndNode(req.Node, int(createCount)*5) // 为每个协程预留5个账号
+		// 原子性地获取账号并立即更新同步时间，防止并发竞争
+		allAccounts, err := model.GetAndUpdateAccountsForContent(req.Node, int(createCount)*5) // 为每个协程预留5个账号
 		if err != nil {
 			log.Printf("[邮件处理] 获取账号失败: %v", err)
 			results <- err
@@ -136,12 +136,7 @@ func GetEmailContentList(c *gin.Context) {
 			return
 		}
 
-		// 立即更新所有账号的同步时间，防止其他请求获取相同账号
-		for _, account := range allAccounts {
-			if err := model.UpdateLastSyncContentTime(account.ID); err != nil {
-				log.Printf("[邮件处理] 更新账号 %d 的同步时间失败: %v", account.ID, err)
-			}
-		}
+		log.Printf("[邮件处理] 节点 %d - 原子性获取并更新了 %d 个账号的同步时间", req.Node, len(allAccounts))
 
 		log.Printf("[邮件处理] 节点 %d - 获取到 %d 个账号，准备分配给 %d 个协程", req.Node, len(allAccounts), createCount)
 
@@ -225,8 +220,8 @@ func GetEmailContentList(c *gin.Context) {
 
 // GetEmailContent 获取邮件内容
 func GetEmailContent(limit int, node int) error {
-	// 第一步：按照 last_sync_content_time 获取前5个账号
-	accounts, err := model.GetActiveAccountByContentSyncTimeAndNode(node, 5)
+	// 第一步：原子性地获取账号并立即更新同步时间，防止并发竞争
+	accounts, err := model.GetAndUpdateAccountsForContent(node, 5)
 	if err != nil {
 		return err
 	}
@@ -237,19 +232,8 @@ func GetEmailContent(limit int, node int) error {
 		return nil
 	}
 
-	log.Printf("[邮件处理] 节点 %d - 获取到 %d 个需要处理的账号", node, len(accounts))
+	log.Printf("[邮件处理] 节点 %d - 原子性获取并更新了 %d 个账号的同步时间", node, len(accounts))
 	fmt.Printf("========== 节点 %d - 开始处理 %d 个账号的邮件 ==========\n", node, len(accounts))
-
-	// 立即更新这些账号的last_sync_content_time，防止并发请求获取相同账号
-	log.Printf("[邮件处理] 立即更新账号同步时间以防止并发冲突...")
-	for _, account := range accounts {
-		if err := model.UpdateLastSyncContentTime(account.ID); err != nil {
-			log.Printf("[邮件处理] 更新账号 %d 的last_sync_content_time失败: %v", account.ID, err)
-			// 不返回错误，继续处理
-		} else {
-			log.Printf("[邮件处理] 成功更新账号 %d (%s) 的last_sync_content_time", account.ID, account.Account)
-		}
-	}
 
 	// 第二步：为每个账号获取邮件
 	var allEmailIDs []model.PrimeEmail
@@ -571,7 +555,51 @@ func GetEmailContent(limit int, node int) error {
 	log.Printf("[邮件处理] 成功提交事务，完成处理 %d 封邮件", len(allEmailData))
 	fmt.Printf("✅ 成功\n")
 
-	// 注意：账号同步时间已在开始时更新，防止并发冲突
+	// 根据处理结果更新账号的同步时间
+	fmt.Printf("\n【第3阶段】更新账号同步时间...\n")
+
+	// 统计每个账号的处理结果
+	accountResults := make(map[int]struct {
+		SuccessCount int
+		FailureCount int
+	})
+
+	for _, data := range allEmailData {
+		result := accountResults[data.AccountId]
+		result.SuccessCount++
+		accountResults[data.AccountId] = result
+	}
+
+	// 对于有处理失败的账号，也需要统计
+	for _, emailOne := range emailIDs {
+		if _, exists := accountResults[emailOne.AccountId]; !exists {
+			// 这个账号的所有邮件都失败了
+			result := accountResults[emailOne.AccountId]
+			result.FailureCount++
+			accountResults[emailOne.AccountId] = result
+		}
+	}
+
+	// 更新账号的同步时间
+	for accountID, result := range accountResults {
+		if result.SuccessCount > 0 {
+			// 有成功处理的邮件，更新为完成时间
+			if err := model.UpdateLastSyncContentTimeOnComplete(accountID); err != nil {
+				log.Printf("[邮件处理] 更新账号 %d 完成时间失败: %v", accountID, err)
+			} else {
+				log.Printf("[邮件处理] 账号 %d 处理完成，更新同步时间", accountID)
+				fmt.Printf("  • 账号 %d: 处理完成，更新同步时间\n", accountID)
+			}
+		} else {
+			// 所有邮件都失败了，重置同步时间让其能够被重新优先选择
+			if err := model.ResetSyncContentTimeOnFailure(accountID); err != nil {
+				log.Printf("[邮件处理] 重置账号 %d 同步时间失败: %v", accountID, err)
+			} else {
+				log.Printf("[邮件处理] 账号 %d 处理失败，重置同步时间", accountID)
+				fmt.Printf("  • 账号 %d: 处理失败，重置同步时间\n", accountID)
+			}
+		}
+	}
 
 	fmt.Printf("========== 邮件处理完成 ==========\n")
 	fmt.Printf("成功: %d 封邮件\n", successCount)
@@ -912,7 +940,51 @@ func GetEmailContentWithAccounts(limit int, node int, accounts []model.PrimeEmai
 	log.Printf("[邮件处理] 成功提交事务，完成处理 %d 封邮件", len(allEmailData))
 	fmt.Printf("✅ 成功\n")
 
-	// 注意：账号同步时间已在GetEmailContentList中更新，防止并发冲突
+	// 根据处理结果更新账号的同步时间
+	fmt.Printf("\n【第3阶段】更新账号同步时间...\n")
+
+	// 统计每个账号的处理结果
+	accountResults := make(map[int]struct {
+		SuccessCount int
+		FailureCount int
+	})
+
+	for _, data := range allEmailData {
+		result := accountResults[data.AccountId]
+		result.SuccessCount++
+		accountResults[data.AccountId] = result
+	}
+
+	// 对于有处理失败的账号，也需要统计
+	for _, emailOne := range emailIDs {
+		if _, exists := accountResults[emailOne.AccountId]; !exists {
+			// 这个账号的所有邮件都失败了
+			result := accountResults[emailOne.AccountId]
+			result.FailureCount++
+			accountResults[emailOne.AccountId] = result
+		}
+	}
+
+	// 更新账号的同步时间
+	for accountID, result := range accountResults {
+		if result.SuccessCount > 0 {
+			// 有成功处理的邮件，更新为完成时间
+			if err := model.UpdateLastSyncContentTimeOnComplete(accountID); err != nil {
+				log.Printf("[邮件处理] 更新账号 %d 完成时间失败: %v", accountID, err)
+			} else {
+				log.Printf("[邮件处理] 账号 %d 处理完成，更新同步时间", accountID)
+				fmt.Printf("  • 账号 %d: 处理完成，更新同步时间\n", accountID)
+			}
+		} else {
+			// 所有邮件都失败了，重置同步时间让其能够被重新优先选择
+			if err := model.ResetSyncContentTimeOnFailure(accountID); err != nil {
+				log.Printf("[邮件处理] 重置账号 %d 同步时间失败: %v", accountID, err)
+			} else {
+				log.Printf("[邮件处理] 账号 %d 处理失败，重置同步时间", accountID)
+				fmt.Printf("  • 账号 %d: 处理失败，重置同步时间\n", accountID)
+			}
+		}
+	}
 
 	fmt.Printf("========== 邮件处理完成 ==========\n")
 	fmt.Printf("成功: %d 封邮件\n", successCount)
@@ -1304,51 +1376,13 @@ func SyncMultipleAccounts(c *gin.Context) {
 		return
 	}
 
-	// 按指定节点筛选账号
-	accounts, err := model.GetActiveAccountByNode(req.Node)
-	if err != nil {
-		utils.SendResponse(c, err, "获取邮箱配置失败")
-		return
-	}
-
-	if len(accounts) == 0 {
-		utils.SendResponse(c, nil, fmt.Sprintf("没有找到节点 %d 的活跃邮箱账号", req.Node))
-		return
-	}
-
-	log.Printf("[邮件同步] 节点 %d 找到 %d 个活跃账号", req.Node, len(accounts))
-
-	// 使用互斥锁保护并发访问和处理中账号集合
+	// 使用互斥锁保护并发访问
 	emailListProcessMutex.Lock()
 
 	// 检查是否已达到最大全局协程数
 	if atomic.LoadInt32(&currentEmailListGoroutines) >= maxEmailListTotalGoroutines {
 		emailListProcessMutex.Unlock()
 		utils.SendResponse(c, nil, "已达到全局最大处理协程数量，请等待当前任务完成")
-		return
-	}
-
-	// 使用一个全局map来跟踪正在处理的账号ID
-	// 如果不存在，创建一个空map
-	if processingAccounts == nil {
-		processingAccounts = make(map[int]bool)
-	}
-
-	// 过滤掉正在处理中的账号
-	var filteredAccounts []model.PrimeEmailAccount
-	var skippedAccounts []int
-	for _, account := range accounts {
-		if _, isProcessing := processingAccounts[account.ID]; !isProcessing {
-			filteredAccounts = append(filteredAccounts, account)
-		} else {
-			skippedAccounts = append(skippedAccounts, account.ID)
-		}
-	}
-
-	// 如果所有账号都在处理中，返回提示信息
-	if len(filteredAccounts) == 0 {
-		emailListProcessMutex.Unlock()
-		utils.SendResponse(c, nil, fmt.Sprintf("所有账号(%d个)都在处理中，请等待当前任务完成", len(skippedAccounts)))
 		return
 	}
 
@@ -1366,7 +1400,22 @@ func SyncMultipleAccounts(c *gin.Context) {
 		maxWorkers = int(remainingSlots)
 	}
 
-	// 确保不创建过多无用的worker
+	// 原子性地获取账号并立即更新状态，防止并发竞争
+	// 先尝试获取足够的账号（为每个worker预留账号）
+	filteredAccounts, err := model.GetAndUpdateAccountsForList(req.Node, maxWorkers*5)
+	if err != nil {
+		emailListProcessMutex.Unlock()
+		utils.SendResponse(c, err, "获取邮箱配置失败")
+		return
+	}
+
+	if len(filteredAccounts) == 0 {
+		emailListProcessMutex.Unlock()
+		utils.SendResponse(c, nil, fmt.Sprintf("没有找到节点 %d 的可用邮箱账号（可能都在处理中）", req.Node))
+		return
+	}
+
+	// 根据实际获取到的账号数量调整worker数量
 	if len(filteredAccounts) < maxWorkers {
 		maxWorkers = len(filteredAccounts)
 	}
@@ -1381,17 +1430,14 @@ func SyncMultipleAccounts(c *gin.Context) {
 	// 更新全局协程计数
 	atomic.AddInt32(&currentEmailListGoroutines, int32(maxWorkers))
 
-	// 标记这些账号为正在处理
-	for _, account := range filteredAccounts {
-		processingAccounts[account.ID] = true
-	}
+	log.Printf("[邮件同步] 节点 %d - 原子性获取并更新了 %d 个账号的状态，将创建 %d 个工作协程", req.Node, len(filteredAccounts), maxWorkers)
 
 	nodeInfo := fmt.Sprintf("节点 %d ", req.Node)
 
-	log.Printf("[邮件同步] %s当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号, 跳过 %d 个正在处理的账号",
-		nodeInfo, atomic.LoadInt32(&currentEmailListGoroutines), maxWorkers, len(filteredAccounts), len(skippedAccounts))
-	fmt.Printf("[邮件同步] %s当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号, 跳过 %d 个正在处理的账号\n",
-		nodeInfo, atomic.LoadInt32(&currentEmailListGoroutines), maxWorkers, len(filteredAccounts), len(skippedAccounts))
+	log.Printf("[邮件同步] %s当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号",
+		nodeInfo, atomic.LoadInt32(&currentEmailListGoroutines), maxWorkers, len(filteredAccounts))
+	fmt.Printf("[邮件同步] %s当前全局协程数: %d, 本次请求将创建 %d 个工作协程处理 %d 个账号\n",
+		nodeInfo, atomic.LoadInt32(&currentEmailListGoroutines), maxWorkers, len(filteredAccounts))
 
 	emailListProcessMutex.Unlock()
 
@@ -1442,10 +1488,22 @@ func SyncMultipleAccounts(c *gin.Context) {
 
 				count, err := syncSingleAccount(account, limit)
 
-				// 同步完成后，从处理中账号集合移除
-				emailListProcessMutex.Lock()
-				delete(processingAccounts, account.ID)
-				emailListProcessMutex.Unlock()
+				// 根据处理结果更新账号状态
+				if err != nil {
+					// 处理失败，重置同步时间让其能被重新优先选择
+					if updateErr := model.ResetSyncListTimeOnFailure(account.ID); updateErr != nil {
+						log.Printf("[邮件同步] 重置账号 %d 状态失败: %v", account.ID, updateErr)
+					} else {
+						log.Printf("[邮件同步] 账号 %d 处理失败，已重置状态", account.ID)
+					}
+				} else {
+					// 处理成功，更新为完成时间
+					if updateErr := model.UpdateLastSyncListTimeOnComplete(account.ID); updateErr != nil {
+						log.Printf("[邮件同步] 更新账号 %d 完成状态失败: %v", account.ID, updateErr)
+					} else {
+						log.Printf("[邮件同步] 账号 %d 处理完成，已更新状态", account.ID)
+					}
+				}
 
 				results <- struct {
 					AccountID int
@@ -1478,14 +1536,8 @@ func SyncMultipleAccounts(c *gin.Context) {
 	}()
 
 	// 构造返回消息
-	var responseMsg string
-	if len(skippedAccounts) > 0 {
-		responseMsg = fmt.Sprintf("正在同步节点 %d 的 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d，跳过 %d 个正在处理的账号",
-			req.Node, len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentEmailListGoroutines), len(skippedAccounts))
-	} else {
-		responseMsg = fmt.Sprintf("正在同步节点 %d 的 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d",
-			req.Node, len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentEmailListGoroutines))
-	}
+	responseMsg := fmt.Sprintf("正在同步节点 %d 的 %d 个邮箱账号，使用 %d 个工作协程，当前全局协程数: %d",
+		req.Node, len(filteredAccounts), maxWorkers, atomic.LoadInt32(&currentEmailListGoroutines))
 
 	// 返回正在处理的信息
 	utils.SendResponse(c, nil, responseMsg)
