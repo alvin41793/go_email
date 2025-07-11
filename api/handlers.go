@@ -98,49 +98,45 @@ func GetEmailContentList(c *gin.Context) {
 		nodeInfo = fmt.Sprintf("节点 %d ", req.Node)
 	}
 
-	log.Printf("[邮件处理] %s当前已有 %d 个协程，本次请求将尝试创建 %d 个新协程",
+	log.Printf("[邮件处理] %s当前已有 %d 个协程，本次请求将创建 %d 个新协程",
 		nodeInfo, atomic.LoadInt32(&currentEmailContentGoroutines), createCount)
 
 	// 释放互斥锁，允许其他请求继续
 	emailContentProcessMutex.Unlock()
 
-	// 【关键修改】先获取账号，确认有可用账号后再返回响应
-	// 原子性地获取账号并立即更新同步时间，防止并发竞争
-	allAccounts, err := model.GetAndUpdateAccountsForContent(req.Node, int(createCount)*5) // 为每个协程预留5个账号
-	if err != nil {
-		log.Printf("[邮件处理] 获取账号失败: %v", err)
-		utils.SendResponse(c, err, "获取账号失败")
-		return
-	}
+	// 使用WaitGroup来等待本次创建的协程完成
+	var wg sync.WaitGroup
 
-	if len(allAccounts) == 0 {
-		log.Printf("[邮件处理] 节点 %d - 没有找到活跃账号，可能都在处理中", req.Node)
-		utils.SendResponse(c, nil, fmt.Sprintf("节点 %d 当前没有可用账号，请稍后再试（可能所有账号都在处理中）", req.Node))
-		return
-	}
+	// 创建结果通道
+	results := make(chan error, createCount)
 
-	log.Printf("[邮件处理] 节点 %d - 原子性获取并更新了 %d 个账号的同步时间", req.Node, len(allAccounts))
-
-	// 确认有账号可用后，返回准确的响应
-	responseMsg := fmt.Sprintf("节点 %d 的邮件处理任务已启动，获取了 %d 个账号，将创建 %d 个处理协程", req.Node, len(allAccounts), createCount)
-	utils.SendResponse(c, nil, responseMsg)
-
-	// 后台启动协程处理邮件
+	// 启动协程以处理结果
 	go func() {
-		// 使用WaitGroup来等待本次创建的协程完成
-		var wg sync.WaitGroup
-
-		// 创建结果通道
-		results := make(chan error, createCount)
-
-		// 启动协程以处理结果
-		go func() {
-			for err := range results {
-				if err != nil {
-					log.Printf("[邮件处理] 处理邮件时出错: %v", err)
-				}
+		for err := range results {
+			if err != nil {
+				log.Printf("[邮件处理] 处理邮件时出错: %v", err)
 			}
-		}()
+		}
+	}()
+
+	// 在启动协程前，先获取账号并分配
+	go func() {
+		// 原子性地获取账号并立即更新同步时间，防止并发竞争
+		allAccounts, err := model.GetAndUpdateAccountsForContent(req.Node, int(createCount)*5) // 为每个协程预留5个账号
+		if err != nil {
+			log.Printf("[邮件处理] 获取账号失败: %v", err)
+			results <- err
+			close(results)
+			return
+		}
+
+		if len(allAccounts) == 0 {
+			log.Printf("[邮件处理] 节点 %d - 没有找到活跃账号", req.Node)
+			close(results)
+			return
+		}
+
+		log.Printf("[邮件处理] 节点 %d - 原子性获取并更新了 %d 个账号的同步时间", req.Node, len(allAccounts))
 
 		log.Printf("[邮件处理] 节点 %d - 获取到 %d 个账号，准备分配给 %d 个协程", req.Node, len(allAccounts), createCount)
 
@@ -185,6 +181,23 @@ func GetEmailContentList(c *gin.Context) {
 						goroutineNum, newCount)
 				}()
 
+				// 【关键】添加panic处理，确保账号状态能被重置
+				defer func() {
+					if r := recover(); r != nil {
+						log.Printf("[邮件处理] 协程 %d 发生panic，正在重置账号状态: %v", goroutineNum, r)
+						// 发生panic时，重置所有分配给该协程的账号状态
+						for _, account := range accounts {
+							if err := model.ResetSyncContentTimeOnFailure(account.ID); err != nil {
+								log.Printf("[邮件处理] 重置账号 %d 状态失败: %v", account.ID, err)
+							} else {
+								log.Printf("[邮件处理] 已重置账号 %d 状态", account.ID)
+							}
+						}
+						// 将panic作为错误发送到results通道
+						results <- fmt.Errorf("协程panic: %v", r)
+					}
+				}()
+
 				nodeInfo := ""
 				if req.Node > 0 {
 					nodeInfo = fmt.Sprintf("节点 %d ", req.Node)
@@ -210,6 +223,16 @@ func GetEmailContentList(c *gin.Context) {
 		}
 		log.Printf("[邮件处理] %s本次请求创建的 %d 个协程已全部完成", nodeInfoForComplete, createCount)
 	}()
+
+	// 构造返回消息
+	var responseMsg string
+	if req.Node > 0 {
+		responseMsg = fmt.Sprintf("节点 %d 的邮件处理任务已启动，创建了 %d 个处理协程", req.Node, createCount)
+	} else {
+		responseMsg = fmt.Sprintf("邮件处理任务已启动，创建了 %d 个处理协程", createCount)
+	}
+
+	utils.SendResponse(c, nil, responseMsg)
 }
 
 // GetEmailContent 获取邮件内容
