@@ -58,3 +58,33 @@ func UpdateLastSyncTimeWithTx(tx *gorm.DB, accountID int) error {
 	result := tx.Model(&PrimeEmailAccount{}).Where("id = ?", accountID).Update("last_sync_list_time", now)
 	return result.Error
 }
+
+// GetActiveAccountByContentSyncTime 获取状态为启用的账号，按最后同步邮件内容时间排序（优先处理最久未同步的账户）
+func GetActiveAccountByContentSyncTime(limit int) ([]PrimeEmailAccount, error) {
+	var accounts []PrimeEmailAccount
+	// 按last_sync_content_time升序排列，NULL值排在最前面（从未同步的账户优先）
+	result := db.DB().Where("status = ?", 1).Order("ISNULL(last_sync_content_time) DESC, last_sync_content_time ASC").Limit(limit).Find(&accounts)
+	return accounts, result.Error
+}
+
+// GetActiveAccountByContentSyncTimeAndNode 根据节点编号获取状态为启用的账号，按最后同步邮件内容时间排序
+func GetActiveAccountByContentSyncTimeAndNode(node int, limit int) ([]PrimeEmailAccount, error) {
+	var accounts []PrimeEmailAccount
+	// 按node和last_sync_content_time筛选排序
+	result := db.DB().Where("status = ? AND node = ?", 1, node).Order("ISNULL(last_sync_content_time) DESC, last_sync_content_time ASC").Limit(limit).Find(&accounts)
+	return accounts, result.Error
+}
+
+// UpdateLastSyncContentTime 更新账号的最后同步邮件内容时间
+func UpdateLastSyncContentTime(accountID int) error {
+	now := time.Now()
+	result := db.DB().Model(&PrimeEmailAccount{}).Where("id = ?", accountID).Update("last_sync_content_time", now)
+	return result.Error
+}
+
+// UpdateLastSyncContentTimeWithTx 使用事务更新账号的最后同步邮件内容时间
+func UpdateLastSyncContentTimeWithTx(tx *gorm.DB, accountID int) error {
+	now := time.Now()
+	result := tx.Model(&PrimeEmailAccount{}).Where("id = ?", accountID).Update("last_sync_content_time", now)
+	return result.Error
+}

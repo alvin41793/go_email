@@ -177,23 +177,64 @@ func GetEmailContentList(c *gin.Context) {
 
 // GetEmailContent 获取邮件内容
 func GetEmailContent(limit int, node int) error {
-	// 根据节点获取状态为-1的邮件ID，并将其状态更新为0（处理中）
-	var emailIDs []model.PrimeEmail
-	var err error
-
-	// 必须指定节点编号
-	emailIDs, err = model.GetEmailByStatusAndNode(-1, limit, node)
+	// 第一步：按照 last_sync_content_time 获取前3个账号
+	accounts, err := model.GetActiveAccountByContentSyncTimeAndNode(node, 5)
 	if err != nil {
 		return err
 	}
-	log.Printf("[邮件处理] 节点 %d - 获取到 %d 封待处理邮件", node, len(emailIDs))
-	folder := "INBOX"
+
+	if len(accounts) == 0 {
+		log.Printf("[邮件处理] 节点 %d - 没有找到活跃账号", node)
+		fmt.Println("没有找到活跃账号")
+		return nil
+	}
+
+	log.Printf("[邮件处理] 节点 %d - 获取到 %d 个需要处理的账号", node, len(accounts))
+	fmt.Printf("========== 节点 %d - 开始处理 %d 个账号的邮件 ==========\n", node, len(accounts))
+
+	// 第二步：为每个账号获取邮件
+	var allEmailIDs []model.PrimeEmail
+	perAccountLimit := limit / len(accounts)
+	remainder := limit % len(accounts)
+
+	// 记录每个账号的邮件数量，用于后续更新last_sync_content_time
+	accountEmailCounts := make(map[int]int)
+
+	for i, account := range accounts {
+		currentLimit := perAccountLimit
+		// 将余数分配给前面的账号
+		if i < remainder {
+			currentLimit++
+		}
+
+		if currentLimit == 0 {
+			continue
+		}
+
+		// 获取该账号的邮件
+		accountEmails, err := model.GetEmailByStatusAndAccount(-1, account.ID, currentLimit)
+		if err != nil {
+			log.Printf("[邮件处理] 获取账号 %d 的邮件失败: %v", account.ID, err)
+			continue
+		}
+
+		if len(accountEmails) > 0 {
+			allEmailIDs = append(allEmailIDs, accountEmails...)
+			accountEmailCounts[account.ID] = len(accountEmails)
+			log.Printf("[邮件处理] 账号 %d (%s) - 获取到 %d 封待处理邮件", account.ID, account.Account, len(accountEmails))
+			fmt.Printf("账号 %d (%s) - 获取到 %d 封待处理邮件\n", account.ID, account.Account, len(accountEmails))
+		}
+	}
+
 	// 检查是否有邮件需要处理
-	if len(emailIDs) == 0 {
+	if len(allEmailIDs) == 0 {
 		log.Printf("[邮件处理] 没有需要处理的新邮件")
 		fmt.Println("没有需要处理的新邮件")
 		return nil
 	}
+
+	emailIDs := allEmailIDs
+	folder := "INBOX"
 
 	log.Printf("[邮件处理] 开始处理 %d 封邮件, 文件夹: %s", len(emailIDs), folder)
 	fmt.Printf("\n========== 开始处理 %d 封邮件，文件夹: %s ==========\n", len(emailIDs), folder)
@@ -458,10 +499,32 @@ func GetEmailContent(limit int, node int) error {
 
 	log.Printf("[邮件处理] 成功提交事务，完成处理 %d 封邮件", len(allEmailData))
 	fmt.Printf("✅ 成功\n")
+
+	// 第三步：更新账号的last_sync_content_time
+	fmt.Printf("\n【第3阶段】更新账号同步时间...\n")
+
+	for accountID, emailCount := range accountEmailCounts {
+		// 只为实际处理了邮件的账号更新时间
+		if emailCount > 0 {
+			log.Printf("[邮件处理] 更新账号 %d 的last_sync_content_time，处理了 %d 封邮件", accountID, emailCount)
+			fmt.Printf("  • 更新账号 %d 的同步时间... ", accountID)
+
+			if err := model.UpdateLastSyncContentTime(accountID); err != nil {
+				log.Printf("[邮件处理] 更新账号 %d 的last_sync_content_time失败: %v", accountID, err)
+				fmt.Printf("❌ 失败: %v\n", err)
+				// 这里不返回错误，因为邮件处理已经成功，只是更新同步时间失败
+			} else {
+				log.Printf("[邮件处理] 成功更新账号 %d 的last_sync_content_time", accountID)
+				fmt.Printf("✅ 成功\n")
+			}
+		}
+	}
+
 	fmt.Printf("========== 邮件处理完成 ==========\n")
 	fmt.Printf("成功: %d 封邮件\n", successCount)
 	fmt.Printf("失败: %d 封邮件\n", failureCount)
 	fmt.Printf("总计: %d 封邮件\n", len(emailIDs))
+	fmt.Printf("涉及账号: %d 个\n", len(accountEmailCounts))
 	fmt.Printf("================================\n\n")
 	return nil
 }

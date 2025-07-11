@@ -366,3 +366,57 @@ func BatchCreateEmailsWithStats(emails []*PrimeEmail, tx *gorm.DB) (*BatchCreate
 
 	return result, nil
 }
+
+// GetEmailByStatusAndAccount 获取特定账号的指定状态邮件并更新状态为"处理中"
+func GetEmailByStatusAndAccount(status int, accountID int, limit int) ([]PrimeEmail, error) {
+	var emails []PrimeEmail
+
+	// 开始事务
+	tx := db.DB().Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 查询指定账号的指定状态邮件
+	err := tx.Model(&PrimeEmail{}).
+		Where("status = ? AND account_id = ?", status, accountID).
+		Limit(limit).
+		Find(&emails).Error
+
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// 如果没有找到邮件，直接返回
+	if len(emails) == 0 {
+		tx.Rollback()
+		return emails, nil
+	}
+
+	// 收集email_id用于状态更新
+	var emailIDs []int
+	for _, email := range emails {
+		emailIDs = append(emailIDs, email.EmailID)
+	}
+
+	// 更新这些邮件的状态为"处理中"(0)
+	err = tx.Model(&PrimeEmail{}).
+		Where("email_id IN (?)", emailIDs).
+		Update("status", 0).Error
+
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// 提交事务
+	if err = tx.Commit().Error; err != nil {
+		return nil, err
+	}
+
+	log.Printf("[邮件分配] 账号ID %d - 成功分配 %d 封邮件", accountID, len(emails))
+	return emails, nil
+}
