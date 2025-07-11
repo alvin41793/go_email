@@ -281,10 +281,20 @@ func GetEmailContent(limit int, node int) error {
 		}
 	}
 
-	// 检查是否有邮件需要处理
+	// 【关键修复】检查是否有邮件需要处理，如果没有则重置所有账号状态
 	if len(allEmailIDs) == 0 {
-		log.Printf("[邮件处理] 没有需要处理的新邮件")
-		fmt.Println("没有需要处理的新邮件")
+		log.Printf("[邮件处理] 没有需要处理的新邮件，重置所有账号状态")
+		fmt.Println("没有需要处理的新邮件，重置所有账号状态")
+
+		// 重置所有账号的状态，避免卡死
+		for _, account := range accounts {
+			if err := model.UpdateLastSyncContentTimeOnComplete(account.ID); err != nil {
+				log.Printf("[邮件处理] 重置账号 %d 状态失败: %v", account.ID, err)
+			} else {
+				log.Printf("[邮件处理] 账号 %d (%s) 状态已重置", account.ID, account.Account)
+				fmt.Printf("  • 账号 %d (%s): 状态已重置\n", account.ID, account.Account)
+			}
+		}
 		return nil
 	}
 
@@ -677,10 +687,20 @@ func GetEmailContentWithAccounts(limit int, node int, accounts []model.PrimeEmai
 		}
 	}
 
-	// 检查是否有邮件需要处理
+	// 【关键修复】检查是否有邮件需要处理，如果没有则重置所有账号状态
 	if len(allEmailIDs) == 0 {
-		log.Printf("[邮件处理] 没有需要处理的新邮件")
-		fmt.Println("没有需要处理的新邮件")
+		log.Printf("[邮件处理] 没有需要处理的新邮件，重置所有账号状态")
+		fmt.Println("没有需要处理的新邮件，重置所有账号状态")
+
+		// 重置所有账号的状态，避免卡死
+		for _, account := range accounts {
+			if err := model.UpdateLastSyncContentTimeOnComplete(account.ID); err != nil {
+				log.Printf("[邮件处理] 重置账号 %d 状态失败: %v", account.ID, err)
+			} else {
+				log.Printf("[邮件处理] 账号 %d (%s) 状态已重置", account.ID, account.Account)
+				fmt.Printf("  • 账号 %d (%s): 状态已重置\n", account.ID, account.Account)
+			}
+		}
 		return nil
 	}
 
