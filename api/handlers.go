@@ -119,19 +119,65 @@ func GetEmailContentList(c *gin.Context) {
 		}
 	}()
 
-	// 启动创建协程的协程
+	// 在启动协程前，先获取账号并分配
 	go func() {
+		// 获取可用的账号
+		allAccounts, err := model.GetActiveAccountByContentSyncTimeAndNode(req.Node, int(createCount)*5) // 为每个协程预留5个账号
+		if err != nil {
+			log.Printf("[邮件处理] 获取账号失败: %v", err)
+			results <- err
+			close(results)
+			return
+		}
+
+		if len(allAccounts) == 0 {
+			log.Printf("[邮件处理] 节点 %d - 没有找到活跃账号", req.Node)
+			close(results)
+			return
+		}
+
+		// 立即更新所有账号的同步时间，防止其他请求获取相同账号
+		for _, account := range allAccounts {
+			if err := model.UpdateLastSyncContentTime(account.ID); err != nil {
+				log.Printf("[邮件处理] 更新账号 %d 的同步时间失败: %v", account.ID, err)
+			}
+		}
+
+		log.Printf("[邮件处理] 节点 %d - 获取到 %d 个账号，准备分配给 %d 个协程", req.Node, len(allAccounts), createCount)
+
+		// 将账号分配给不同的协程
+		accountsPerGoroutine := len(allAccounts) / int(createCount)
+		remainder := len(allAccounts) % int(createCount)
+
+		var startIndex int
 		for i := int32(0); i < createCount; i++ {
 			wg.Add(1)
+
+			// 计算当前协程分配的账号数量
+			currentAccountCount := accountsPerGoroutine
+			if i < int32(remainder) {
+				currentAccountCount++
+			}
+
+			// 分配账号给当前协程
+			var assignedAccounts []model.PrimeEmailAccount
+			if currentAccountCount > 0 && startIndex < len(allAccounts) {
+				endIndex := startIndex + currentAccountCount
+				if endIndex > len(allAccounts) {
+					endIndex = len(allAccounts)
+				}
+				assignedAccounts = allAccounts[startIndex:endIndex]
+				startIndex = endIndex
+			}
 
 			// 增加全局协程计数
 			currentCount := atomic.AddInt32(&currentEmailContentGoroutines, 1)
 
-			log.Printf("[邮件处理] 创建第 %d 个协程 (总计: %d/%d)",
-				i+1, currentCount, maxEmailContentTotalGoroutines)
+			log.Printf("[邮件处理] 创建第 %d 个协程 (总计: %d/%d)，分配 %d 个账号",
+				i+1, currentCount, maxEmailContentTotalGoroutines, len(assignedAccounts))
 
 			// 启动协程处理邮件
-			go func(goroutineNum int32, globalNum int32) {
+			go func(goroutineNum int32, globalNum int32, accounts []model.PrimeEmailAccount) {
 				defer wg.Done()
 				defer func() {
 					// 完成时减少计数
@@ -144,11 +190,13 @@ func GetEmailContentList(c *gin.Context) {
 				if req.Node > 0 {
 					nodeInfo = fmt.Sprintf("节点 %d ", req.Node)
 				}
-				log.Printf("[邮件处理] %s协程 %d (全局 %d) 开始处理邮件，限制为 %d 封",
-					nodeInfo, goroutineNum, globalNum, req.Limit)
-				err := GetEmailContent(req.Limit, req.Node)
+				log.Printf("[邮件处理] %s协程 %d (全局 %d) 开始处理 %d 个账号的邮件",
+					nodeInfo, goroutineNum, globalNum, len(accounts))
+
+				// 调用新的处理函数，传入分配的账号
+				err := GetEmailContentWithAccounts(req.Limit, req.Node, accounts)
 				results <- err
-			}(i+1, currentCount)
+			}(i+1, currentCount, assignedAccounts)
 
 			// 等待3秒再创建下一个协程
 			time.Sleep(time.Duration(sleepTime) * time.Second)
@@ -177,7 +225,7 @@ func GetEmailContentList(c *gin.Context) {
 
 // GetEmailContent 获取邮件内容
 func GetEmailContent(limit int, node int) error {
-	// 第一步：按照 last_sync_content_time 获取前3个账号
+	// 第一步：按照 last_sync_content_time 获取前5个账号
 	accounts, err := model.GetActiveAccountByContentSyncTimeAndNode(node, 5)
 	if err != nil {
 		return err
@@ -192,13 +240,24 @@ func GetEmailContent(limit int, node int) error {
 	log.Printf("[邮件处理] 节点 %d - 获取到 %d 个需要处理的账号", node, len(accounts))
 	fmt.Printf("========== 节点 %d - 开始处理 %d 个账号的邮件 ==========\n", node, len(accounts))
 
+	// 立即更新这些账号的last_sync_content_time，防止并发请求获取相同账号
+	log.Printf("[邮件处理] 立即更新账号同步时间以防止并发冲突...")
+	for _, account := range accounts {
+		if err := model.UpdateLastSyncContentTime(account.ID); err != nil {
+			log.Printf("[邮件处理] 更新账号 %d 的last_sync_content_time失败: %v", account.ID, err)
+			// 不返回错误，继续处理
+		} else {
+			log.Printf("[邮件处理] 成功更新账号 %d (%s) 的last_sync_content_time", account.ID, account.Account)
+		}
+	}
+
 	// 第二步：为每个账号获取邮件
 	var allEmailIDs []model.PrimeEmail
 	perAccountLimit := limit / len(accounts)
 	remainder := limit % len(accounts)
 
-	// 记录每个账号的邮件数量，用于后续更新last_sync_content_time
-	accountEmailCounts := make(map[int]int)
+	// 记录处理的账号信息
+	processedAccounts := make(map[int]string)
 
 	for i, account := range accounts {
 		currentLimit := perAccountLimit
@@ -220,7 +279,7 @@ func GetEmailContent(limit int, node int) error {
 
 		if len(accountEmails) > 0 {
 			allEmailIDs = append(allEmailIDs, accountEmails...)
-			accountEmailCounts[account.ID] = len(accountEmails)
+			processedAccounts[account.ID] = account.Account
 			log.Printf("[邮件处理] 账号 %d (%s) - 获取到 %d 封待处理邮件", account.ID, account.Account, len(accountEmails))
 			fmt.Printf("账号 %d (%s) - 获取到 %d 封待处理邮件\n", account.ID, account.Account, len(accountEmails))
 		}
@@ -273,7 +332,7 @@ func GetEmailContent(limit int, node int) error {
 		// 为每个请求创建独立的邮件客户端实例
 		mailClient, err := newMailClient(account)
 		if err != nil {
-			log.Printf("获取邮箱配置失败: %v", err)
+			log.Printf("[邮件处理] 获取邮箱配置失败: 账号ID=%d, 错误: %v", account.ID, err)
 			fmt.Printf("❌ 失败: %v\n", err)
 			failureCount++
 			// 设置邮件状态为失败
@@ -288,10 +347,22 @@ func GetEmailContent(limit int, node int) error {
 			log.Printf("[邮件处理] 获取邮件内容失败，邮件ID: %d, 错误: %v", emailOne.EmailID, err)
 			fmt.Printf("❌ 失败: %v\n", err)
 			failureCount++
-			// 如果获取失败，将邮件状态置为-2.
-			resetErr := model.ResetEmailStatus(emailOne.EmailID, -2)
-			if resetErr != nil {
-				log.Printf("[邮件处理] 设置邮件状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
+
+			// 特殊处理：如果是UID不存在的错误，将邮件标记为已删除状态
+			if strings.Contains(strings.ToLower(err.Error()), "邮件不存在") ||
+				strings.Contains(strings.ToLower(err.Error()), "邮件uid无效") ||
+				strings.Contains(strings.ToLower(err.Error()), "bad sequence") {
+				log.Printf("[邮件处理] 检测到邮件已删除或UID无效，标记为已删除状态: 邮件ID=%d", emailOne.EmailID)
+				resetErr := model.ResetEmailStatus(emailOne.EmailID, -3) // -3表示已删除
+				if resetErr != nil {
+					log.Printf("[邮件处理] 设置邮件已删除状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
+				}
+			} else {
+				// 其他错误，设置为失败状态
+				resetErr := model.ResetEmailStatus(emailOne.EmailID, -2)
+				if resetErr != nil {
+					log.Printf("[邮件处理] 设置邮件状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
+				}
 			}
 			// 继续处理下一个邮件，而不是直接返回错误
 			continue
@@ -500,31 +571,354 @@ func GetEmailContent(limit int, node int) error {
 	log.Printf("[邮件处理] 成功提交事务，完成处理 %d 封邮件", len(allEmailData))
 	fmt.Printf("✅ 成功\n")
 
-	// 第三步：更新账号的last_sync_content_time
-	fmt.Printf("\n【第3阶段】更新账号同步时间...\n")
-
-	for accountID, emailCount := range accountEmailCounts {
-		// 只为实际处理了邮件的账号更新时间
-		if emailCount > 0 {
-			log.Printf("[邮件处理] 更新账号 %d 的last_sync_content_time，处理了 %d 封邮件", accountID, emailCount)
-			fmt.Printf("  • 更新账号 %d 的同步时间... ", accountID)
-
-			if err := model.UpdateLastSyncContentTime(accountID); err != nil {
-				log.Printf("[邮件处理] 更新账号 %d 的last_sync_content_time失败: %v", accountID, err)
-				fmt.Printf("❌ 失败: %v\n", err)
-				// 这里不返回错误，因为邮件处理已经成功，只是更新同步时间失败
-			} else {
-				log.Printf("[邮件处理] 成功更新账号 %d 的last_sync_content_time", accountID)
-				fmt.Printf("✅ 成功\n")
-			}
-		}
-	}
+	// 注意：账号同步时间已在开始时更新，防止并发冲突
 
 	fmt.Printf("========== 邮件处理完成 ==========\n")
 	fmt.Printf("成功: %d 封邮件\n", successCount)
 	fmt.Printf("失败: %d 封邮件\n", failureCount)
 	fmt.Printf("总计: %d 封邮件\n", len(emailIDs))
-	fmt.Printf("涉及账号: %d 个\n", len(accountEmailCounts))
+	fmt.Printf("涉及账号: %d 个\n", len(processedAccounts))
+	fmt.Printf("================================\n\n")
+	return nil
+}
+
+// GetEmailContentWithAccounts 使用预分配的账号获取邮件内容
+func GetEmailContentWithAccounts(limit int, node int, accounts []model.PrimeEmailAccount) error {
+	if len(accounts) == 0 {
+		log.Printf("[邮件处理] 没有分配到账号")
+		return nil
+	}
+
+	log.Printf("[邮件处理] 节点 %d - 开始处理 %d 个账号的邮件", node, len(accounts))
+	fmt.Printf("========== 节点 %d - 开始处理 %d 个账号的邮件 ==========\n", node, len(accounts))
+
+	// 为每个账号获取邮件
+	var allEmailIDs []model.PrimeEmail
+	perAccountLimit := limit / len(accounts)
+	remainder := limit % len(accounts)
+
+	// 记录处理的账号信息
+	processedAccounts := make(map[int]string)
+
+	for i, account := range accounts {
+		currentLimit := perAccountLimit
+		// 将余数分配给前面的账号
+		if i < remainder {
+			currentLimit++
+		}
+
+		if currentLimit == 0 {
+			continue
+		}
+
+		// 获取该账号的邮件
+		accountEmails, err := model.GetEmailByStatusAndAccount(-1, account.ID, currentLimit)
+		if err != nil {
+			log.Printf("[邮件处理] 获取账号 %d 的邮件失败: %v", account.ID, err)
+			continue
+		}
+
+		if len(accountEmails) > 0 {
+			allEmailIDs = append(allEmailIDs, accountEmails...)
+			processedAccounts[account.ID] = account.Account
+			log.Printf("[邮件处理] 账号 %d (%s) - 获取到 %d 封待处理邮件", account.ID, account.Account, len(accountEmails))
+			fmt.Printf("账号 %d (%s) - 获取到 %d 封待处理邮件\n", account.ID, account.Account, len(accountEmails))
+		}
+	}
+
+	// 检查是否有邮件需要处理
+	if len(allEmailIDs) == 0 {
+		log.Printf("[邮件处理] 没有需要处理的新邮件")
+		fmt.Println("没有需要处理的新邮件")
+		return nil
+	}
+
+	emailIDs := allEmailIDs
+	folder := "INBOX"
+
+	log.Printf("[邮件处理] 开始处理 %d 封邮件, 文件夹: %s", len(emailIDs), folder)
+	fmt.Printf("\n========== 开始处理 %d 封邮件，文件夹: %s ==========\n", len(emailIDs), folder)
+
+	// 存储所有邮件内容和附件，以便后续批量存储
+	type EmailData struct {
+		EmailID      int
+		AccountId    int
+		EmailContent *model.PrimeEmailContent
+		Attachments  []*model.PrimeEmailContentAttachment
+	}
+
+	allEmailData := make([]EmailData, 0, len(emailIDs))
+
+	// 添加计数器
+	var successCount, failureCount int
+
+	// 第一步：获取所有邮件内容
+	fmt.Printf("\n【第1阶段】获取所有邮件内容...\n")
+	for i, emailOne := range emailIDs {
+		log.Printf("[邮件处理] 正在获取邮件内容，ID: %d", emailOne.EmailID)
+		fmt.Printf("  • 获取邮件 ID: %d 内容... ", emailOne.EmailID)
+
+		// 在处理每个邮件之间添加延迟，避免连接过于频繁
+		if i > 0 {
+			time.Sleep(time.Millisecond * 500) // 500毫秒延迟
+		}
+
+		account, err := model.GetAccountByID(emailOne.AccountId)
+		if err != nil && err != gorm.ErrRecordNotFound {
+			log.Printf("[邮件处理] 获取邮件账号失败，ID: %d", emailOne.AccountId)
+			fmt.Printf("  • 获取邮件账号失败，ID: %d", emailOne.AccountId)
+			failureCount++
+			continue
+		}
+		// 为每个请求创建独立的邮件客户端实例
+		mailClient, err := newMailClient(account)
+		if err != nil {
+			log.Printf("[邮件处理] 获取邮箱配置失败: 账号ID=%d, 错误: %v", account.ID, err)
+			fmt.Printf("❌ 失败: %v\n", err)
+			failureCount++
+			// 设置邮件状态为失败
+			resetErr := model.ResetEmailStatus(emailOne.EmailID, -2)
+			if resetErr != nil {
+				log.Printf("[邮件处理] 设置邮件状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
+			}
+			continue
+		}
+		email, err := mailClient.GetEmailContent(uint32(emailOne.EmailID), folder)
+		if err != nil {
+			log.Printf("[邮件处理] 获取邮件内容失败，邮件ID: %d, 错误: %v", emailOne.EmailID, err)
+			fmt.Printf("❌ 失败: %v\n", err)
+			failureCount++
+
+			// 特殊处理：如果是UID不存在的错误，将邮件标记为已删除状态
+			if strings.Contains(strings.ToLower(err.Error()), "邮件不存在") ||
+				strings.Contains(strings.ToLower(err.Error()), "邮件uid无效") ||
+				strings.Contains(strings.ToLower(err.Error()), "bad sequence") {
+				log.Printf("[邮件处理] 检测到邮件已删除或UID无效，标记为已删除状态: 邮件ID=%d", emailOne.EmailID)
+				resetErr := model.ResetEmailStatus(emailOne.EmailID, -3) // -3表示已删除
+				if resetErr != nil {
+					log.Printf("[邮件处理] 设置邮件已删除状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
+				}
+			} else {
+				// 其他错误，设置为失败状态
+				resetErr := model.ResetEmailStatus(emailOne.EmailID, -2)
+				if resetErr != nil {
+					log.Printf("[邮件处理] 设置邮件状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
+				}
+			}
+			// 继续处理下一个邮件，而不是直接返回错误
+			continue
+		}
+
+		log.Printf("[邮件处理] 成功获取邮件内容，邮件ID: %d, 主题: %s, 发件人: %s", emailOne.EmailID, email.Subject, email.From)
+		fmt.Printf("✅ 成功，主题: %s\n", email.Subject)
+		successCount++
+
+		// 创建邮件内容记录
+		emailContent := &model.PrimeEmailContent{
+			EmailID:       emailOne.EmailID,
+			AccountId:     emailOne.AccountId,
+			Subject:       utils.SanitizeUTF8(email.Subject),
+			FromEmail:     utils.SanitizeUTF8(email.From),
+			ToEmail:       utils.SanitizeUTF8(email.To),
+			Date:          utils.SanitizeUTF8(email.Date),
+			Content:       utils.SanitizeUTF8(email.Body),
+			HTMLContent:   utils.SanitizeUTF8(email.BodyHTML),
+			Type:          0,
+			HasAttachment: emailOne.HasAttachment,
+			CreatedAt:     utils.JsonTime{Time: time.Now()},
+			UpdatedAt:     utils.JsonTime{Time: time.Now()},
+		}
+
+		// 创建附件记录列表
+		attachmentRecords := make([]*model.PrimeEmailContentAttachment, 0)
+		if len(email.Attachments) > 0 {
+			log.Printf("[邮件处理] 邮件含有 %d 个附件，邮件ID: %d", len(email.Attachments), emailOne.EmailID)
+			fmt.Printf("    📎 发现 %d 个附件\n", len(email.Attachments))
+
+			// 处理附件
+			for i, attachment := range email.Attachments {
+				log.Printf("[附件处理] 开始处理附件 %d/%d，邮件ID: %d, 文件名: %s",
+					i+1, len(email.Attachments), emailOne.EmailID, attachment.Filename)
+				fmt.Printf("      - 附件 %d/%d: %s (%.2f KB, %s)\n",
+					i+1, len(email.Attachments), attachment.Filename, attachment.SizeKB, attachment.MimeType)
+
+				// 上传到OSS
+				ossURL := ""
+				if attachment.Base64Data != "" {
+					fileType := ""
+					if attachment.MimeType != "" {
+						parts := strings.Split(attachment.MimeType, "/")
+						if len(parts) > 1 {
+							fileType = parts[1]
+						}
+					}
+
+					log.Printf("[附件处理] 开始上传附件到OSS，邮件ID: %d, 文件名: %s", emailOne.EmailID, attachment.Filename)
+					fmt.Printf("        正在上传到OSS... ")
+					var err error
+					// 添加重试机制，最多尝试2次
+					maxRetries := 2
+					for attempt := 1; attempt <= maxRetries; attempt++ {
+						log.Printf("[附件处理] 尝试上传附件到OSS (尝试 %d/%d)，邮件ID: %d, 文件名: %s",
+							attempt, maxRetries, emailOne.EmailID, attachment.Filename)
+						if attempt > 1 {
+							fmt.Printf("        重试上传到OSS (尝试 %d/%d)... ", attempt, maxRetries)
+						} else {
+							fmt.Printf("        正在上传到OSS... ")
+						}
+
+						ossURL, err = oss.UploadBase64ToOSS(attachment.Filename, attachment.Base64Data, fileType)
+						if err == nil {
+							// 上传成功，跳出循环
+							log.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, URL: %s", emailOne.EmailID, attachment.Filename, ossURL)
+							fmt.Printf("✅ 成功\n")
+							break
+						}
+
+						// 上传失败
+						if attempt < maxRetries {
+							log.Printf("[附件处理] 上传附件到OSS失败，准备重试，邮件ID: %d, 文件名: %s, 错误: %v",
+								emailOne.EmailID, attachment.Filename, err)
+							fmt.Printf("❌ 失败: %v，准备重试\n", err)
+							// 可以在这里添加短暂的延迟
+							time.Sleep(time.Second * 2)
+						} else {
+							// 最后一次尝试也失败了
+							log.Printf("[附件处理] 上传附件到OSS失败，已达到最大重试次数，邮件ID: %d, 文件名: %s, 错误: %v",
+								emailOne.EmailID, attachment.Filename, err)
+							fmt.Printf("❌ 最终失败: %v\n", err)
+						}
+					}
+
+					// 检查是否所有尝试都失败了
+					if err != nil {
+						fmt.Printf("[附件处理] 经过 %d 次尝试，上传附件到OSS仍然失败，邮件ID: %d, 文件名: %s\n",
+							maxRetries, emailOne.EmailID, attachment.Filename)
+					}
+				} else {
+					log.Printf("[附件处理] 附件没有Base64数据，邮件ID: %d, 文件名: %s", emailOne.EmailID, attachment.Filename)
+					fmt.Printf("        附件没有Base64数据，跳过上传\n")
+				}
+
+				// 创建附件记录
+				attachmentRecord := &model.PrimeEmailContentAttachment{
+					EmailID:   emailOne.EmailID,
+					AccountId: emailOne.AccountId,
+					FileName:  utils.SanitizeUTF8(attachment.Filename),
+					SizeKb:    attachment.SizeKB,
+					MimeType:  utils.SanitizeUTF8(attachment.MimeType),
+					OssUrl:    utils.SanitizeUTF8(ossURL),
+					CreatedAt: utils.JsonTime{Time: time.Now()},
+					UpdatedAt: utils.JsonTime{Time: time.Now()},
+				}
+
+				attachmentRecords = append(attachmentRecords, attachmentRecord)
+			}
+		} else {
+			log.Printf("[邮件处理] 邮件没有附件，邮件ID: %d", emailOne.EmailID)
+			fmt.Printf("    📄 邮件没有附件\n")
+		}
+
+		// 添加到待处理列表
+		allEmailData = append(allEmailData, EmailData{
+			EmailID:      emailOne.EmailID,
+			AccountId:    emailOne.AccountId,
+			EmailContent: emailContent,
+			Attachments:  attachmentRecords,
+		})
+	}
+
+	// 检查处理结果
+	fmt.Printf("\n【处理结果】成功: %d, 失败: %d, 总计: %d\n", successCount, failureCount, len(emailIDs))
+	log.Printf("[邮件处理] 处理结果 - 成功: %d, 失败: %d, 总计: %d", successCount, failureCount, len(emailIDs))
+
+	// 如果没有成功处理任何邮件，直接返回
+	if successCount == 0 {
+		log.Printf("[邮件处理] 没有成功处理任何邮件，终止流程")
+		fmt.Printf("❌ 没有成功处理任何邮件，终止流程\n")
+		return fmt.Errorf("所有 %d 封邮件都处理失败", len(emailIDs))
+	}
+
+	// 第二步：将所有数据保存到数据库 - 保持原有逻辑
+	fmt.Printf("\n【第2阶段】将所有数据保存到数据库...\n")
+
+	// 开始数据库事务
+	tx := db.DB().Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			log.Printf("[邮件处理] 发生异常，事务回滚: %v", r)
+			fmt.Printf("❌ 发生异常，事务回滚: %v\n", r)
+		}
+	}()
+
+	// 保存邮件内容
+	for _, data := range allEmailData {
+		// 保存邮件内容
+		log.Printf("[邮件处理] 保存邮件内容，ID: %d, 主题: %s", data.EmailID, data.EmailContent.Subject)
+		fmt.Printf("  • 保存邮件 ID: %d 内容... ", data.EmailID)
+
+		if err := data.EmailContent.CreateWithTransaction(tx); err != nil {
+			log.Printf("[邮件处理] 保存邮件内容失败，ID: %d, 错误: %v", data.EmailID, err)
+			fmt.Printf("❌ 失败: %v\n", err)
+			tx.Rollback()
+			return err
+		}
+
+		fmt.Printf("✅ 成功\n")
+
+		// 保存附件记录
+		if len(data.Attachments) > 0 {
+			log.Printf("[邮件处理] 保存 %d 个附件记录，邮件ID: %d", len(data.Attachments), data.EmailID)
+			fmt.Printf("    • 保存 %d 个附件记录... ", len(data.Attachments))
+
+			// 使用单个Create而不是批量操作，避免反射问题
+			for _, attachment := range data.Attachments {
+				if err := tx.Create(attachment).Error; err != nil {
+					log.Printf("[附件处理] 保存附件失败: 邮件ID=%d, 文件名=%s, 错误=%v",
+						attachment.EmailID, attachment.FileName, err)
+					fmt.Printf("❌ 失败: %v\n", err)
+					tx.Rollback()
+					return err
+				}
+			}
+
+			fmt.Printf("✅ 成功\n")
+		}
+
+		// 更新邮件状态为已处理
+		log.Printf("[邮件处理] 更新邮件状态为已处理，邮件ID: %d", data.EmailID)
+		fmt.Printf("    • 更新邮件状态为已处理... ")
+
+		if err := tx.Model(&model.PrimeEmail{}).Where("email_id = ?", data.EmailID).Update("status", 1).Error; err != nil {
+			log.Printf("[邮件处理] 更新邮件状态失败，邮件ID: %d, 错误: %v", data.EmailID, err)
+			fmt.Printf("❌ 失败: %v\n", err)
+			tx.Rollback()
+			return err
+		}
+
+		fmt.Printf("✅ 成功\n")
+	}
+
+	// 提交事务
+	fmt.Printf("\n◉ 提交事务... ")
+	if err := tx.Commit().Error; err != nil {
+		log.Printf("[邮件处理] 提交事务失败，错误: %v", err)
+		fmt.Printf("❌ 失败: %v\n", err)
+		tx.Rollback()
+		return err
+	}
+
+	log.Printf("[邮件处理] 成功提交事务，完成处理 %d 封邮件", len(allEmailData))
+	fmt.Printf("✅ 成功\n")
+
+	// 注意：账号同步时间已在GetEmailContentList中更新，防止并发冲突
+
+	fmt.Printf("========== 邮件处理完成 ==========\n")
+	fmt.Printf("成功: %d 封邮件\n", successCount)
+	fmt.Printf("失败: %d 封邮件\n", failureCount)
+	fmt.Printf("总计: %d 封邮件\n", len(emailIDs))
+	fmt.Printf("涉及账号: %d 个\n", len(processedAccounts))
 	fmt.Printf("================================\n\n")
 	return nil
 }

@@ -7,8 +7,7 @@
     <list default="true" id="a282b92f-b990-4f59-8643-e6793cdebe48" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api/handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/handlers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/prime_email.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/prime_email.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model/prime_email_account.go" beforeDir="false" afterPath="$PROJECT_DIR$/model/prime_email_account.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/mailclient/mailcontent.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/mailclient/mailcontent.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

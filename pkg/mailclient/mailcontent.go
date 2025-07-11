@@ -329,7 +329,7 @@ func (m *MailClient) tryGetEmailContent(uid uint32, folder string) (*Email, erro
 	}
 
 	// 选择邮箱
-	_, err = c.Select(folder, false)
+	mbox, err := c.Select(folder, false)
 	if err != nil {
 		// 检查是否是IMAP命令错误
 		if strings.Contains(strings.ToLower(err.Error()), "command is not a valid imap command") {
@@ -341,20 +341,32 @@ func (m *MailClient) tryGetEmailContent(uid uint32, folder string) (*Email, erro
 		return nil, fmt.Errorf("选择邮箱失败: %w", err)
 	}
 
-	// 创建搜索条件
+	// 检查邮箱是否有邮件
+	if mbox.Messages == 0 {
+		return nil, fmt.Errorf("邮箱中没有邮件")
+	}
+
+	// 验证UID是否有效 - 先检查UID是否存在
+	log.Printf("[邮件获取] 验证UID %d 是否存在，邮箱总邮件数: %d", uid, mbox.Messages)
+
+	// 创建搜索条件来验证UID是否存在
 	criteria := imap.NewSearchCriteria()
 	criteria.Uid = new(imap.SeqSet)
 	criteria.Uid.AddNum(uid)
 
-	// 搜索邮件（使用 UidSearch 因为我们传入的是 UID）
+	// 先搜索确认UID是否存在
 	ids, err := c.UidSearch(criteria)
 	if err != nil {
+		log.Printf("[邮件获取] UID搜索失败: UID=%d, 错误: %v", uid, err)
 		return nil, fmt.Errorf("搜索邮件失败: %w", err)
 	}
 
 	if len(ids) == 0 {
-		return nil, fmt.Errorf("未找到邮件")
+		log.Printf("[邮件获取] UID不存在: UID=%d, 邮箱: %s", uid, folder)
+		return nil, fmt.Errorf("邮件不存在: UID=%d 在邮箱 %s 中未找到", uid, folder)
 	}
+
+	log.Printf("[邮件获取] UID验证成功: UID=%d 存在", uid)
 
 	seqSet := new(imap.SeqSet)
 	seqSet.AddNum(ids...)
@@ -371,11 +383,17 @@ func (m *MailClient) tryGetEmailContent(uid uint32, folder string) (*Email, erro
 
 	msg := <-messages
 	if err := <-done; err != nil {
+		// 检查是否是FETCH相关的错误
+		if strings.Contains(strings.ToLower(err.Error()), "bad sequence") {
+			log.Printf("[邮件获取] 检测到FETCH序列错误: UID=%d, 错误: %v", uid, err)
+			return nil, fmt.Errorf("邮件UID无效或已过期: UID=%d, 错误: %w", uid, err)
+		}
 		return nil, fmt.Errorf("获取邮件内容失败: %w", err)
 	}
 
 	if msg == nil {
-		return nil, fmt.Errorf("邮件不存在")
+		log.Printf("[邮件获取] 邮件消息为空: UID=%d", uid)
+		return nil, fmt.Errorf("邮件不存在或已被删除: UID=%d", uid)
 	}
 
 	// 创建Email结构体
@@ -404,10 +422,10 @@ func (m *MailClient) tryGetEmailContent(uid uint32, folder string) (*Email, erro
 	// 调试输出
 	log.Printf("[邮件解析调试] UID: %d, 解码成功，内容长度: %d", uid, len(rawContent))
 
-	// 保存原始内容到文件用于调试
-	if err := saveRawContentToFile(uid, rawContent); err != nil {
-		log.Printf("[邮件解析调试] 保存原始内容失败: %v", err)
-	}
+	//// 保存原始内容到文件用于调试
+	//if err := saveRawContentToFile(uid, rawContent); err != nil {
+	//	log.Printf("[邮件解析调试] 保存原始内容失败: %v", err)
+	//}
 
 	// 解析邮件内容
 	if msg.BodyStructure.MIMEType == "multipart" {
