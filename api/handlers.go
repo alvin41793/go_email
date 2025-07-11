@@ -40,7 +40,7 @@ var (
 	currentEmailContentGoroutines  int32     // 当前获取邮件内容运行的协程总数
 	maxEmailContentTotalGoroutines int32 = 5 // 全局获取邮件内容最大协程数
 	listEmailsByUidMutex           sync.Mutex
-	goroutinesPerReq               int32 = 3 // 每次请求创建的协程数
+	goroutinesPerReq               int32 = 5 // 每次请求创建的协程数
 	sleepTime                      int   = 3
 	processingAccounts             map[int]bool
 )
@@ -106,7 +106,7 @@ func GetEmailContentList(c *gin.Context) {
 
 	// 【关键修改】先获取账号，确认有可用账号后再返回响应
 	// 原子性地获取账号并立即更新同步时间，防止并发竞争
-	allAccounts, err := model.GetAndUpdateAccountsForContent(req.Node, int(createCount)*5) // 为每个协程预留5个账号
+	allAccounts, err := model.GetAndUpdateAccountsForContent(req.Node, int(createCount)*3) // 为每个协程预留5个账号
 	if err != nil {
 		log.Printf("[邮件处理] 获取账号失败: %v", err)
 		utils.SendResponse(c, err, "获取账号失败")

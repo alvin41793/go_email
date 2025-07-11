@@ -751,21 +751,86 @@ func (m *MailClient) parseMultipartMessage(msg *imap.Message, email *Email, read
 						// 解码RFC 2047编码的文件名
 						decodedFilename := DecodeMIMESubject(filename)
 
-						// 读取附件内容以获取大小
+						// 读取附件原始数据
 						attachBytes, err := io.ReadAll(p)
 						if err != nil {
 							log.Printf("读取附件内容失败: %v", err)
 							continue
 						}
 
-						// 替换\r\n为空字符串
-						//attachBytes = bytes.ReplaceAll(attachBytes, []byte("\r\n"), []byte(""))
+						// 根据Content-Transfer-Encoding智能处理附件数据
+						encoding := p.Header.Get("Content-Transfer-Encoding")
+						var finalBase64Data string
+						var actualSize int64
+
+						startTime := time.Now()
+
+						switch strings.ToLower(encoding) {
+						case "base64":
+							// 对于Base64编码，先验证是否为有效的Base64
+							originalData := string(attachBytes)
+
+							// 快速验证：尝试解码很小的一部分来检测有效性
+							testSample := originalData
+							if len(originalData) > 100 {
+								testSample = originalData[:100] // 只测试前100个字符
+							}
+
+							_, testErr := base64.StdEncoding.DecodeString(testSample)
+							if testErr == nil {
+								// 如果是有效的Base64，直接使用（性能优化）
+								finalBase64Data = originalData
+								// 计算解码后的实际大小（不实际解码，用数学计算）
+								actualSize = int64(len(originalData)) * 3 / 4
+								if strings.HasSuffix(originalData, "==") {
+									actualSize -= 2
+								} else if strings.HasSuffix(originalData, "=") {
+									actualSize -= 1
+								}
+								log.Printf("[附件处理-快速路径] 文件: %s, 检测到有效Base64，直接使用", decodedFilename)
+							} else {
+								// 不是有效的Base64，需要解码重编码
+								decodedAttachData, err := base64.StdEncoding.DecodeString(originalData)
+								if err != nil {
+									log.Printf("Base64解码附件失败: %v, 文件: %s", err, decodedFilename)
+									// 解码失败，使用原始数据重新编码
+									finalBase64Data = base64.StdEncoding.EncodeToString(attachBytes)
+									actualSize = int64(len(attachBytes))
+								} else {
+									finalBase64Data = base64.StdEncoding.EncodeToString(decodedAttachData)
+									actualSize = int64(len(decodedAttachData))
+								}
+								log.Printf("[附件处理-解码路径] 文件: %s, 重新解码编码", decodedFilename)
+							}
+
+						case "quoted-printable":
+							// Quoted-printable编码，需要解码
+							qpReader := quotedprintable.NewReader(bytes.NewReader(attachBytes))
+							decodedAttachData, err := io.ReadAll(qpReader)
+							if err != nil {
+								log.Printf("Quoted-printable解码附件失败: %v, 文件: %s", err, decodedFilename)
+								finalBase64Data = base64.StdEncoding.EncodeToString(attachBytes)
+								actualSize = int64(len(attachBytes))
+							} else {
+								finalBase64Data = base64.StdEncoding.EncodeToString(decodedAttachData)
+								actualSize = int64(len(decodedAttachData))
+							}
+
+						default:
+							// 其他情况或无编码，直接编码为Base64
+							finalBase64Data = base64.StdEncoding.EncodeToString(attachBytes)
+							actualSize = int64(len(attachBytes))
+						}
+
+						processingTime := time.Since(startTime)
+						log.Printf("[附件处理] 文件: %s, 大小: %.2f KB, 编码方式: %s, 处理耗时: %v",
+							decodedFilename, float64(actualSize)/1024.0, encoding, processingTime)
 
 						email.Attachments = append(email.Attachments, AttachmentInfo{
-							Filename:   decodedFilename, // 使用解码后的文件名
-							SizeKB:     float64(len(attachBytes)) / 1024.0,
+							Filename:   decodedFilename,
+							SizeKB:     float64(actualSize) / 1024.0,
 							MimeType:   partMediaType,
-							Base64Data: string(attachBytes),
+							Base64Data: finalBase64Data,
 						})
 					}
 				}
