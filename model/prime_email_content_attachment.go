@@ -29,27 +29,3 @@ func (a *PrimeEmailContentAttachment) Create() error {
 func (a *PrimeEmailContentAttachment) CreateWithTransaction(tx *gorm.DB) error {
 	return tx.Create(a).Error
 }
-
-// BatchCreateAttachments 批量创建邮件附件记录
-func BatchCreateAttachments(attachments []*PrimeEmailContentAttachment) error {
-	return db.DB().Create(attachments).Error
-}
-
-// BatchCreateAttachmentsWithTransaction 使用事务批量创建邮件附件记录
-func BatchCreateAttachmentsWithTransaction(attachments []*PrimeEmailContentAttachment, tx *gorm.DB) error {
-	return tx.Create(attachments).Error
-}
-
-// GetAttachmentsByIDs 根据ID列表获取附件
-func GetAttachmentsByIDs(ids []uint) ([]*PrimeEmailContentAttachment, error) {
-	var attachments []*PrimeEmailContentAttachment
-	err := db.DB().Where("id IN (?)", ids).Find(&attachments).Error
-	return attachments, err
-}
-
-// GetAttachmentsByEmailID 根据邮件ID获取附件列表
-func GetAttachmentsByEmailID(emailID int) ([]*PrimeEmailContentAttachment, error) {
-	var attachments []*PrimeEmailContentAttachment
-	err := db.DB().Where("email_id = ?", emailID).Find(&attachments).Error
-	return attachments, err
-}

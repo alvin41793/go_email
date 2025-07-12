@@ -26,13 +26,6 @@ func (e *PrimeEmailIdentifyLog) Create() error {
 	return db.DB().Create(e).Error
 }
 
-// GetByID 根据ID获取邮件识别日志
-func GetEmailIdentifyLogByID(id uint) (*PrimeEmailIdentifyLog, error) {
-	var log PrimeEmailIdentifyLog
-	err := db.DB().Where("id = ?", id).First(&log).Error
-	return &log, err
-}
-
 // UpdateFields 更新指定字段
 func (e *PrimeEmailIdentifyLog) UpdateFields(fields map[string]interface{}) error {
 	return db.DB().Model(e).Updates(fields).Error

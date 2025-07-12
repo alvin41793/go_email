@@ -26,20 +26,6 @@ type PrimeEmailAccount struct {
 	UpdatedAt        time.Time  `json:"updated_at" gorm:"type:datetime"`
 }
 
-// GetActiveAccount 获取状态为启用的账号，按最后同步时间排序（优先处理最久未同步的账户）
-func GetActiveAccount() ([]PrimeEmailAccount, error) {
-	var account []PrimeEmailAccount
-	result := db.DB().Where("status = ?", 1).Order("ISNULL(last_sync_time) DESC, last_sync_time ASC").Find(&account)
-	return account, result.Error
-}
-
-// GetActiveAccountByNode 根据节点编号获取状态为启用的账号，按最后同步时间排序
-func GetActiveAccountByNode(node int) ([]PrimeEmailAccount, error) {
-	var account []PrimeEmailAccount
-	result := db.DB().Where("status = ? AND node = ?", 1, node).Order("ISNULL(last_sync_time) DESC, last_sync_time ASC").Find(&account)
-	return account, result.Error
-}
-
 // GetAccountByID 根据ID获取账号信息
 func GetAccountByID(id int) (PrimeEmailAccount, error) {
 	var account PrimeEmailAccount
@@ -115,23 +101,6 @@ func GetActiveAccountByContentSyncTime(limit int) ([]PrimeEmailAccount, error) {
 	return accounts, result.Error
 }
 
-// GetActiveAccountByContentSyncTimeAndNode 根据节点编号获取状态为启用的账号，按最后同步时间排序（兼容性函数）
-func GetActiveAccountByContentSyncTimeAndNode(node int, limit int) ([]PrimeEmailAccount, error) {
-	var accounts []PrimeEmailAccount
-	result := db.DB().Where("status = ? AND node = ?", 1, node).Order("ISNULL(last_sync_time) DESC, last_sync_time ASC").Limit(limit).Find(&accounts)
-	return accounts, result.Error
-}
-
-// UpdateLastSyncContentTime 更新账号的最后同步邮件内容时间（兼容性函数）
-func UpdateLastSyncContentTime(accountID int) error {
-	return UpdateLastSyncTime(accountID)
-}
-
-// UpdateLastSyncContentTimeWithTx 使用事务更新账号的最后同步邮件内容时间（兼容性函数）
-func UpdateLastSyncContentTimeWithTx(tx *gorm.DB, accountID int) error {
-	return UpdateLastSyncTimeWithTx(tx, accountID)
-}
-
 // GetAndUpdateAccountsForContent 原子性地获取账号并更新同步时间，防止并发竞争（兼容性函数）
 func GetAndUpdateAccountsForContent(node int, limit int) ([]PrimeEmailAccount, error) {
 	return GetAndUpdateAccountsForUnifiedSync(node, limit)
@@ -146,23 +115,6 @@ func UpdateLastSyncContentTimeOnComplete(accountID int) error {
 func ResetSyncContentTimeOnFailure(accountID int) error {
 	return ResetSyncTimeOnFailure(accountID)
 }
-
-// GetAndUpdateAccountsForList 原子性地获取账号并更新同步时间，防止邮件列表同步的并发竞争（兼容性函数）
-func GetAndUpdateAccountsForList(node int, limit int) ([]PrimeEmailAccount, error) {
-	return GetAndUpdateAccountsForUnifiedSync(node, limit)
-}
-
-// UpdateLastSyncListTimeOnComplete 在邮件列表同步完成后更新真正的同步时间（兼容性函数）
-func UpdateLastSyncListTimeOnComplete(accountID int) error {
-	return UpdateLastSyncTimeOnComplete(accountID)
-}
-
-// ResetSyncListTimeOnFailure 在邮件列表同步失败后重置同步时间（兼容性函数）
-func ResetSyncListTimeOnFailure(accountID int) error {
-	return ResetSyncTimeOnFailure(accountID)
-}
-
-// 以下是统一同步的核心函数
 
 // GetAndUpdateAccountsForUnifiedSync 原子性地获取账号并更新同步时间，用于统一同步
 func GetAndUpdateAccountsForUnifiedSync(node int, limit int) ([]PrimeEmailAccount, error) {

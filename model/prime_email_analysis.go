@@ -2,7 +2,6 @@ package model
 
 import (
 	"encoding/json"
-	"go_email/db"
 	"go_email/pkg/utils"
 )
 
@@ -19,18 +18,4 @@ type PrimeEmailAnalysis struct {
 	IsAttachment int             `gorm:"column:is_attachment" json:"is_attachment"`
 	CreatedAt    utils.JsonTime  `gorm:"column:created_at" json:"created_at"`
 	UpdatedAt    utils.JsonTime  `gorm:"column:updated_at" json:"updated_at"`
-}
-
-// GetAnalysisByEmailID 根据EmailID获取邮件分析结果
-func GetAnalysisByEmailID(emailID int) ([]PrimeEmailAnalysis, error) {
-	var analysis []PrimeEmailAnalysis
-	err := db.DB().Where("email_id = ? and confidence>=0.7", emailID).
-		Where("(mbl != '' OR hbl != '' OR container != '[]' OR container != '')").
-		Find(&analysis).Error
-	return analysis, err
-}
-
-// CreateAnalysis 创建邮件分析记录
-func CreateAnalysis(analysis *PrimeEmailAnalysis) error {
-	return db.DB().Create(analysis).Error
 }
