@@ -1123,8 +1123,8 @@ func ListEmailsByUid(c *gin.Context) {
 
 // CleanupStuckAccounts 清理卡死的账号状态
 func CleanupStuckAccounts(c *gin.Context) {
-	// 获取参数，默认清理超过30分钟还在处理中的账号
-	timeoutMinutes := 30
+	// 获取参数，默认清理超过50分钟还在处理中的账号
+	timeoutMinutes := 50
 	if timeoutStr := c.Query("timeout_minutes"); timeoutStr != "" {
 		if t, err := strconv.Atoi(timeoutStr); err == nil && t > 0 {
 			timeoutMinutes = t
