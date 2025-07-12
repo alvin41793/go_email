@@ -199,7 +199,11 @@ func getAndUpdateAccountsForUnifiedSyncOnce(node int, limit int) ([]PrimeEmailAc
 		return nil, err
 	}
 
-	log.Printf("[统一同步] 成功批量更新 %d 个账号状态", len(accounts))
+	for _, account := range accounts {
+		log.Printf("[统一同步] 账号状态更新: ID=%d, Account=%s, processing_status: 0 → 1, last_sync_time更新",
+			account.ID, account.Account)
+	}
+	log.Printf("[统一同步] 成功批量更新 %d 个账号状态 (processing_status: 0 → 1)", len(accounts))
 	return accounts, nil
 }
 
@@ -212,6 +216,13 @@ func UpdateLastSyncTimeOnComplete(accountID int) error {
 			"last_sync_time":    now,
 			"processing_status": 0,
 		})
+
+	if result.Error == nil {
+		log.Printf("[统一同步] 账号处理完成，状态更新: ID=%d, processing_status: 1 → 0, last_sync_time更新", accountID)
+	} else {
+		log.Printf("[统一同步] 账号完成状态更新失败: ID=%d, 错误=%v", accountID, result.Error)
+	}
+
 	return result.Error
 }
 
@@ -224,5 +235,12 @@ func ResetSyncTimeOnFailure(accountID int) error {
 			"last_sync_time":    resetTime,
 			"processing_status": 0,
 		})
+
+	if result.Error == nil {
+		log.Printf("[统一同步] 账号处理失败，状态重置: ID=%d, processing_status: 1 → 0, last_sync_time重置为24小时前（优先重试）", accountID)
+	} else {
+		log.Printf("[统一同步] 账号失败状态重置失败: ID=%d, 错误=%v", accountID, result.Error)
+	}
+
 	return result.Error
 }

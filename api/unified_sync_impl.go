@@ -8,8 +8,10 @@ import (
 	"go_email/model"
 	"go_email/pkg/mailclient"
 	"go_email/pkg/utils"
+	"go_email/pkg/utils/oss"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -128,13 +130,14 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 	log.Printf("账号 %d (%s) - 获取到 %d 封待处理邮件", account.ID, account.Account, len(accountEmails))
 
 	folder := "INBOX"
+	startTime := time.Now()
 
 	// 存储所有邮件内容和附件，以便后续批量存储
 	allEmailData := make([]EmailContentData, 0, len(accountEmails))
 	var successCount, failureCount int
 
 	for i, emailOne := range accountEmails {
-		log.Printf("[邮件内容同步] 正在获取邮件内容，ID: %d", emailOne.EmailID)
+		log.Printf("[邮件内容同步] 正在获取邮件内容，ID: %d，进度: %d/%d", emailOne.EmailID, i+1, len(accountEmails))
 
 		// 在处理每个邮件之间添加延迟，避免连接过于频繁
 		if i > 0 {
@@ -144,14 +147,36 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 		// 检查context是否被取消
 		select {
 		case <-ctx.Done():
-			log.Printf("[邮件内容同步] 上下文已取消，停止处理")
+			remainingEmails := len(accountEmails) - i
+			log.Printf("[邮件内容同步] 上下文已取消，停止处理，已处理: %d/%d，未处理: %d，耗时: %v",
+				i, len(accountEmails), remainingEmails, time.Since(startTime))
+
+			// 如果有已处理的邮件，先保存它们（这些邮件的status会变成1）
+			if len(allEmailData) > 0 {
+				log.Printf("[邮件内容同步] 尝试保存已处理的 %d 封邮件（status: -1 → 1）", len(allEmailData))
+				if saveErr := batchSaveEmailContents(allEmailData); saveErr != nil {
+					log.Printf("[邮件内容同步] 保存已处理邮件失败: %v", saveErr)
+				} else {
+					log.Printf("[邮件内容同步] 成功保存已处理的 %d 封邮件（status已更新为1）", len(allEmailData))
+					successCount = len(allEmailData)
+				}
+			}
+
+			// 未处理的邮件保持status=-1，下次同步时会被重新处理
+			if remainingEmails > 0 {
+				log.Printf("[邮件内容同步] %d 封邮件未处理，状态保持为-1，等待下次同步", remainingEmails)
+			}
+
+			log.Printf("[邮件内容同步] 超时处理完成，账号 %d 的processing_status将被重置为0", account.ID)
 			return successCount, ctx.Err()
 		default:
 		}
 
+		emailStartTime := time.Now()
 		email, err := mailClient.GetEmailContent(uint32(emailOne.EmailID), folder)
+		emailDuration := time.Since(emailStartTime)
 		if err != nil {
-			log.Printf("[邮件内容同步] 获取邮件内容失败，邮件ID: %d, 错误: %v", emailOne.EmailID, err)
+			log.Printf("[邮件内容同步] 获取邮件内容失败，邮件ID: %d, 耗时: %v, 错误: %v", emailOne.EmailID, emailDuration, err)
 			failureCount++
 
 			// 设置邮件状态为失败
@@ -188,18 +213,75 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 		var attachments []*model.PrimeEmailContentAttachment
 		if email.Attachments != nil && len(email.Attachments) > 0 {
 			emailContent.HasAttachment = 1
-			for _, att := range email.Attachments {
+			log.Printf("[邮件内容同步] 邮件含有 %d 个附件，邮件ID: %d", len(email.Attachments), emailOne.EmailID)
+
+			for i, att := range email.Attachments {
+				log.Printf("[附件处理] 开始处理附件 %d/%d，邮件ID: %d, 文件名: %s",
+					i+1, len(email.Attachments), emailOne.EmailID, att.Filename)
+
+				// 上传到OSS
+				ossURL := ""
+				if att.Base64Data != "" {
+					fileType := ""
+					if att.MimeType != "" {
+						parts := strings.Split(att.MimeType, "/")
+						if len(parts) > 1 {
+							fileType = parts[1]
+						}
+					}
+
+					log.Printf("[附件处理] 开始上传附件到OSS，邮件ID: %d, 文件名: %s", emailOne.EmailID, att.Filename)
+					// 添加重试机制，最多尝试2次
+					maxRetries := 2
+					var err error
+					for attempt := 1; attempt <= maxRetries; attempt++ {
+						log.Printf("[附件处理] 尝试上传附件到OSS (尝试 %d/%d)，邮件ID: %d, 文件名: %s",
+							attempt, maxRetries, emailOne.EmailID, att.Filename)
+
+						// 使用完整包路径调用OSS上传
+						ossURL, err = oss.UploadBase64ToOSS(att.Filename, att.Base64Data, fileType)
+						if err == nil {
+							// 上传成功，跳出循环
+							log.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, URL: %s", emailOne.EmailID, att.Filename, ossURL)
+							break
+						}
+
+						// 上传失败
+						if attempt < maxRetries {
+							log.Printf("[附件处理] 上传附件到OSS失败，准备重试，邮件ID: %d, 文件名: %s, 错误: %v",
+								emailOne.EmailID, att.Filename, err)
+							// 添加短暂的延迟
+							time.Sleep(time.Second * 2)
+						} else {
+							// 最后一次尝试也失败了
+							log.Printf("[附件处理] 上传附件到OSS失败，已达到最大重试次数，邮件ID: %d, 文件名: %s, 错误: %v",
+								emailOne.EmailID, att.Filename, err)
+						}
+					}
+
+					// 检查是否所有尝试都失败了
+					if err != nil {
+						log.Printf("[附件处理] 经过 %d 次尝试，上传附件到OSS仍然失败，邮件ID: %d, 文件名: %s",
+							maxRetries, emailOne.EmailID, att.Filename)
+					}
+				} else {
+					log.Printf("[附件处理] 附件没有Base64数据，邮件ID: %d, 文件名: %s", emailOne.EmailID, att.Filename)
+				}
+
+				// 创建附件记录
 				attachment := &model.PrimeEmailContentAttachment{
 					EmailID:   emailOne.EmailID,
 					AccountId: account.ID,
 					FileName:  utils.SanitizeUTF8(att.Filename),
 					SizeKb:    att.SizeKB, // 直接使用SizeKB字段
 					MimeType:  utils.SanitizeUTF8(att.MimeType),
-					OssUrl:    "", // 这里可以后续实现OSS上传
+					OssUrl:    utils.SanitizeUTF8(ossURL),
 					CreatedAt: utils.JsonTime{Time: time.Now()},
 				}
 				attachments = append(attachments, attachment)
 			}
+		} else {
+			log.Printf("[邮件内容同步] 邮件没有附件，邮件ID: %d", emailOne.EmailID)
 		}
 
 		// 添加到批量处理列表
@@ -211,19 +293,38 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 		})
 
 		successCount++
-		log.Printf("[邮件内容同步] 邮件 ID: %d 内容获取成功", emailOne.EmailID)
+		log.Printf("[邮件内容同步] 邮件 ID: %d 内容获取成功，耗时: %v，进度: %d/%d",
+			emailOne.EmailID, emailDuration, i+1, len(accountEmails))
+
+		// 检查是否接近超时（如果已经用了90%的时间，提前结束）
+		totalElapsed := time.Since(startTime)
+		if deadline, ok := ctx.Deadline(); ok {
+			remaining := time.Until(deadline)
+			if totalElapsed > remaining-2*time.Minute {
+				log.Printf("[邮件内容同步] 接近超时，提前结束处理，已处理: %d/%d，耗时: %v，剩余时间: %v",
+					i+1, len(accountEmails), totalElapsed, remaining)
+				break
+			}
+		}
 	}
 
 	// 批量保存所有邮件内容和附件
+	totalDuration := time.Since(startTime)
 	if len(allEmailData) > 0 {
+		saveStartTime := time.Now()
 		err := batchSaveEmailContents(allEmailData)
+		saveDuration := time.Since(saveStartTime)
+
 		if err != nil {
 			log.Printf("[邮件内容同步] 批量保存邮件内容失败: %v", err)
 			return 0, fmt.Errorf("批量保存邮件内容失败: %v", err)
 		}
 
-		log.Printf("[邮件内容同步] 账号 %d 批量保存完成: 成功 %d 封，失败 %d 封",
-			account.ID, successCount, failureCount)
+		log.Printf("[邮件内容同步] 账号 %d 批量保存完成: 成功 %d 封，失败 %d 封，总耗时: %v，保存耗时: %v",
+			account.ID, successCount, failureCount, totalDuration, saveDuration)
+	} else {
+		log.Printf("[邮件内容同步] 账号 %d 没有邮件需要保存，总耗时: %v",
+			account.ID, totalDuration)
 	}
 
 	return successCount, nil
@@ -282,9 +383,11 @@ func batchSaveEmailContents(emailDataList []EmailContentData) error {
 			}
 		}
 
-		// 更新邮件状态为已处理
+		// 更新邮件状态：-1（待处理）→ 1（已处理）
 		if err := tx.Model(&model.PrimeEmail{}).Where("email_id = ?", emailData.EmailID).Update("status", 1).Error; err != nil {
-			log.Printf("[批量保存邮件内容] 更新邮件状态失败: EmailID=%d, 错误=%v", emailData.EmailID, err)
+			log.Printf("[批量保存邮件内容] 更新邮件状态失败: EmailID=%d, status: -1 → 1, 错误=%v", emailData.EmailID, err)
+		} else {
+			log.Printf("[批量保存邮件内容] 邮件状态更新成功: EmailID=%d, status: -1 → 1", emailData.EmailID)
 		}
 
 		successCount++

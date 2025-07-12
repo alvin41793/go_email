@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 // UnifiedSyncRequest 统一同步请求
@@ -123,8 +124,13 @@ func UnifiedEmailSync(c *gin.Context) {
 
 				log.Printf("[统一同步] 账号 %d (%s) 协程开始处理 [%d/%d]", account.ID, account.Account, accountIndex, accountCount)
 
-				// 创建超时context
-				timeoutCtx, timeoutCancel := context.WithTimeout(ctx, 15*time.Minute)
+				// 创建超时context，从配置文件读取超时时间
+				timeoutMinutes := viper.GetInt("sync.timeout_minutes")
+				if timeoutMinutes <= 0 {
+					timeoutMinutes = 30 // 默认30分钟
+				}
+				timeoutCtx, timeoutCancel := context.WithTimeout(ctx, time.Duration(timeoutMinutes)*time.Minute)
+				log.Printf("[统一同步] 账号 %d 设置超时时间: %d 分钟", account.ID, timeoutMinutes)
 
 				// 执行统一同步（先列表，后详情）
 				result := syncSingleAccountSequential(account, req, timeoutCtx)

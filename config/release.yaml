@@ -13,6 +13,8 @@ log:
   log_rotate_date: 1
   log_rotate_size: 1
   log_backup_count: 7
+sync:
+  timeout_minutes: 45                          # 邮件同步超时时间（分钟），生产环境设置更长
 db:
   addr: rm-uf65u4z15o9sliy6m6o.mysql.rds.aliyuncs.com
   name: primeai_dev

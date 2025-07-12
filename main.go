@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go_email/api"
 	"go_email/config"
+	"io"
 	stdlog "log"
 	"os"
 	"path/filepath"
@@ -38,10 +39,20 @@ func initStdLog() {
 		return
 	}
 
-	// 设置标准日志输出到文件
-	stdlog.SetOutput(f)
-	stdlog.SetFlags(stdlog.LstdFlags | stdlog.Lshortfile)
-	stdlog.Printf("标准日志已重定向到 %s", logFile)
+	// 根据配置决定是否输出到控制台
+	writers := viper.GetString("log.writers")
+	if writers == "file,stdout" || writers == "stdout,file" {
+		// 双重输出：文件和控制台
+		multiWriter := io.MultiWriter(os.Stdout, f)
+		stdlog.SetOutput(multiWriter)
+		stdlog.SetFlags(stdlog.LstdFlags | stdlog.Lshortfile)
+		stdlog.Printf("标准日志已配置为双重输出：控制台和文件 %s", logFile)
+	} else {
+		// 只输出到文件
+		stdlog.SetOutput(f)
+		stdlog.SetFlags(stdlog.LstdFlags | stdlog.Lshortfile)
+		stdlog.Printf("标准日志已重定向到 %s", logFile)
+	}
 }
 
 func main() {

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# 选择环境菜单
+# 控制台前台运行脚本
+echo "===== 控制台前台运行模式 ====="
 echo "请选择运行环境:"
 echo "1. Debug环境（默认）"
 echo "2. Release环境"
@@ -38,7 +39,7 @@ fi
 # 检查程序是否存在
 if [ ! -f "$app_file" ]; then
     echo "找不到程序文件: $app_file"
-    echo "请先运行 run.sh 编译程序"
+    echo "请先运行 compile.sh 编译程序"
     exit 1
 fi
 
@@ -47,21 +48,8 @@ echo "停止现有程序实例..."
 pkill -f "$app_file" || true
 sleep 1
 
-# 创建日志目录和文件
-mkdir -p log
-log_file="log/${env_name}_$(date +%Y%m%d_%H%M%S).log"
-
-# 启动程序
-echo "启动程序(${env_name}环境)，日志: $log_file"
-read -p "是否在控制台显示日志? [y/N]: " show_console
-show_console=${show_console:-n}
-
-if [[ "$show_console" =~ ^[Yy]$ ]]; then
-    # 在控制台显示日志，同时写入文件
-    echo "程序将在前台运行，按 Ctrl+C 停止"
-    $app_file -env ${env_name} | tee $log_file
-else
-    # 后台运行，所有输出重定向到文件
-    nohup $app_file -env ${env_name} > $log_file 2>&1 &
-    echo "程序已启动，进程ID: $!"
-fi
+# 前台运行程序
+echo "程序将在前台运行，日志会显示在控制台"
+echo "按 Ctrl+C 停止程序"
+echo "=========================="
+exec $app_file -env ${env_name}
