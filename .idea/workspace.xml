@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a282b92f-b990-4f59-8643-e6793cdebe48" name="Changes" comment="" />
+    <list default="true" id="a282b92f-b990-4f59-8643-e6793cdebe48" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/api/unified_sync.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/unified_sync.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

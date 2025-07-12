@@ -15,10 +15,8 @@ import (
 
 // UnifiedSyncRequest 统一同步请求
 type UnifiedSyncRequest struct {
-	SyncLimit   int  `json:"sync_limit"`              // 每个账号同步的邮件数量（列表和详情统一）
-	Node        int  `json:"node" binding:"required"` // 节点编号，用于筛选特定节点的账号（必填）
-	SyncList    bool `json:"sync_list"`               // 是否同步邮件列表
-	SyncContent bool `json:"sync_content"`            // 是否同步邮件内容
+	SyncLimit int `json:"sync_limit"`              // 每个账号同步的邮件数量（列表和详情统一）
+	Node      int `json:"node" binding:"required"` // 节点编号，用于筛选特定节点的账号（必填）
 }
 
 // 统一同步相关的全局变量
@@ -46,10 +44,6 @@ func UnifiedEmailSync(c *gin.Context) {
 	// 设置默认值
 	if req.SyncLimit <= 0 {
 		req.SyncLimit = 30 // 默认每个账号同步30封邮件
-	}
-	if !req.SyncList && !req.SyncContent {
-		req.SyncList = true    // 默认同步列表
-		req.SyncContent = true // 默认同步内容
 	}
 
 	// 使用互斥锁保护并发访问
@@ -234,28 +228,24 @@ func syncSingleAccountSequential(account model.PrimeEmailAccount, req UnifiedSyn
 	}
 
 	// 第一步：同步邮件列表
-	if req.SyncList {
-		log.Printf("[账号同步] 账号 %d - 开始同步邮件列表，数量限制: %d", account.ID, req.SyncLimit)
-		listCount, err := syncAccountEmailList(mailClient, account, req.SyncLimit, ctx)
-		if err != nil {
-			result.Error = fmt.Errorf("同步邮件列表失败: %v", err)
-			return result
-		}
-		result.ListCount = listCount
-		log.Printf("[账号同步] 账号 %d - 邮件列表同步完成，数量: %d", account.ID, listCount)
+	log.Printf("[账号同步] 账号 %d - 开始同步邮件列表，数量限制: %d", account.ID, req.SyncLimit)
+	listCount, err := syncAccountEmailList(mailClient, account, req.SyncLimit, ctx)
+	if err != nil {
+		result.Error = fmt.Errorf("同步邮件列表失败: %v", err)
+		return result
 	}
+	result.ListCount = listCount
+	log.Printf("[账号同步] 账号 %d - 邮件列表同步完成，数量: %d", account.ID, listCount)
 
 	// 第二步：同步邮件详情
-	if req.SyncContent {
-		log.Printf("[账号同步] 账号 %d - 开始同步邮件详情，数量限制: %d", account.ID, req.SyncLimit)
-		contentCount, err := syncAccountEmailContent(account, req.SyncLimit, ctx)
-		if err != nil {
-			result.Error = fmt.Errorf("同步邮件详情失败: %v", err)
-			return result
-		}
-		result.ContentCount = contentCount
-		log.Printf("[账号同步] 账号 %d - 邮件详情同步完成，数量: %d", account.ID, contentCount)
+	log.Printf("[账号同步] 账号 %d - 开始同步邮件详情，数量限制: %d", account.ID, req.SyncLimit)
+	contentCount, err := syncAccountEmailContent(account, req.SyncLimit, ctx)
+	if err != nil {
+		result.Error = fmt.Errorf("同步邮件详情失败: %v", err)
+		return result
 	}
+	result.ContentCount = contentCount
+	log.Printf("[账号同步] 账号 %d - 邮件详情同步完成，数量: %d", account.ID, contentCount)
 
 	log.Printf("[账号同步] 账号 %d (%s) 处理完成 - 列表: %d, 详情: %d",
 		account.ID, account.Account, result.ListCount, result.ContentCount)
