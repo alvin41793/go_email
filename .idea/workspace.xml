@@ -5,7 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a282b92f-b990-4f59-8643-e6793cdebe48" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/corn.sh" beforeDir="false" afterPath="$PROJECT_DIR$/corn.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/handlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/handlers.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/routes.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/routes.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/unified_sync.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/unified_sync.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/debug.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/debug.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/release.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/release.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/utils/goroutine_fix.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/utils/goroutine_fix.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

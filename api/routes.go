@@ -29,9 +29,14 @@ func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		// 系统状态相关路由
 		system := v1.Group("/system")
 		{
-
 			// 获取协程统计信息
 			system.GET("/goroutine-stats", GetGoroutineStats)
+			// 获取详细的协程统计信息
+			system.GET("/goroutine-stats/detailed", GetDetailedGoroutineStats)
+			// 协程监控端点，用于健康检查
+			system.GET("/goroutine-monitor", MonitorGoroutines)
+			// 强制清理协程
+			system.POST("/goroutines/cleanup", ForceCleanupGoroutines)
 			// 清理卡死账号状态
 			system.POST("/cleanup-stuck-accounts", CleanupStuckAccounts)
 		}

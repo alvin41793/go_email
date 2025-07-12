@@ -33,13 +33,50 @@ func DB() *gorm.DB {
 			panic(err)
 		}
 
-		sqlDB.SetMaxIdleConns(100)
-		sqlDB.SetConnMaxLifetime(30 * time.Minute) // 修复：从2秒改为30分钟
-		sqlDB.SetMaxOpenConns(200)
+		// 优化数据库连接池配置
+		configureConnectionPool(sqlDB)
 
 		db = newDb
 	}
 	return db
+}
+
+// configureConnectionPool 配置数据库连接池
+func configureConnectionPool(sqlDB interface {
+	SetMaxIdleConns(n int)
+	SetMaxOpenConns(n int)
+	SetConnMaxLifetime(d time.Duration)
+	SetConnMaxIdleTime(d time.Duration)
+}) {
+	// 根据配置文件读取连接池参数，如果没有配置则使用默认值
+	maxIdleConns := viper.GetInt("db.max_idle_conns")
+	if maxIdleConns <= 0 {
+		maxIdleConns = 50 // 降低空闲连接数，避免过多连接占用资源
+	}
+
+	maxOpenConns := viper.GetInt("db.max_open_conns")
+	if maxOpenConns <= 0 {
+		maxOpenConns = 100 // 降低最大连接数，适应协程数量限制
+	}
+
+	connMaxLifetime := viper.GetDuration("db.conn_max_lifetime")
+	if connMaxLifetime <= 0 {
+		connMaxLifetime = 30 * time.Minute // 连接最大生命周期
+	}
+
+	connMaxIdleTime := viper.GetDuration("db.conn_max_idle_time")
+	if connMaxIdleTime <= 0 {
+		connMaxIdleTime = 10 * time.Minute // 连接最大空闲时间
+	}
+
+	// 设置连接池参数
+	sqlDB.SetMaxIdleConns(maxIdleConns)
+	sqlDB.SetMaxOpenConns(maxOpenConns)
+	sqlDB.SetConnMaxLifetime(connMaxLifetime)
+	sqlDB.SetConnMaxIdleTime(connMaxIdleTime)
+
+	fmt.Printf("[数据库] 连接池配置: MaxIdle=%d, MaxOpen=%d, MaxLifetime=%v, MaxIdleTime=%v\n",
+		maxIdleConns, maxOpenConns, connMaxLifetime, connMaxIdleTime)
 }
 
 func newDB() (*gorm.DB, error) {

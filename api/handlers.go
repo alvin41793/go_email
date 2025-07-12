@@ -8,9 +8,11 @@ import (
 	"go_email/pkg/utils"
 	"go_email/pkg/utils/oss"
 	"log"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -1037,7 +1039,164 @@ func GetForwardOriginalEmail(c *gin.Context) {
 // GetGoroutineStats 获取协程统计信息
 func GetGoroutineStats(c *gin.Context) {
 	stats := utils.GlobalSafeGoroutineManager.GetGoroutineStats()
-	utils.SendResponse(c, nil, stats)
+
+	// 添加当前邮件同步协程数
+	stats.UnifiedSyncGoroutines = atomic.LoadInt32(&currentUnifiedSyncs)
+
+	// 检查是否有异常情况
+	warnings := make([]string, 0)
+
+	if stats.SystemGoroutines > 300 {
+		warnings = append(warnings, fmt.Sprintf("系统协程数过多: %d", stats.SystemGoroutines))
+	}
+
+	if stats.ManagedGoroutines > stats.MaxGoroutines*80/100 {
+		warnings = append(warnings, fmt.Sprintf("管理协程数接近上限: %d/%d", stats.ManagedGoroutines, stats.MaxGoroutines))
+	}
+
+	if len(stats.LongRunning) > 5 {
+		warnings = append(warnings, fmt.Sprintf("长时间运行协程过多: %d", len(stats.LongRunning)))
+	}
+
+	// 检查邮件同步协程是否卡死
+	if stats.UnifiedSyncGoroutines > maxUnifiedSyncs*80/100 {
+		warnings = append(warnings, fmt.Sprintf("邮件同步协程数接近上限: %d/%d", stats.UnifiedSyncGoroutines, maxUnifiedSyncs))
+	}
+
+	// 添加警告信息
+	response := map[string]interface{}{
+		"stats":    stats,
+		"warnings": warnings,
+		"status":   "healthy",
+	}
+
+	if len(warnings) > 0 {
+		response["status"] = "warning"
+	}
+
+	if stats.SystemGoroutines > 500 || stats.ManagedGoroutines >= stats.MaxGoroutines {
+		response["status"] = "critical"
+	}
+
+	utils.SendResponse(c, nil, response)
+}
+
+// GetDetailedGoroutineStats 获取详细的协程统计信息
+func GetDetailedGoroutineStats(c *gin.Context) {
+	stats := utils.GlobalSafeGoroutineManager.GetGoroutineStats()
+
+	// 获取更详细的信息
+	detailedStats := map[string]interface{}{
+		"basic_stats": stats,
+		"memory_stats": map[string]interface{}{
+			"alloc":      getMemoryUsage(),
+			"goroutines": runtime.NumGoroutine(),
+		},
+		"sync_stats": map[string]interface{}{
+			"unified_sync_goroutines": atomic.LoadInt32(&currentUnifiedSyncs),
+			"max_unified_syncs":       maxUnifiedSyncs,
+			"usage_percentage":        float64(atomic.LoadInt32(&currentUnifiedSyncs)) / float64(maxUnifiedSyncs) * 100,
+		},
+	}
+
+	utils.SendResponse(c, nil, detailedStats)
+}
+
+// getMemoryUsage 获取内存使用情况
+func getMemoryUsage() map[string]interface{} {
+	var m runtime.MemStats
+	runtime.GC() // 强制GC以获得更准确的内存统计
+	runtime.ReadMemStats(&m)
+
+	return map[string]interface{}{
+		"alloc_mb":       float64(m.Alloc) / 1024 / 1024,
+		"total_alloc_mb": float64(m.TotalAlloc) / 1024 / 1024,
+		"sys_mb":         float64(m.Sys) / 1024 / 1024,
+		"num_gc":         m.NumGC,
+		"heap_objects":   m.HeapObjects,
+	}
+}
+
+// MonitorGoroutines 协程监控端点，用于健康检查
+func MonitorGoroutines(c *gin.Context) {
+	stats := utils.GlobalSafeGoroutineManager.GetGoroutineStats()
+
+	status := "healthy"
+	issues := make([]string, 0)
+
+	// 检查各种异常情况
+	if stats.SystemGoroutines > 500 {
+		status = "critical"
+		issues = append(issues, "系统协程数过多")
+	} else if stats.SystemGoroutines > 300 {
+		status = "warning"
+		issues = append(issues, "系统协程数较高")
+	}
+
+	if stats.ManagedGoroutines >= stats.MaxGoroutines {
+		status = "critical"
+		issues = append(issues, "管理协程数达到上限")
+	} else if stats.ManagedGoroutines > stats.MaxGoroutines*80/100 {
+		if status != "critical" {
+			status = "warning"
+		}
+		issues = append(issues, "管理协程数接近上限")
+	}
+
+	if len(stats.LongRunning) > 10 {
+		status = "critical"
+		issues = append(issues, "长时间运行协程过多")
+	} else if len(stats.LongRunning) > 5 {
+		if status != "critical" {
+			status = "warning"
+		}
+		issues = append(issues, "长时间运行协程较多")
+	}
+
+	// 设置HTTP状态码
+	var httpStatus int
+	switch status {
+	case "healthy":
+		httpStatus = 200
+	case "warning":
+		httpStatus = 200 // 警告仍然返回200
+	case "critical":
+		httpStatus = 503 // 严重问题返回503
+	default:
+		httpStatus = 200
+	}
+
+	response := map[string]interface{}{
+		"status":    status,
+		"issues":    issues,
+		"stats":     stats,
+		"timestamp": time.Now(),
+	}
+
+	c.JSON(httpStatus, response)
+}
+
+// ForceCleanupGoroutines 强制清理协程
+func ForceCleanupGoroutines(c *gin.Context) {
+	// 获取超时参数，默认30分钟
+	timeoutMinutes := 30
+	if timeoutStr := c.Query("timeout_minutes"); timeoutStr != "" {
+		if t, err := strconv.Atoi(timeoutStr); err == nil && t > 0 {
+			timeoutMinutes = t
+		}
+	}
+
+	timeout := time.Duration(timeoutMinutes) * time.Minute
+	cleanedCount := utils.GlobalSafeGoroutineManager.CleanupTimeoutGoroutines(timeout)
+
+	message := fmt.Sprintf("强制清理了 %d 个超时协程（超过 %d 分钟）", cleanedCount, timeoutMinutes)
+	log.Printf("[协程管理] %s", message)
+
+	utils.SendResponse(c, nil, map[string]interface{}{
+		"message":         message,
+		"cleaned_count":   cleanedCount,
+		"timeout_minutes": timeoutMinutes,
+	})
 }
 
 func ListEmailsByUid(c *gin.Context) {

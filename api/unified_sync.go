@@ -96,110 +96,227 @@ func UnifiedEmailSync(c *gin.Context) {
 	// 创建完全独立的context，不受HTTP请求影响
 	independentCtx := context.Background()
 
-	// 启动完全独立的后台处理协程
-	go func() {
-		// 使用独立的context，不通过SafeGoroutineManager
-		defer func() {
-			if r := recover(); r != nil {
-				log.Printf("[统一同步] 后台处理发生panic: %v", r)
+	// 获取超时时间
+	timeoutMinutes := viper.GetInt("sync.timeout_minutes")
+	if timeoutMinutes <= 0 {
+		timeoutMinutes = 25 // 默认25分钟
+	}
+
+	// 启动完全独立的后台处理协程，使用SafeGoroutineManager
+	// 使用更长的超时时间确保不会过早取消
+	parentTimeout := time.Duration(timeoutMinutes+15) * time.Minute // 增加15分钟缓冲
+	log.Printf("[统一同步] 启动主协程，超时时间: %v", parentTimeout)
+	err = utils.GlobalSafeGoroutineManager.StartSafeGoroutineWithTimeout(
+		independentCtx,
+		fmt.Sprintf("unified-sync-node-%d", req.Node),
+		parentTimeout,
+		func(ctx context.Context) {
+			log.Printf("[统一同步] 启动独立的后台处理协程，节点: %d", req.Node)
+
+			// 创建带缓冲的结果通道，防止阻塞
+			results := make(chan UnifiedSyncResult, accountCount+10) // 增加缓冲
+
+			// 创建安全的WaitGroup
+			type SafeWaitGroup struct {
+				wg sync.WaitGroup
+				mu sync.Mutex
 			}
-		}()
 
-		log.Printf("[统一同步] 启动独立的后台处理协程，节点: %d", req.Node)
+			swg := &SafeWaitGroup{}
 
-		// 创建结果通道
-		results := make(chan UnifiedSyncResult, accountCount)
+			// 为每个账号启动一个协程
+			for i, account := range filteredAccounts {
+				accountIndex := i + 1
 
-		// 启动工作池
-		var wg sync.WaitGroup
-		// 为每个账号启动一个协程
-		for i, account := range filteredAccounts {
-			wg.Add(1)
-			accountIndex := i + 1
+				// 使用SafeGoroutineManager启动协程
+				childTimeout := time.Duration(timeoutMinutes) * time.Minute
+				log.Printf("[统一同步] 准备启动账号 %d 协程，超时时间: %v", account.ID, childTimeout)
+				err := utils.GlobalSafeGoroutineManager.StartSafeGoroutineWithTimeout(
+					independentCtx, // 使用独立的context，避免父context取消影响子协程
+					fmt.Sprintf("account-sync-%d", account.ID),
+					childTimeout,
+					func(accCtx context.Context) {
+						swg.mu.Lock()
+						swg.wg.Add(1)
+						swg.mu.Unlock()
 
-			// 启动独立的协程处理每个账号
-			go func(acc model.PrimeEmailAccount, accIndex int) {
-				defer wg.Done()
-				defer func() {
-					// 完成时减少全局计数
+						defer func() {
+							// 完成时减少全局计数
+							atomic.AddInt32(&currentUnifiedSyncs, -1)
+							log.Printf("[统一同步] 账号 %d 协程完成，剩余全局协程数: %d",
+								account.ID, atomic.LoadInt32(&currentUnifiedSyncs))
+
+							// 安全地调用Done
+							swg.mu.Lock()
+							swg.wg.Done()
+							swg.mu.Unlock()
+						}()
+
+						log.Printf("[统一同步] 账号 %d (%s) 协程开始处理 [%d/%d]", account.ID, account.Account, accountIndex, accountCount)
+
+						// 检查context状态
+						select {
+						case <-accCtx.Done():
+							log.Printf("[统一同步] 账号 %d 协程启动时context已取消: %v", account.ID, accCtx.Err())
+							// 即使context被取消也要更新状态
+							if updateErr := model.ResetSyncTimeOnFailure(account.ID); updateErr != nil {
+								log.Printf("[统一同步] 重置账号 %d 状态失败: %v", account.ID, updateErr)
+							}
+							return
+						default:
+							// context正常，继续处理
+							log.Printf("[统一同步] 账号 %d 协程context状态正常，开始处理", account.ID)
+						}
+
+						// 执行统一同步（先列表，后详情）
+						result := syncSingleAccountSequential(account, req, accCtx)
+
+						// 根据处理结果更新账号状态
+						if result.Error != nil {
+							// 处理失败，重置同步时间
+							if updateErr := model.ResetSyncTimeOnFailure(account.ID); updateErr != nil {
+								log.Printf("[统一同步] 重置账号 %d 状态失败: %v", account.ID, updateErr)
+							} else {
+								log.Printf("[统一同步] 账号 %d 处理失败，已重置状态", account.ID)
+							}
+						} else {
+							// 处理成功，更新为完成时间
+							if updateErr := model.UpdateLastSyncTimeOnComplete(account.ID); updateErr != nil {
+								log.Printf("[统一同步] 更新账号 %d 完成状态失败: %v", account.ID, updateErr)
+							} else {
+								log.Printf("[统一同步] 账号 %d 处理完成，已更新状态", account.ID)
+							}
+						}
+
+						// 安全发送结果，防止阻塞和向已关闭通道发送
+						func() {
+							defer func() {
+								if r := recover(); r != nil {
+									log.Printf("[统一同步] 账号 %d 发送结果时发生panic: %v", account.ID, r)
+									// 即使发送失败也不影响程序运行
+								}
+							}()
+
+							// 尝试发送结果，如果失败也不要阻塞
+							select {
+							case results <- result:
+								// 成功发送
+								log.Printf("[统一同步] 账号 %d 结果发送成功", account.ID)
+							case <-accCtx.Done():
+								// 超时或取消
+								log.Printf("[统一同步] 账号 %d 结果发送被取消: %v", account.ID, accCtx.Err())
+							case <-time.After(5 * time.Second):
+								// 发送超时，不等太久
+								log.Printf("[统一同步] 账号 %d 结果发送超时，跳过发送", account.ID)
+							}
+						}()
+
+						log.Printf("[统一同步] 账号 %d (%s) 协程处理完成", account.ID, account.Account)
+					},
+				)
+
+				if err != nil {
+					log.Printf("[统一同步] 启动账号 %d 协程失败: %v", account.ID, err)
+					// 启动失败时减少计数
 					atomic.AddInt32(&currentUnifiedSyncs, -1)
-					log.Printf("[统一同步] 账号 %d 协程完成，剩余全局协程数: %d",
-						acc.ID, atomic.LoadInt32(&currentUnifiedSyncs))
-
-					// 捕获panic
-					if r := recover(); r != nil {
-						log.Printf("[统一同步] 账号 %d 协程发生panic: %v", acc.ID, r)
-					}
-				}()
-
-				log.Printf("[统一同步] 账号 %d (%s) 协程开始处理 [%d/%d]", acc.ID, acc.Account, accIndex, accountCount)
-
-				// 创建超时context，从配置文件读取超时时间
-				timeoutMinutes := viper.GetInt("sync.timeout_minutes")
-				if timeoutMinutes <= 0 {
-					timeoutMinutes = 45 // 默认45分钟
-				}
-				timeoutCtx, timeoutCancel := context.WithTimeout(independentCtx, time.Duration(timeoutMinutes)*time.Minute)
-				defer timeoutCancel() // 确保context被清理
-
-				log.Printf("[统一同步] 账号 %d 设置超时时间: %d 分钟", acc.ID, timeoutMinutes)
-
-				// 执行统一同步（先列表，后详情）
-				result := syncSingleAccountSequential(acc, req, timeoutCtx)
-
-				// 根据处理结果更新账号状态
-				if result.Error != nil {
-					// 处理失败，重置同步时间
-					if updateErr := model.ResetSyncTimeOnFailure(acc.ID); updateErr != nil {
-						log.Printf("[统一同步] 重置账号 %d 状态失败: %v", acc.ID, updateErr)
-					} else {
-						log.Printf("[统一同步] 账号 %d 处理失败，已重置状态", acc.ID)
-					}
-				} else {
-					// 处理成功，更新为完成时间
-					if updateErr := model.UpdateLastSyncTimeOnComplete(acc.ID); updateErr != nil {
-						log.Printf("[统一同步] 更新账号 %d 完成状态失败: %v", acc.ID, updateErr)
-					} else {
-						log.Printf("[统一同步] 账号 %d 处理完成，已更新状态", acc.ID)
-					}
-				}
-
-				results <- result
-				log.Printf("[统一同步] 账号 %d (%s) 协程处理完成", acc.ID, acc.Account)
-			}(account, accountIndex)
-		}
-
-		// 启动结果收集协程
-		go func() {
-			defer func() {
-				if r := recover(); r != nil {
-					log.Printf("[统一同步] 结果收集发生panic: %v", r)
-				}
-			}()
-
-			// 等待所有协程完成
-			wg.Wait()
-			close(results)
-
-			// 统计结果
-			var successCount, failureCount int
-			totalListCount, totalContentCount := 0, 0
-
-			for result := range results {
-				if result.Error != nil {
-					failureCount++
-					log.Printf("[统一同步] 账号 %d 处理失败: %v", result.AccountID, result.Error)
-				} else {
-					successCount++
-					totalListCount += result.ListCount
-					totalContentCount += result.ContentCount
 				}
 			}
 
-			log.Printf("[统一同步] 节点 %d 处理完成 - 成功: %d, 失败: %d, 总邮件列表: %d, 总邮件内容: %d",
-				req.Node, successCount, failureCount, totalListCount, totalContentCount)
-		}()
-	}()
+			// 启动结果收集协程
+			collectorTimeout := time.Duration(timeoutMinutes+20) * time.Minute // 给结果收集更多时间
+			log.Printf("[统一同步] 启动结果收集协程，超时时间: %v", collectorTimeout)
+			err := utils.GlobalSafeGoroutineManager.StartSafeGoroutineWithTimeout(
+				independentCtx, // 使用独立的context
+				fmt.Sprintf("result-collector-node-%d", req.Node),
+				collectorTimeout,
+				func(collectorCtx context.Context) {
+					// 收集结果的计数器
+					var successCount, failureCount int
+					totalListCount, totalContentCount := 0, 0
+					processedCount := 0
+
+					// 等待所有协程完成或超时
+					waitDone := make(chan struct{})
+					go func() {
+						swg.wg.Wait()
+						close(waitDone)
+					}()
+
+					// 在单独的协程中收集结果
+					go func() {
+						defer func() {
+							if r := recover(); r != nil {
+								log.Printf("[统一同步] 结果收集协程panic: %v", r)
+							}
+						}()
+
+						for {
+							select {
+							case result, ok := <-results:
+								if !ok {
+									// 通道已关闭
+									return
+								}
+								processedCount++
+								if result.Error != nil {
+									failureCount++
+									log.Printf("[统一同步] 账号 %d 处理失败: %v", result.AccountID, result.Error)
+								} else {
+									successCount++
+									totalListCount += result.ListCount
+									totalContentCount += result.ContentCount
+								}
+							case <-collectorCtx.Done():
+								log.Printf("[统一同步] 结果收集被取消: %v", collectorCtx.Err())
+								return
+							}
+						}
+					}()
+
+					// 等待所有协程完成，给足够的时间
+					maxWaitTime := time.Duration(timeoutMinutes+5) * time.Minute
+					log.Printf("[统一同步] 等待所有账号协程完成，最大等待时间: %v", maxWaitTime)
+
+					select {
+					case <-waitDone:
+						log.Printf("[统一同步] 所有账号协程正常完成")
+					case <-collectorCtx.Done():
+						log.Printf("[统一同步] 结果收集被取消: %v", collectorCtx.Err())
+					case <-time.After(maxWaitTime):
+						log.Printf("[统一同步] 等待协程完成超时，强制结束")
+					}
+
+					log.Printf("[统一同步] 准备关闭results通道")
+					// 关闭通道（在所有协程完成后）
+					close(results)
+					log.Printf("[统一同步] results通道已关闭")
+
+					// 给结果收集一点时间
+					time.Sleep(time.Second * 2)
+
+					log.Printf("[统一同步] 节点 %d 处理完成 - 成功: %d, 失败: %d, 总邮件列表: %d, 总邮件内容: %d, 收集到结果: %d",
+						req.Node, successCount, failureCount, totalListCount, totalContentCount, processedCount)
+				},
+			)
+
+			if err != nil {
+				log.Printf("[统一同步] 启动结果收集协程失败: %v", err)
+			}
+		},
+	)
+
+	if err != nil {
+		log.Printf("[统一同步] 启动后台处理协程失败: %v", err)
+		// 启动失败时重置所有计数
+		atomic.AddInt32(&currentUnifiedSyncs, -int32(accountCount))
+
+		// 重置账号状态
+		for _, account := range filteredAccounts {
+			if resetErr := model.ResetSyncTimeOnFailure(account.ID); resetErr != nil {
+				log.Printf("[统一同步] 重置账号 %d 状态失败: %v", account.ID, resetErr)
+			}
+		}
+	}
 }
 
 // UnifiedSyncResult 统一同步结果
