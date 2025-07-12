@@ -34,7 +34,7 @@ func DB() *gorm.DB {
 		}
 
 		sqlDB.SetMaxIdleConns(100)
-		sqlDB.SetConnMaxLifetime(2 * time.Second)
+		sqlDB.SetConnMaxLifetime(30 * time.Minute) // 修复：从2秒改为30分钟
 		sqlDB.SetMaxOpenConns(200)
 
 		db = newDb

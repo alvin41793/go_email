@@ -190,8 +190,8 @@ func (m *MailClient) tryListEmails(folder string, limit int, fromUID ...uint32) 
 	state := c.State()
 	log.Printf("[邮件列表] 连接状态: %v, 文件夹: %s", state, folder)
 
-	// 确保连接处于正确的状态 (Auth=2 或 Selected=3)
-	if state != 2 && state != 3 {
+	// 确保连接处于正确的状态 (Auth=2 或 Selected=6)
+	if state != 2 && state != 6 {
 		return nil, fmt.Errorf("连接状态异常: %v，需要重新建立连接", state)
 	}
 
@@ -331,8 +331,8 @@ func (m *MailClient) tryListEmailsFromUID(folder string, limit int, lastUID uint
 	state := c.State()
 	log.Printf("[邮件列表] 连接状态: %v, 文件夹: %s, lastUID: %d", state, folder, lastUID)
 
-	// 确保连接处于正确的状态 (Auth=2 或 Selected=3)
-	if state != 2 && state != 3 {
+	// 确保连接处于正确的状态 (Auth=2 或 Selected=6)
+	if state != 2 && state != 6 {
 		return nil, fmt.Errorf("连接状态异常: %v，需要重新建立连接", state)
 	}
 
@@ -504,8 +504,8 @@ func (m *MailClient) tryGetEmailContent(uid uint32, folder string) (*Email, erro
 	state := c.State()
 	log.Printf("[邮件获取] 连接状态: %v, UID: %d", state, uid)
 
-	// 确保连接处于正确的状态 (Auth=2 或 Selected=3)
-	if state != 2 && state != 3 {
+	// 确保连接处于正确的状态 (Auth=2 或 Selected=6)
+	if state != 2 && state != 6 {
 		return nil, fmt.Errorf("连接状态异常: %v，需要重新建立连接", state)
 	}
 
@@ -969,8 +969,8 @@ func (m *MailClient) tryGetAttachment(uid uint32, filename string, folder string
 	state := c.State()
 	log.Printf("[附件获取] 连接状态: %v, UID: %d, 文件: %s", state, uid, filename)
 
-	// 确保连接处于正确的状态 (Auth=2 或 Selected=3)
-	if state != 2 && state != 3 {
+	// 确保连接处于正确的状态 (Auth=2 或 Selected=6)
+	if state != 2 && state != 6 {
 		return nil, "", fmt.Errorf("连接状态异常: %v，需要重新建立连接", state)
 	}
 
@@ -1371,8 +1371,8 @@ func (m *MailClient) tryForwardOriginalEmail(uid uint32, sourceFolder string, to
 	state := c.State()
 	log.Printf("[邮件转发] 连接状态: %v, UID: %d", state, uid)
 
-	// 确保连接处于正确的状态 (Auth=2 或 Selected=3)
-	if state != 2 && state != 3 {
+	// 确保连接处于正确的状态 (Auth=2 或 Selected=6)
+	if state != 2 && state != 6 {
 		return fmt.Errorf("连接状态异常: %v，需要重新建立连接", state)
 	}
 

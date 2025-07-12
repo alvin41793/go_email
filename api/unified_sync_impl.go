@@ -138,7 +138,7 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 	if hasDeadline {
 		// 提前2分钟结束，避免真正超时
 		safeTimeLimit = deadline.Add(-2 * time.Minute)
-		log.Printf("账号 %d - 检测到超时deadline: %v，安全时限: %v", account.ID, deadline, safeTimeLimit)
+		log.Printf("账号 %d - 启用智能超时保护，超时时限: %v，安全时限: %v", account.ID, deadline, safeTimeLimit)
 	}
 
 	// 存储所有邮件内容和附件，以便后续批量存储

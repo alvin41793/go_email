@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a282b92f-b990-4f59-8643-e6793cdebe48" name="Changes" comment="" />
+    <list default="true" id="a282b92f-b990-4f59-8643-e6793cdebe48" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/unified_sync.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/unified_sync.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/unified_sync_impl.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/unified_sync_impl.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/db.go" beforeDir="false" afterPath="$PROJECT_DIR$/db/db.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pkg/mailclient/mailcontent.go" beforeDir="false" afterPath="$PROJECT_DIR$/pkg/mailclient/mailcontent.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

@@ -90,85 +90,87 @@ func UnifiedEmailSync(c *gin.Context) {
 	responseMsg := fmt.Sprintf("正在统一同步节点 %d 的 %d 个邮箱账号，每个账号创建一个协程，同步 %d 封邮件，当前全局协程数: %d",
 		req.Node, accountCount, req.SyncLimit, atomic.LoadInt32(&currentUnifiedSyncs))
 
-	// 返回正在处理的信息
+	// 立即返回响应，避免HTTP请求context影响后续处理
 	utils.SendResponse(c, nil, responseMsg)
 
-	// 创建结果通道
-	results := make(chan UnifiedSyncResult, accountCount)
+	// 创建完全独立的context，不受HTTP请求影响
+	independentCtx := context.Background()
 
-	// 启动工作池
-	var wg sync.WaitGroup
+	// 启动完全独立的后台处理协程
+	go func() {
+		// 使用独立的context，不通过SafeGoroutineManager
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("[统一同步] 后台处理发生panic: %v", r)
+			}
+		}()
 
-	// 使用安全协程管理器启动后台处理
-	syncCtx := context.Background()
+		log.Printf("[统一同步] 启动独立的后台处理协程，节点: %d", req.Node)
 
-	syncErr := utils.GlobalSafeGoroutineManager.StartSafeGoroutine(syncCtx, "unified-sync-batch", func(ctx context.Context) {
+		// 创建结果通道
+		results := make(chan UnifiedSyncResult, accountCount)
+
+		// 启动工作池
+		var wg sync.WaitGroup
 		// 为每个账号启动一个协程
 		for i, account := range filteredAccounts {
 			wg.Add(1)
 			accountIndex := i + 1
 
-			accountErr := utils.GlobalSafeGoroutineManager.StartSafeGoroutine(ctx, fmt.Sprintf("unified-sync-account-%d", account.ID), func(ctx context.Context) {
+			// 启动独立的协程处理每个账号
+			go func(acc model.PrimeEmailAccount, accIndex int) {
 				defer wg.Done()
 				defer func() {
 					// 完成时减少全局计数
 					atomic.AddInt32(&currentUnifiedSyncs, -1)
 					log.Printf("[统一同步] 账号 %d 协程完成，剩余全局协程数: %d",
-						account.ID, atomic.LoadInt32(&currentUnifiedSyncs))
+						acc.ID, atomic.LoadInt32(&currentUnifiedSyncs))
 
 					// 捕获panic
 					if r := recover(); r != nil {
-						log.Printf("[统一同步] 账号 %d 协程发生panic: %v", account.ID, r)
+						log.Printf("[统一同步] 账号 %d 协程发生panic: %v", acc.ID, r)
 					}
 				}()
 
-				log.Printf("[统一同步] 账号 %d (%s) 协程开始处理 [%d/%d]", account.ID, account.Account, accountIndex, accountCount)
+				log.Printf("[统一同步] 账号 %d (%s) 协程开始处理 [%d/%d]", acc.ID, acc.Account, accIndex, accountCount)
 
 				// 创建超时context，从配置文件读取超时时间
 				timeoutMinutes := viper.GetInt("sync.timeout_minutes")
 				if timeoutMinutes <= 0 {
-					timeoutMinutes = 30 // 默认30分钟
+					timeoutMinutes = 45 // 默认45分钟
 				}
-				timeoutCtx, timeoutCancel := context.WithTimeout(ctx, time.Duration(timeoutMinutes)*time.Minute)
-				log.Printf("[统一同步] 账号 %d 设置超时时间: %d 分钟", account.ID, timeoutMinutes)
+				timeoutCtx, timeoutCancel := context.WithTimeout(independentCtx, time.Duration(timeoutMinutes)*time.Minute)
+				defer timeoutCancel() // 确保context被清理
+
+				log.Printf("[统一同步] 账号 %d 设置超时时间: %d 分钟", acc.ID, timeoutMinutes)
 
 				// 执行统一同步（先列表，后详情）
-				result := syncSingleAccountSequential(account, req, timeoutCtx)
-
-				// 清理超时context
-				timeoutCancel()
+				result := syncSingleAccountSequential(acc, req, timeoutCtx)
 
 				// 根据处理结果更新账号状态
 				if result.Error != nil {
 					// 处理失败，重置同步时间
-					if updateErr := model.ResetSyncTimeOnFailure(account.ID); updateErr != nil {
-						log.Printf("[统一同步] 重置账号 %d 状态失败: %v", account.ID, updateErr)
+					if updateErr := model.ResetSyncTimeOnFailure(acc.ID); updateErr != nil {
+						log.Printf("[统一同步] 重置账号 %d 状态失败: %v", acc.ID, updateErr)
 					} else {
-						log.Printf("[统一同步] 账号 %d 处理失败，已重置状态", account.ID)
+						log.Printf("[统一同步] 账号 %d 处理失败，已重置状态", acc.ID)
 					}
 				} else {
 					// 处理成功，更新为完成时间
-					if updateErr := model.UpdateLastSyncTimeOnComplete(account.ID); updateErr != nil {
-						log.Printf("[统一同步] 更新账号 %d 完成状态失败: %v", account.ID, updateErr)
+					if updateErr := model.UpdateLastSyncTimeOnComplete(acc.ID); updateErr != nil {
+						log.Printf("[统一同步] 更新账号 %d 完成状态失败: %v", acc.ID, updateErr)
 					} else {
-						log.Printf("[统一同步] 账号 %d 处理完成，已更新状态", account.ID)
+						log.Printf("[统一同步] 账号 %d 处理完成，已更新状态", acc.ID)
 					}
 				}
 
 				results <- result
-				log.Printf("[统一同步] 账号 %d (%s) 协程处理完成", account.ID, account.Account)
-			})
-
-			if accountErr != nil {
-				log.Printf("[统一同步] 创建账号 %d 协程失败: %v", account.ID, accountErr)
-				wg.Done()
-				atomic.AddInt32(&currentUnifiedSyncs, -1)
-				continue
-			}
+				log.Printf("[统一同步] 账号 %d (%s) 协程处理完成", acc.ID, acc.Account)
+			}(account, accountIndex)
 		}
 
-		// 收集结果
-		resultErr := utils.GlobalSafeGoroutineManager.StartSafeGoroutine(ctx, "unified-sync-results", func(ctx context.Context) {
+		// 启动结果收集协程
+		go func() {
 			defer func() {
 				if r := recover(); r != nil {
 					log.Printf("[统一同步] 结果收集发生panic: %v", r)
@@ -196,18 +198,8 @@ func UnifiedEmailSync(c *gin.Context) {
 
 			log.Printf("[统一同步] 节点 %d 处理完成 - 成功: %d, 失败: %d, 总邮件列表: %d, 总邮件内容: %d",
 				req.Node, successCount, failureCount, totalListCount, totalContentCount)
-		})
-
-		if resultErr != nil {
-			log.Printf("[统一同步] 创建结果收集协程失败: %v", resultErr)
-		}
-	})
-
-	if syncErr != nil {
-		log.Printf("[统一同步] 创建批处理协程失败: %v", syncErr)
-		// 重置协程计数
-		atomic.AddInt32(&currentUnifiedSyncs, -int32(accountCount))
-	}
+		}()
+	}()
 }
 
 // UnifiedSyncResult 统一同步结果
