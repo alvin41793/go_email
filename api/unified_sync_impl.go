@@ -184,7 +184,7 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 
 			// 如果有已处理的邮件，先保存它们（这些邮件的status会变成1）
 			if len(allEmailData) > 0 {
-				log.Printf("[邮件内容同步] 尝试保存已处理的 %d 封邮件（status: -1 → 1）", len(allEmailData))
+				log.Printf("[邮件内容同步] 尝试保存已处理的 %d 封邮件（status: 0 → 1）", len(allEmailData))
 				if saveErr := batchSaveEmailContents(allEmailData); saveErr != nil {
 					log.Printf("[邮件内容同步] 保存已处理邮件失败: %v", saveErr)
 				} else {
@@ -193,9 +193,26 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 				}
 			}
 
-			// 未处理的邮件保持status=-1，下次同步时会被重新处理
+			// 重置未处理邮件的状态：从0（处理中）回到-1（待处理），下次同步时会被重新处理
 			if remainingEmails > 0 {
-				log.Printf("[邮件内容同步] %d 封邮件未处理，状态保持为-1，等待下次同步", remainingEmails)
+				log.Printf("[邮件内容同步] 开始重置 %d 封未处理邮件的状态（status: 0 → -1）", remainingEmails)
+				var resetEmailIDs []int
+				for j := i; j < len(accountEmails); j++ {
+					resetEmailIDs = append(resetEmailIDs, accountEmails[j].EmailID)
+				}
+
+				// 批量重置状态
+				if len(resetEmailIDs) > 0 {
+					resetCount := 0
+					for _, emailID := range resetEmailIDs {
+						if resetErr := resetEmailStatus(emailID, -1); resetErr != nil {
+							log.Printf("[邮件内容同步] 重置邮件状态失败，邮件ID: %d, 错误: %v", emailID, resetErr)
+						} else {
+							resetCount++
+						}
+					}
+					log.Printf("[邮件内容同步] 成功重置 %d/%d 封邮件状态为-1，等待下次同步", resetCount, len(resetEmailIDs))
+				}
 			}
 
 			log.Printf("[邮件内容同步] 超时处理完成，账号 %d 的processing_status将被重置为0", account.ID)
@@ -216,8 +233,42 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 			log.Printf("[邮件内容同步] 获取邮件内容失败，邮件ID: %d, 耗时: %v, 错误: %v", emailOne.EmailID, emailDuration, err)
 			failureCount++
 
-			// 设置邮件状态为失败
-			resetErr := resetEmailStatus(emailOne.EmailID, -2)
+			// 根据错误类型决定状态：
+			// - 网络/连接错误 → -1（重新处理）
+			// - 其他错误 → -2（永久失败）
+			var newStatus int
+			errStr := strings.ToLower(err.Error())
+
+			// 检查是否是临时性的网络/连接错误
+			isTemporaryError := strings.Contains(errStr, "timeout") ||
+				strings.Contains(errStr, "connection") ||
+				strings.Contains(errStr, "network") ||
+				strings.Contains(errStr, "read tcp") ||
+				strings.Contains(errStr, "write tcp") ||
+				strings.Contains(errStr, "broken pipe") ||
+				strings.Contains(errStr, "connection reset") ||
+				strings.Contains(errStr, "i/o timeout") ||
+				strings.Contains(errStr, "operation timed out") ||
+				strings.Contains(errStr, "context deadline exceeded") ||
+				strings.Contains(errStr, "context canceled") ||
+				strings.Contains(errStr, "error reading response") ||
+				strings.Contains(errStr, "server error") ||
+				strings.Contains(errStr, "temporary failure") ||
+				strings.Contains(errStr, "service unavailable") ||
+				strings.Contains(errStr, "server busy") ||
+				strings.Contains(errStr, "please try again later") ||
+				strings.Contains(errStr, "连接状态异常") ||
+				strings.Contains(errStr, "需要重新建立连接")
+
+			if isTemporaryError {
+				newStatus = -1 // 重新处理
+				log.Printf("[邮件内容同步] 检测到临时错误，设置状态为-1（重新处理），邮件ID: %d", emailOne.EmailID)
+			} else {
+				newStatus = -2 // 永久失败
+				log.Printf("[邮件内容同步] 检测到永久错误，设置状态为-2（永久失败），邮件ID: %d", emailOne.EmailID)
+			}
+
+			resetErr := resetEmailStatus(emailOne.EmailID, newStatus)
 			if resetErr != nil {
 				log.Printf("[邮件内容同步] 设置邮件状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
 			}

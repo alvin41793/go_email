@@ -1,6 +1,7 @@
 package mailclient
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"strings"
@@ -34,7 +35,7 @@ var globalPool = &ConnectionPool{
 // 定期清理过期连接
 func init() {
 	go func() {
-		ticker := time.NewTicker(5 * time.Minute) // 每5分钟清理一次
+		ticker := time.NewTicker(2 * time.Minute) // 每2分钟清理一次，缩短清理间隔
 		defer ticker.Stop()
 
 		for {
@@ -53,8 +54,8 @@ func (p *ConnectionPool) cleanupExpiredConnections() {
 
 	now := time.Now()
 	for email, conn := range p.connections {
-		// 如果连接超过15分钟未使用，则关闭（缩短超时时间）
-		if now.Sub(conn.LastUsed) > 15*time.Minute {
+		// 如果连接超过10分钟未使用，则关闭（进一步缩短超时时间，防止网络超时）
+		if now.Sub(conn.LastUsed) > 10*time.Minute {
 			log.Printf("[连接池] 清理过期连接: %s (闲置时间: %v)", email, now.Sub(conn.LastUsed))
 			conn.mutex.Lock()
 			if conn.Client != nil {
@@ -180,6 +181,18 @@ func isConnectionError(err error) bool {
 		"internal server error",            // 内部服务器错误
 		"server busy",                      // 服务器繁忙
 		"resource temporarily unavailable", // 资源临时不可用
+		"operation timed out",              // 操作超时
+		"read: operation timed out",        // 读取操作超时
+		"write: operation timed out",       // 写入操作超时
+		"error reading response",           // 读取响应错误
+		"error writing request",            // 写入请求错误
+		"dial timeout",                     // 连接超时
+		"context deadline exceeded",        // 上下文超时
+		"context canceled",                 // 上下文取消
+		"network connection timed out",     // 网络连接超时
+		"tcp timeout",                      // TCP超时
+		"ssl handshake timeout",            // SSL握手超时
+		"tls handshake timeout",            // TLS握手超时
 	}
 
 	for _, connErr := range connectionErrors {
@@ -228,9 +241,13 @@ func (p *ConnectionPool) isConnectionHealthy(c *client.Client, email string) boo
 		return false
 	}
 
-	// 检查3: NOOP命令（更安全的检查）
-	if err := c.Noop(); err != nil {
-		log.Printf("[连接池] NOOP命令失败: %s, 错误: %v", email, err)
+	// 检查3: NOOP命令（更安全的检查）- 设置更短的超时时间
+	noopStart := time.Now()
+	err := c.Noop()
+	noopDuration := time.Since(noopStart)
+
+	if err != nil {
+		log.Printf("[连接池] NOOP命令失败: %s, 耗时: %v, 错误: %v", email, noopDuration, err)
 		// 检查是否是连接相关的错误或IMAP命令错误
 		if isConnectionError(err) || strings.Contains(strings.ToLower(err.Error()), "command is not a valid imap command") {
 			log.Printf("[连接池] NOOP失败，检测到连接或命令错误: %s", email)
@@ -246,7 +263,13 @@ func (p *ConnectionPool) isConnectionHealthy(c *client.Client, email string) boo
 		log.Printf("[连接池] NOOP失败但连接状态正常: %s, 状态: %v, 将继续使用", email, currentState)
 	}
 
-	log.Printf("[连接池] 连接健康检查通过: %s, 状态: %v", email, state)
+	// 检查4: 如果NOOP耗时过长，也认为连接不健康
+	if noopDuration > 10*time.Second {
+		log.Printf("[连接池] NOOP响应过慢: %s, 耗时: %v, 认为连接不健康", email, noopDuration)
+		return false
+	}
+
+	log.Printf("[连接池] 连接健康检查通过: %s, 状态: %v, NOOP耗时: %v", email, state, noopDuration)
 	return true
 }
 
@@ -266,13 +289,19 @@ func createNewConnection(config *EmailConfigInfo) (*client.Client, error) {
 		var c *client.Client
 		var err error
 
+		// 创建TLS配置
+		tlsConfig := &tls.Config{
+			ServerName:         config.IMAPServer,
+			InsecureSkipVerify: false,
+		}
+
 		// 如果使用SSL，则使用TLS连接
 		if config.UseSSL {
-			c, err = client.DialTLS(fmt.Sprintf("%s:%d", config.IMAPServer, config.IMAPPort), nil)
+			c, err = client.DialTLS(fmt.Sprintf("%s:%d", config.IMAPServer, config.IMAPPort), tlsConfig)
 		} else {
 			c, err = client.Dial(fmt.Sprintf("%s:%d", config.IMAPServer, config.IMAPPort))
 			if err == nil {
-				if err = c.StartTLS(nil); err != nil {
+				if err = c.StartTLS(tlsConfig); err != nil {
 					c.Logout()
 					log.Printf("[IMAP连接] StartTLS失败 (尝试 %d/%d): %v", attempt, maxRetries, err)
 					if attempt < maxRetries {

@@ -312,6 +312,7 @@ type BatchCreateResult struct {
 }
 
 // BatchCreateEmailsWithStats 使用事务批量创建邮件记录，返回详细统计信息
+// 采用"全部成功或全部失败"策略，避免断层问题
 func BatchCreateEmailsWithStats(emails []*PrimeEmail, tx *gorm.DB) (*BatchCreateResult, error) {
 	result := &BatchCreateResult{
 		TotalCount:   len(emails),
@@ -325,43 +326,51 @@ func BatchCreateEmailsWithStats(emails []*PrimeEmail, tx *gorm.DB) (*BatchCreate
 		return result, nil
 	}
 
+	// 第一步：分离新邮件和已存在的邮件
+	var newEmails []*PrimeEmail
+	var existingEmailIDs []int
+
 	for _, email := range emails {
-		// 先检查是否已存在相同的email_id和account_id记录
+		// 检查是否已存在相同的email_id和account_id记录
 		var count int64
 		if err := tx.Model(&PrimeEmail{}).
 			Where("email_id = ? AND account_id = ?", email.EmailID, email.AccountId).
 			Count(&count).Error; err != nil {
 			log.Printf("[邮件批量插入] 检查记录是否存在时出错: email_id=%d, account_id=%d, 错误=%v",
 				email.EmailID, email.AccountId, err)
-			result.FailedCount++
-			result.FailedEmails = append(result.FailedEmails, fmt.Sprintf("email_id=%d(检查失败:%v)", email.EmailID, err))
-			continue // 跳过这条记录，继续处理下一条
+			// 检查失败时，为了避免断层，返回错误让上层重试
+			return nil, fmt.Errorf("检查邮件是否存在失败，避免断层: email_id=%d, 错误=%w", email.EmailID, err)
 		}
 
 		// 如果记录已存在，则跳过此条记录的创建
 		if count > 0 {
 			log.Printf("[邮件批量插入] 记录已存在，跳过: email_id=%d, account_id=%d", email.EmailID, email.AccountId)
 			result.SkippedCount++
+			existingEmailIDs = append(existingEmailIDs, email.EmailID)
 			continue
 		}
 
-		// 记录不存在，创建新记录
-		if err := tx.Create(email).Error; err != nil {
-			log.Printf("[邮件批量插入] 创建记录失败，跳过: email_id=%d, account_id=%d, 错误=%v",
-				email.EmailID, email.AccountId, err)
-			result.FailedCount++
-			result.FailedEmails = append(result.FailedEmails, fmt.Sprintf("email_id=%d(插入失败:%v)", email.EmailID, err))
-			continue // 跳过这条记录，继续处理下一条
-		}
+		// 记录不存在，添加到新邮件列表
+		newEmails = append(newEmails, email)
+	}
 
-		result.SuccessCount++
+	// 第二步：批量创建新邮件（全部成功或全部失败）
+	if len(newEmails) > 0 {
+		if err := tx.CreateInBatches(newEmails, 100).Error; err != nil {
+			log.Printf("[邮件批量插入] 批量创建失败: 错误=%v", err)
+			// 如果批量创建失败，返回错误让上层决定是否重试
+			// 这样可以确保不会产生断层
+			return nil, fmt.Errorf("批量创建邮件失败，避免断层: %w", err)
+		}
+		result.SuccessCount = len(newEmails)
+		log.Printf("[邮件批量插入] 批量创建成功: 数量=%d", len(newEmails))
 	}
 
 	log.Printf("[邮件批量插入] 批量处理完成: 总计=%d, 成功=%d, 跳过=%d, 失败=%d",
 		result.TotalCount, result.SuccessCount, result.SkippedCount, result.FailedCount)
 
-	if result.FailedCount > 0 {
-		log.Printf("[邮件批量插入] 失败的记录: %v", result.FailedEmails)
+	if len(existingEmailIDs) > 0 {
+		log.Printf("[邮件批量插入] 已存在的邮件ID: %v", existingEmailIDs)
 	}
 
 	return result, nil
