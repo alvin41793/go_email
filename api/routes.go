@@ -40,7 +40,7 @@ func Load1(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		emails := v1.Group("/emails")
 		{
 			// 统一同步接口 - 合并邮件列表和内容同步
-			emails.POST("/unified-sync", UnifiedEmailSync)
+			emails.POST("/list", UnifiedEmailSync)
 
 			// 通过指定uid获取邮件列表
 			emails.POST("/list_by_uid", ListEmailsByUid)
