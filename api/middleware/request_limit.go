@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"context"
+	"fmt"
 	"go_email/pkg/utils"
 	"log"
 	"sync"
@@ -116,8 +118,8 @@ func RequestLimit(maxRequests int32) gin.HandlerFunc {
 		limiter.activeRequests[reqId] = reqInfo
 		limiter.mutex.Unlock()
 
-		// 监听context取消和超时
-		go func() {
+		// 监听context取消和超时 - 使用安全协程管理器
+		monitorErr := utils.GlobalSafeGoroutineManager.StartSafeGoroutine(c.Request.Context(), fmt.Sprintf("request-monitor-%s", reqId), func(ctx context.Context) {
 			select {
 			case <-c.Request.Context().Done():
 				// 请求被取消或超时
@@ -132,8 +134,23 @@ func RequestLimit(maxRequests int32) gin.HandlerFunc {
 			case <-reqInfo.done:
 				// 请求正常完成
 				return
+			case <-ctx.Done():
+				// 协程被取消
+				return
 			}
-		}()
+		})
+
+		if monitorErr != nil {
+			log.Printf("[请求限制] 创建监控协程失败: %v", monitorErr)
+			// 如果创建监控协程失败，直接清理资源
+			atomic.AddInt32(&limiter.currentRequests, -1)
+			limiter.mutex.Lock()
+			delete(limiter.activeRequests, reqId)
+			limiter.mutex.Unlock()
+			utils.SendResponse(c, nil, "创建监控协程失败")
+			c.Abort()
+			return
+		}
 
 		// 请求完成后清理资源
 		defer func() {

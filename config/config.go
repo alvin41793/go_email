@@ -1,10 +1,11 @@
 package config
 
 import (
+	"strings"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"github.com/zxmrlc/log"
-	"strings"
 )
 
 type Config struct {

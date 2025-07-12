@@ -223,7 +223,7 @@ func (p *ConnectionPool) isConnectionHealthy(c *client.Client, email string) boo
 	}
 
 	// 检查2: 验证是否在正确的状态
-	if state != 2 && state != 3 { // Auth=2, Selected=3 in go-imap v1
+	if state != 2 && state != 6 { // Auth=2, Selected=6 in go-imap v1
 		log.Printf("[连接池] 连接状态异常: %s, 状态: %v", email, state)
 		return false
 	}
@@ -450,49 +450,4 @@ func GetEmailConfig(account model.PrimeEmailAccount) (*EmailConfigInfo, error) {
 		IMAPPort:     993,
 		UseSSL:       true,
 	}, nil
-}
-
-// GetConnectionPoolStats 获取连接池统计信息
-func GetConnectionPoolStats() map[string]interface{} {
-	globalPool.mutex.RLock()
-	defer globalPool.mutex.RUnlock()
-
-	stats := make(map[string]interface{})
-	stats["total_connections"] = len(globalPool.connections)
-
-	healthyCount := 0
-	unhealthyCount := 0
-
-	connections := make([]map[string]interface{}, 0)
-	for email, conn := range globalPool.connections {
-		conn.mutex.Lock()
-		connInfo := map[string]interface{}{
-			"email":     email,
-			"last_used": conn.LastUsed,
-			"active":    conn.Client != nil,
-			"idle_time": time.Since(conn.LastUsed).String(),
-		}
-		if conn.Client != nil {
-			state := conn.Client.State()
-			connInfo["state"] = state
-			// 简单的健康检查
-			if state == 2 || state == 3 {
-				connInfo["is_healthy"] = true
-				healthyCount++
-			} else {
-				connInfo["is_healthy"] = false
-				unhealthyCount++
-			}
-		} else {
-			connInfo["is_healthy"] = false
-			unhealthyCount++
-		}
-		connections = append(connections, connInfo)
-		conn.mutex.Unlock()
-	}
-	stats["connections"] = connections
-	stats["healthy_connections"] = healthyCount
-	stats["unhealthy_connections"] = unhealthyCount
-
-	return stats
 }
