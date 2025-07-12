@@ -132,24 +132,55 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 	folder := "INBOX"
 	startTime := time.Now()
 
+	// 从context获取deadline，计算实际可用时间
+	deadline, hasDeadline := ctx.Deadline()
+	var safeTimeLimit time.Time
+	if hasDeadline {
+		// 提前2分钟结束，避免真正超时
+		safeTimeLimit = deadline.Add(-2 * time.Minute)
+		log.Printf("账号 %d - 检测到超时deadline: %v，安全时限: %v", account.ID, deadline, safeTimeLimit)
+	}
+
 	// 存储所有邮件内容和附件，以便后续批量存储
 	allEmailData := make([]EmailContentData, 0, len(accountEmails))
 	var successCount, failureCount int
 
+	// 性能监控变量
+	var totalFetchTime, totalOSSTime time.Duration
+	var attachmentCount int
+
 	for i, emailOne := range accountEmails {
-		log.Printf("[邮件内容同步] 正在获取邮件内容，ID: %d，进度: %d/%d", emailOne.EmailID, i+1, len(accountEmails))
+		currentTime := time.Now()
+		elapsed := currentTime.Sub(startTime)
+
+		log.Printf("[邮件内容同步] 正在获取邮件内容，ID: %d，进度: %d/%d，已耗时: %v",
+			emailOne.EmailID, i+1, len(accountEmails), elapsed)
 
 		// 在处理每个邮件之间添加延迟，避免连接过于频繁
 		if i > 0 {
 			time.Sleep(time.Millisecond * 500)
 		}
 
-		// 检查context是否被取消
+		// 智能超时检测
+		shouldStop := false
 		select {
 		case <-ctx.Done():
+			shouldStop = true
+			log.Printf("[邮件内容同步] 上下文已取消，立即停止处理")
+		default:
+			// 检查是否接近安全时限
+			if hasDeadline && currentTime.After(safeTimeLimit) {
+				shouldStop = true
+				log.Printf("[邮件内容同步] 已接近安全时限，提前停止处理，当前时间: %v，安全时限: %v",
+					currentTime, safeTimeLimit)
+			}
+		}
+
+		if shouldStop {
 			remainingEmails := len(accountEmails) - i
-			log.Printf("[邮件内容同步] 上下文已取消，停止处理，已处理: %d/%d，未处理: %d，耗时: %v",
-				i, len(accountEmails), remainingEmails, time.Since(startTime))
+			log.Printf("[邮件内容同步] 停止处理，已处理: %d/%d，未处理: %d，总耗时: %v，平均每邮件: %v",
+				i, len(accountEmails), remainingEmails, elapsed,
+				time.Duration(int64(elapsed)/int64(max(i, 1))))
 
 			// 如果有已处理的邮件，先保存它们（这些邮件的status会变成1）
 			if len(allEmailData) > 0 {
@@ -168,13 +199,19 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 			}
 
 			log.Printf("[邮件内容同步] 超时处理完成，账号 %d 的processing_status将被重置为0", account.ID)
+
+			// 根据具体原因返回不同的错误
+			if hasDeadline && currentTime.After(safeTimeLimit) {
+				return successCount, fmt.Errorf("达到安全时限，提前停止处理")
+			}
 			return successCount, ctx.Err()
-		default:
 		}
 
 		emailStartTime := time.Now()
 		email, err := mailClient.GetEmailContent(uint32(emailOne.EmailID), folder)
 		emailDuration := time.Since(emailStartTime)
+		totalFetchTime += emailDuration
+
 		if err != nil {
 			log.Printf("[邮件内容同步] 获取邮件内容失败，邮件ID: %d, 耗时: %v, 错误: %v", emailOne.EmailID, emailDuration, err)
 			failureCount++
@@ -211,9 +248,13 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 
 		// 处理附件
 		var attachments []*model.PrimeEmailContentAttachment
+		var attachmentOSSTime time.Duration
+
 		if email.Attachments != nil && len(email.Attachments) > 0 {
 			emailContent.HasAttachment = 1
 			log.Printf("[邮件内容同步] 邮件含有 %d 个附件，邮件ID: %d", len(email.Attachments), emailOne.EmailID)
+
+			attachmentCount += len(email.Attachments)
 
 			for i, att := range email.Attachments {
 				log.Printf("[附件处理] 开始处理附件 %d/%d，邮件ID: %d, 文件名: %s",
@@ -235,27 +276,32 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 					maxRetries := 2
 					var err error
 					for attempt := 1; attempt <= maxRetries; attempt++ {
+						ossStartTime := time.Now()
 						log.Printf("[附件处理] 尝试上传附件到OSS (尝试 %d/%d)，邮件ID: %d, 文件名: %s",
 							attempt, maxRetries, emailOne.EmailID, att.Filename)
 
 						// 使用完整包路径调用OSS上传
 						ossURL, err = oss.UploadBase64ToOSS(att.Filename, att.Base64Data, fileType)
+						ossDuration := time.Since(ossStartTime)
+						attachmentOSSTime += ossDuration
+
 						if err == nil {
 							// 上传成功，跳出循环
-							log.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, URL: %s", emailOne.EmailID, att.Filename, ossURL)
+							log.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, 耗时: %v, URL: %s",
+								emailOne.EmailID, att.Filename, ossDuration, ossURL)
 							break
 						}
 
 						// 上传失败
 						if attempt < maxRetries {
-							log.Printf("[附件处理] 上传附件到OSS失败，准备重试，邮件ID: %d, 文件名: %s, 错误: %v",
-								emailOne.EmailID, att.Filename, err)
+							log.Printf("[附件处理] 上传附件到OSS失败，准备重试，邮件ID: %d, 文件名: %s, 耗时: %v, 错误: %v",
+								emailOne.EmailID, att.Filename, ossDuration, err)
 							// 添加短暂的延迟
 							time.Sleep(time.Second * 2)
 						} else {
 							// 最后一次尝试也失败了
-							log.Printf("[附件处理] 上传附件到OSS失败，已达到最大重试次数，邮件ID: %d, 文件名: %s, 错误: %v",
-								emailOne.EmailID, att.Filename, err)
+							log.Printf("[附件处理] 上传附件到OSS失败，已达到最大重试次数，邮件ID: %d, 文件名: %s, 总耗时: %v, 错误: %v",
+								emailOne.EmailID, att.Filename, ossDuration, err)
 						}
 					}
 
@@ -284,6 +330,8 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 			log.Printf("[邮件内容同步] 邮件没有附件，邮件ID: %d", emailOne.EmailID)
 		}
 
+		totalOSSTime += attachmentOSSTime
+
 		// 添加到批量处理列表
 		allEmailData = append(allEmailData, EmailContentData{
 			EmailID:      emailOne.EmailID,
@@ -293,23 +341,26 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 		})
 
 		successCount++
-		log.Printf("[邮件内容同步] 邮件 ID: %d 内容获取成功，耗时: %v，进度: %d/%d",
-			emailOne.EmailID, emailDuration, i+1, len(accountEmails))
-
-		// 检查是否接近超时（如果已经用了90%的时间，提前结束）
-		totalElapsed := time.Since(startTime)
-		if deadline, ok := ctx.Deadline(); ok {
-			remaining := time.Until(deadline)
-			if totalElapsed > remaining-2*time.Minute {
-				log.Printf("[邮件内容同步] 接近超时，提前结束处理，已处理: %d/%d，耗时: %v，剩余时间: %v",
-					i+1, len(accountEmails), totalElapsed, remaining)
-				break
-			}
-		}
+		totalEmailTime := emailDuration + attachmentOSSTime
+		log.Printf("[邮件内容同步] 邮件 ID: %d 内容获取成功，获取耗时: %v，OSS耗时: %v，总耗时: %v，进度: %d/%d",
+			emailOne.EmailID, emailDuration, attachmentOSSTime, totalEmailTime, i+1, len(accountEmails))
 	}
 
 	// 批量保存所有邮件内容和附件
 	totalDuration := time.Since(startTime)
+
+	// 详细的性能统计
+	if successCount > 0 {
+		avgFetchTime := totalFetchTime / time.Duration(successCount)
+		avgOSSTime := totalOSSTime / time.Duration(max(attachmentCount, 1))
+		avgTotalTime := totalDuration / time.Duration(successCount)
+
+		log.Printf("[性能统计] 账号 %d 处理完成 - 成功: %d, 失败: %d, 总耗时: %v",
+			account.ID, successCount, failureCount, totalDuration)
+		log.Printf("[性能统计] 平均每邮件: %v, 平均获取: %v, 平均OSS: %v, 总附件: %d",
+			avgTotalTime, avgFetchTime, avgOSSTime, attachmentCount)
+	}
+
 	if len(allEmailData) > 0 {
 		saveStartTime := time.Now()
 		err := batchSaveEmailContents(allEmailData)
@@ -401,4 +452,12 @@ func batchSaveEmailContents(emailDataList []EmailContentData) error {
 
 	log.Printf("[批量保存邮件内容] 批量保存完成: 成功=%d, 失败=%d", successCount, failedCount)
 	return nil
+}
+
+// max 返回两个整数中的最大值
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }

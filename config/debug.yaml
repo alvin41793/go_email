@@ -13,6 +13,8 @@ log:
   log_rotate_date: 1
   log_rotate_size: 1
   log_backup_count: 7
+sync:
+  timeout_minutes: 45             # 邮件同步超时时间（分钟）
 db:
   addr: dev-mysql.geekyum.com
   name: primeai_dev

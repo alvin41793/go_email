@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a282b92f-b990-4f59-8643-e6793cdebe48" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/api/unified_sync.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/unified_sync.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/unified_sync_impl.go" beforeDir="false" afterPath="$PROJECT_DIR$/api/unified_sync_impl.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/start.sh" beforeDir="false" afterPath="$PROJECT_DIR$/start.sh" afterDir="false" />
-    </list>
+    <list default="true" id="a282b92f-b990-4f59-8643-e6793cdebe48" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
