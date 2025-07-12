@@ -113,7 +113,7 @@ func syncAccountEmailList(mailClient *mailclient.MailClient, account model.Prime
 }
 
 // syncAccountEmailContent 同步单个账号的邮件内容
-func syncAccountEmailContent(account model.PrimeEmailAccount, limit int, ctx context.Context) (int, error) {
+func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.PrimeEmailAccount, limit int, ctx context.Context) (int, error) {
 	// 获取该账号的待处理邮件
 	accountEmails, err := model.GetEmailByStatusAndAccount(-1, account.ID, limit)
 	if err != nil {
@@ -132,12 +132,6 @@ func syncAccountEmailContent(account model.PrimeEmailAccount, limit int, ctx con
 	// 存储所有邮件内容和附件，以便后续批量存储
 	allEmailData := make([]EmailContentData, 0, len(accountEmails))
 	var successCount, failureCount int
-
-	// 创建邮件客户端
-	mailClient, err := newMailClient(account)
-	if err != nil {
-		return 0, fmt.Errorf("获取邮箱配置失败: %v", err)
-	}
 
 	for i, emailOne := range accountEmails {
 		log.Printf("[邮件内容同步] 正在获取邮件内容，ID: %d", emailOne.EmailID)

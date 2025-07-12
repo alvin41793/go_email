@@ -239,7 +239,7 @@ func syncSingleAccountSequential(account model.PrimeEmailAccount, req UnifiedSyn
 
 	// 第二步：同步邮件详情
 	log.Printf("[账号同步] 账号 %d - 开始同步邮件详情，数量限制: %d", account.ID, req.SyncLimit)
-	contentCount, err := syncAccountEmailContent(account, req.SyncLimit, ctx)
+	contentCount, err := syncAccountEmailContent(mailClient, account, req.SyncLimit, ctx)
 	if err != nil {
 		result.Error = fmt.Errorf("同步邮件详情失败: %v", err)
 		return result
