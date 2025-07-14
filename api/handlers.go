@@ -895,146 +895,146 @@ type ListEmailsByUidRequest struct {
 	AccountId int    `json:"account_id" binding:"required"`
 }
 
-func GetForwardOriginalEmail(c *gin.Context) {
-	startTime := time.Now() // 开始计时
-
-	// 创建请求结构体
-	type ForwardRequest struct {
-		EmailID int `json:"email_id"`
-		Limit   int `json:"limit"`
-		Node    int `json:"node" binding:"required"` // 节点编号，用于筛选特定节点的转发记录（必填）
-	}
-
-	var req ForwardRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.SendResponse(c, err, "参数错误")
-		return
-	}
-
-	// 检查节点参数是否有效
-	if req.Node <= 0 {
-		utils.SendResponse(c, fmt.Errorf("节点编号必须大于0，当前值: %d", req.Node), "节点编号无效")
-		return
-	}
-
-	// 如果请求中有email_id，则直接转发该邮件
-	if req.EmailID > 0 {
-		// 查询这条记录以获取PrimeOp邮箱地址
-		var forward model.PrimeEmailForward
-		if err := db.DB().First(&forward, "email_id = ?", req.EmailID).Error; err != nil {
-			utils.SendResponse(c, err, "未找到对应的转发记录")
-			return
-		}
-		// 获取邮箱配置
-		account, err := model.GetAccountByID(forward.AccountId)
-		if err != nil {
-			utils.SendResponse(c, err, "获取邮箱配置失败")
-			return
-		}
-
-		// 检查账号是否属于指定节点
-		if account.Node != req.Node {
-			utils.SendResponse(c, fmt.Errorf("邮件ID %d 属于节点 %d，与请求节点 %d 不匹配", req.EmailID, account.Node, req.Node), "节点不匹配")
-			return
-		}
-
-		// 为每个请求创建独立的邮件客户端实例
-		mailClient, err := newMailClient(account)
-		if err != nil {
-			utils.SendResponse(c, err, "获取邮箱配置失败")
-			return
-		}
-
-		// 执行转发
-		forwardStartTime := time.Now() // 转发开始时间
-		err = mailClient.ForwardStructuredEmail(uint32(req.EmailID), "INBOX", forward.PrimeOp)
-		forwardDuration := time.Since(forwardStartTime) // 转发耗时
-
-		if err != nil {
-			log.Printf("[邮件转发] 节点 %d - 邮件ID: %d 转发失败, 耗时: %v, 错误: %v", req.Node, req.EmailID, forwardDuration, err)
-			utils.SendResponse(c, err, fmt.Sprintf("节点 %d - 转发失败: %v", req.Node, err))
-			return
-		}
-
-		// 更新状态为已转发(1)
-		db.DB().Model(&forward).Update("status", 1)
-		totalDuration := time.Since(startTime) // 总耗时
-		log.Printf("[邮件转发] 节点 %d - 邮件ID: %d 转发成功, 转发耗时: %v, 总耗时: %v", req.Node, req.EmailID, forwardDuration, totalDuration)
-		utils.SendResponse(c, nil, fmt.Sprintf("节点 %d - 邮件转发成功, 耗时: %v", req.Node, forwardDuration))
-		return
-	}
-
-	// 如果没有指定email_id，则使用封装的函数获取待转发记录
-	records, err := model.GetAndUpdatePendingForwardsByNode(req.Limit, req.Node)
-	if err != nil {
-		utils.SendResponse(c, err, "查询待转发记录失败")
-		return
-	}
-
-	// 如果没有找到记录
-	if len(records) == 0 {
-		utils.SendResponse(c, nil, fmt.Sprintf("没有找到节点 %d 的待转发记录", req.Node))
-		return
-	}
-
-	// 转发邮件
-	var successCount, failCount int
-	var totalForwardTime time.Duration
-
-	for _, record := range records {
-		// 执行转发
-		forwardStartTime := time.Now() // 单封邮件转发开始时间
-		account, err := model.GetAccountByID(record.AccountId)
-		if err != nil {
-			utils.SendResponse(c, err, "获取邮箱配置失败")
-			return
-		}
-		mailClient, err := newMailClient(account)
-		if err != nil {
-			utils.SendResponse(c, err, "获取邮箱配置失败")
-			return
-		}
-		err = mailClient.ForwardStructuredEmail(uint32(record.EmailID), "INBOX", record.PrimeOp)
-		forwardDuration := time.Since(forwardStartTime) // 单封邮件转发耗时
-		totalForwardTime += forwardDuration
-
-		if err != nil {
-			failCount++
-			// 使用封装的函数更新失败状态
-			if updateErr := model.UpdateForwardFailureStatus(record.ID, err); updateErr != nil {
-				log.Printf("[邮件转发] 更新失败状态失败: %v", updateErr)
-			}
-			log.Printf("[邮件转发] 节点 %d - 邮件ID: %d 转发失败, 耗时: %v, 错误: %v", req.Node, record.EmailID, forwardDuration, err)
-		} else {
-			successCount++
-			// 使用封装的函数更新成功状态
-			if updateErr := model.UpdateForwardSuccessStatus(record.ID); updateErr != nil {
-				log.Printf("[邮件转发] 更新成功状态失败: %v", updateErr)
-			}
-			log.Printf("[邮件转发] 节点 %d - 邮件ID: %d 转发成功, 耗时: %v", req.Node, record.EmailID, forwardDuration)
-
-		}
-	}
-
-	totalDuration := time.Since(startTime)
-	avgTime := time.Duration(0)
-	if len(records) > 0 {
-		avgTime = totalForwardTime / time.Duration(len(records))
-	}
-
-	result := map[string]interface{}{
-		"节点":     req.Node,
-		"总耗时":    totalDuration.String(),
-		"平均转发耗时": avgTime.String(),
-		"成功数":    successCount,
-		"失败数":    failCount,
-	}
-
-	log.Printf("[邮件转发] 节点 %d - 批量转发完成: 成功 %d 条, 失败 %d 条, 总耗时: %v, 平均耗时: %v",
-		req.Node, successCount, failCount, totalDuration, avgTime)
-
-	utils.SendResponse(c, nil, result)
-}
+//func GetForwardOriginalEmail(c *gin.Context) {
+//	startTime := time.Now() // 开始计时
+//
+//	// 创建请求结构体
+//	type ForwardRequest struct {
+//		EmailID int `json:"email_id"`
+//		Limit   int `json:"limit"`
+//		Node    int `json:"node" binding:"required"` // 节点编号，用于筛选特定节点的转发记录（必填）
+//	}
+//
+//	var req ForwardRequest
+//	if err := c.ShouldBindJSON(&req); err != nil {
+//		utils.SendResponse(c, err, "参数错误")
+//		return
+//	}
+//
+//	// 检查节点参数是否有效
+//	if req.Node <= 0 {
+//		utils.SendResponse(c, fmt.Errorf("节点编号必须大于0，当前值: %d", req.Node), "节点编号无效")
+//		return
+//	}
+//
+//	// 如果请求中有email_id，则直接转发该邮件
+//	if req.EmailID > 0 {
+//		// 查询这条记录以获取PrimeOp邮箱地址
+//		var forward model.PrimeEmailForward
+//		if err := db.DB().First(&forward, "email_id = ?", req.EmailID).Error; err != nil {
+//			utils.SendResponse(c, err, "未找到对应的转发记录")
+//			return
+//		}
+//		// 获取邮箱配置
+//		account, err := model.GetAccountByID(forward.AccountId)
+//		if err != nil {
+//			utils.SendResponse(c, err, "获取邮箱配置失败")
+//			return
+//		}
+//
+//		// 检查账号是否属于指定节点
+//		if account.Node != req.Node {
+//			utils.SendResponse(c, fmt.Errorf("邮件ID %d 属于节点 %d，与请求节点 %d 不匹配", req.EmailID, account.Node, req.Node), "节点不匹配")
+//			return
+//		}
+//
+//		// 为每个请求创建独立的邮件客户端实例
+//		mailClient, err := newMailClient(account)
+//		if err != nil {
+//			utils.SendResponse(c, err, "获取邮箱配置失败")
+//			return
+//		}
+//
+//		// 执行转发
+//		forwardStartTime := time.Now() // 转发开始时间
+//		err = mailClient.ForwardStructuredEmail(uint32(req.EmailID), "INBOX", forward.PrimeOp)
+//		forwardDuration := time.Since(forwardStartTime) // 转发耗时
+//
+//		if err != nil {
+//			log.Printf("[邮件转发] 节点 %d - 邮件ID: %d 转发失败, 耗时: %v, 错误: %v", req.Node, req.EmailID, forwardDuration, err)
+//			utils.SendResponse(c, err, fmt.Sprintf("节点 %d - 转发失败: %v", req.Node, err))
+//			return
+//		}
+//
+//		// 更新状态为已转发(1)
+//		db.DB().Model(&forward).Update("status", 1)
+//		totalDuration := time.Since(startTime) // 总耗时
+//		log.Printf("[邮件转发] 节点 %d - 邮件ID: %d 转发成功, 转发耗时: %v, 总耗时: %v", req.Node, req.EmailID, forwardDuration, totalDuration)
+//		utils.SendResponse(c, nil, fmt.Sprintf("节点 %d - 邮件转发成功, 耗时: %v", req.Node, forwardDuration))
+//		return
+//	}
+//
+//	// 如果没有指定email_id，则使用封装的函数获取待转发记录
+//	records, err := model.GetAndUpdatePendingForwardsByNode(req.Limit, req.Node)
+//	if err != nil {
+//		utils.SendResponse(c, err, "查询待转发记录失败")
+//		return
+//	}
+//
+//	// 如果没有找到记录
+//	if len(records) == 0 {
+//		utils.SendResponse(c, nil, fmt.Sprintf("没有找到节点 %d 的待转发记录", req.Node))
+//		return
+//	}
+//
+//	// 转发邮件
+//	var successCount, failCount int
+//	var totalForwardTime time.Duration
+//
+//	for _, record := range records {
+//		// 执行转发
+//		forwardStartTime := time.Now() // 单封邮件转发开始时间
+//		account, err := model.GetAccountByID(record.AccountId)
+//		if err != nil {
+//			utils.SendResponse(c, err, "获取邮箱配置失败")
+//			return
+//		}
+//		mailClient, err := newMailClient(account)
+//		if err != nil {
+//			utils.SendResponse(c, err, "获取邮箱配置失败")
+//			return
+//		}
+//		err = mailClient.ForwardStructuredEmail(uint32(record.EmailID), "INBOX", record.PrimeOp)
+//		forwardDuration := time.Since(forwardStartTime) // 单封邮件转发耗时
+//		totalForwardTime += forwardDuration
+//
+//		if err != nil {
+//			failCount++
+//			// 使用封装的函数更新失败状态
+//			if updateErr := model.UpdateForwardFailureStatus(record.ID, err); updateErr != nil {
+//				log.Printf("[邮件转发] 更新失败状态失败: %v", updateErr)
+//			}
+//			log.Printf("[邮件转发] 节点 %d - 邮件ID: %d 转发失败, 耗时: %v, 错误: %v", req.Node, record.EmailID, forwardDuration, err)
+//		} else {
+//			successCount++
+//			// 使用封装的函数更新成功状态
+//			if updateErr := model.UpdateForwardSuccessStatus(record.ID); updateErr != nil {
+//				log.Printf("[邮件转发] 更新成功状态失败: %v", updateErr)
+//			}
+//			log.Printf("[邮件转发] 节点 %d - 邮件ID: %d 转发成功, 耗时: %v", req.Node, record.EmailID, forwardDuration)
+//
+//		}
+//	}
+//
+//	totalDuration := time.Since(startTime)
+//	avgTime := time.Duration(0)
+//	if len(records) > 0 {
+//		avgTime = totalForwardTime / time.Duration(len(records))
+//	}
+//
+//	result := map[string]interface{}{
+//		"节点":     req.Node,
+//		"总耗时":    totalDuration.String(),
+//		"平均转发耗时": avgTime.String(),
+//		"成功数":    successCount,
+//		"失败数":    failCount,
+//	}
+//
+//	log.Printf("[邮件转发] 节点 %d - 批量转发完成: 成功 %d 条, 失败 %d 条, 总耗时: %v, 平均耗时: %v",
+//		req.Node, successCount, failCount, totalDuration, avgTime)
+//
+//	utils.SendResponse(c, nil, result)
+//}
 
 // GetGoroutineStats 获取协程统计信息
 func GetGoroutineStats(c *gin.Context) {
