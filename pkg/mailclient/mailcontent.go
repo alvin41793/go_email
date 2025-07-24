@@ -583,7 +583,7 @@ func (m *MailClient) tryGetEmailContent(uid uint32, folder string) (*Email, erro
 
 	// 创建Email结构体
 	email := &Email{
-		EmailID:     fmt.Sprint(msg.SeqNum),
+		EmailID:     fmt.Sprint(msg.Uid), // 使用UID代替序列号，确保与列表中的ID一致
 		Subject:     DecodeMIMESubject(msg.Envelope.Subject),
 		From:        parseAddressList(msg.Envelope.From),
 		To:          parseAddressList(msg.Envelope.To),
