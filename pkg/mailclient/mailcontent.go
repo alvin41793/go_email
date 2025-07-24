@@ -607,10 +607,10 @@ func (m *MailClient) tryGetEmailContent(uid uint32, folder string) (*Email, erro
 	// 调试输出
 	log.Printf("[邮件解析调试] UID: %d, 解码成功，内容长度: %d", uid, len(rawContent))
 
-	// 保存原始内容到文件用于调试
-	if err := saveRawContentToFile(uid, rawContent); err != nil {
-		log.Printf("[邮件解析调试] 保存原始内容失败: %v", err)
-	}
+	//// 保存原始内容到文件用于调试
+	//if err := saveRawContentToFile(uid, rawContent); err != nil {
+	//	log.Printf("[邮件解析调试] 保存原始内容失败: %v", err)
+	//}
 
 	// 解析邮件内容
 	if msg.BodyStructure.MIMEType == "multipart" {
