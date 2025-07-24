@@ -15,6 +15,7 @@ import (
 	"net/textproto"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -606,10 +607,10 @@ func (m *MailClient) tryGetEmailContent(uid uint32, folder string) (*Email, erro
 	// 调试输出
 	log.Printf("[邮件解析调试] UID: %d, 解码成功，内容长度: %d", uid, len(rawContent))
 
-	//// 保存原始内容到文件用于调试
-	//if err := saveRawContentToFile(uid, rawContent); err != nil {
-	//	log.Printf("[邮件解析调试] 保存原始内容失败: %v", err)
-	//}
+	// 保存原始内容到文件用于调试
+	if err := saveRawContentToFile(uid, rawContent); err != nil {
+		log.Printf("[邮件解析调试] 保存原始内容失败: %v", err)
+	}
 
 	// 解析邮件内容
 	if msg.BodyStructure.MIMEType == "multipart" {
@@ -620,12 +621,139 @@ func (m *MailClient) tryGetEmailContent(uid uint32, folder string) (*Email, erro
 			log.Printf("[邮件解析] 解析多部分邮件失败: %v", err)
 			// 即使解析失败，也返回基本信息
 		}
+
+		// 如果标准解析没有找到附件，尝试使用正则表达式方法
+		if len(email.Attachments) == 0 {
+			log.Printf("[邮件解析] 标准解析没有找到附件，尝试使用正则表达式解析")
+			if err := m.extractAttachmentsWithRegex(rawContent, email); err != nil {
+				log.Printf("[邮件解析] 正则表达式解析附件也失败: %v", err)
+			} else if len(email.Attachments) > 0 {
+				log.Printf("[邮件解析] 正则表达式成功解析出 %d 个附件", len(email.Attachments))
+			}
+		}
 	} else {
 		// 单部分邮件
 		email.Body = rawContent
 	}
 
 	return email, nil
+}
+
+// extractAttachmentsWithRegex 使用正则表达式从原始邮件内容中提取附件
+func (m *MailClient) extractAttachmentsWithRegex(rawContent string, email *Email) error {
+	// 为特定的PDF附件格式创建一个正则表达式
+	// 这个正则表达式专门针对某些特定格式的PDF附件
+	pdfRegex := regexp.MustCompile(`Content-Type: application/octet-stream.*?name=([^\r\n"]+)[\r\n]+Content-Transfer-Encoding: base64[\r\n]+Content-Disposition: attachment.*?filename=([^\r\n"]+)[\r\n]+[\r\n]+((?:[A-Za-z0-9+/=]{1,76}[\r\n]+)+)`)
+
+	matches := pdfRegex.FindAllStringSubmatch(rawContent, -1)
+	if len(matches) == 0 {
+		// 尝试更通用的附件正则表达式
+		generalRegex := regexp.MustCompile(`Content-Type: ([^;\r\n]+)(?:;[\s\S]*?(?:name|filename)=(?:"([^"]+)"|([^\s;,\r\n"]+)))?[\s\S]*?Content-Transfer-Encoding: ([^\r\n]+)[\s\S]*?(?:Content-Disposition: ([^;\r\n]+)(?:;[\s\S]*?filename=(?:"([^"]+)"|([^\s;,\r\n"]+)))?)?[\r\n]+[\r\n]((?:[\s\S]*?))(?:[\r\n]+--|\z)`)
+		matches = generalRegex.FindAllStringSubmatch(rawContent, -1)
+
+		if len(matches) == 0 {
+			return fmt.Errorf("未找到匹配的附件")
+		}
+	}
+
+	for _, match := range matches {
+		// 获取文件名
+		filename := ""
+		if len(match) > 2 && match[2] != "" {
+			filename = strings.Trim(match[2], `"' `)
+		} else if len(match) > 3 && match[3] != "" {
+			filename = strings.Trim(match[3], `"' `)
+		} else if len(match) > 6 && match[6] != "" {
+			filename = strings.Trim(match[6], `"' `)
+		} else if len(match) > 7 && match[7] != "" {
+			filename = strings.Trim(match[7], `"' `)
+		} else {
+			filename = fmt.Sprintf("attachment_%d.pdf", len(email.Attachments)+1)
+		}
+
+		// 获取MIME类型
+		mimeType := "application/octet-stream"
+		if len(match) > 1 && match[1] != "" {
+			mimeType = strings.TrimSpace(match[1])
+		}
+
+		// 获取编码方式
+		encoding := "base64"
+		if len(match) > 4 && match[4] != "" {
+			encoding = strings.TrimSpace(match[4])
+		}
+
+		// 获取附件内容
+		content := ""
+		if len(match) > 8 {
+			content = match[8]
+		} else if len(match) > 3 {
+			content = match[3]
+		}
+
+		// 处理不同的编码
+		var base64Data string
+		var actualSize int64
+
+		switch strings.ToLower(encoding) {
+		case "base64":
+			// 移除所有换行符
+			cleanedContent := strings.ReplaceAll(strings.ReplaceAll(content, "\r", ""), "\n", "")
+			base64Data = cleanedContent
+
+			// 计算大小
+			actualSize = int64(len(cleanedContent)) * 3 / 4
+			if strings.HasSuffix(cleanedContent, "==") {
+				actualSize -= 2
+			} else if strings.HasSuffix(cleanedContent, "=") {
+				actualSize -= 1
+			}
+
+		case "quoted-printable":
+			// 解码quoted-printable并重新编码为base64
+			qpReader := quotedprintable.NewReader(strings.NewReader(content))
+			decodedData, err := io.ReadAll(qpReader)
+			if err != nil {
+				log.Printf("[邮件解析] 解码quoted-printable失败: %v", err)
+				continue
+			}
+
+			base64Data = base64.StdEncoding.EncodeToString(decodedData)
+			actualSize = int64(len(decodedData))
+
+		default:
+			// 对于其他编码，直接编码为base64
+			base64Data = base64.StdEncoding.EncodeToString([]byte(content))
+			actualSize = int64(len(content))
+		}
+
+		// 验证base64数据
+		testSample := base64Data
+		if len(base64Data) > 100 {
+			testSample = base64Data[:100]
+		}
+
+		_, testErr := base64.StdEncoding.DecodeString(testSample)
+		if testErr != nil {
+			log.Printf("[邮件解析] Base64验证失败: %v", testErr)
+			continue
+		}
+
+		// 解码文件名
+		decodedFilename := DecodeMIMESubject(filename)
+
+		// 添加附件信息
+		email.Attachments = append(email.Attachments, AttachmentInfo{
+			Filename:   decodedFilename,
+			SizeKB:     float64(actualSize) / 1024.0,
+			MimeType:   mimeType,
+			Base64Data: base64Data,
+		})
+
+		log.Printf("[邮件解析] 使用正则表达式解析到附件: %s, 大小: %.2f KB", decodedFilename, float64(actualSize)/1024.0)
+	}
+
+	return nil
 }
 
 // saveRawContentToFile 将原始邮件内容保存到文件中
