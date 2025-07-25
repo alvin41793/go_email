@@ -283,26 +283,44 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 
 		// 创建邮件内容记录
 		emailContent := &model.PrimeEmailContent{
-			EmailID:       emailOne.EmailID,
-			AccountId:     account.ID,
-			Subject:       utils.SanitizeUTF8(email.Subject),
-			FromEmail:     utils.SanitizeUTF8(email.From),
-			ToEmail:       utils.SanitizeUTF8(email.To),
-			Date:          utils.SanitizeUTF8(email.Date),
-			Content:       utils.SanitizeUTF8(email.Body),
-			HTMLContent:   utils.SanitizeUTF8(email.BodyHTML),
-			HasAttachment: 0,
-			Type:          0,
-			Status:        -1,
-			CreatedAt:     utils.JsonTime{Time: time.Now()},
+			EmailID:     emailOne.EmailID,
+			AccountId:   account.ID,
+			Subject:     utils.SanitizeUTF8(email.Subject),
+			FromEmail:   utils.SanitizeUTF8(email.From),
+			ToEmail:     utils.SanitizeUTF8(email.To),
+			Date:        utils.SanitizeUTF8(email.Date),
+			Content:     utils.SanitizeUTF8(email.Body),
+			HTMLContent: utils.SanitizeUTF8(email.BodyHTML),
+			Type:        0,
+			Status:      -1,
+			CreatedAt:   utils.JsonTime{Time: time.Now()},
 		}
 
-		// 处理附件
+		// 查询对应的PrimeEmail记录，以获取HasAttachment值
+		var primeEmail model.PrimeEmail
+		if err := db.DB().Where("email_id = ? AND account_id = ?", emailOne.EmailID, account.ID).First(&primeEmail).Error; err != nil {
+			log.Printf("[邮件内容同步] 查询PrimeEmail记录失败，使用默认附件状态: %v", err)
+			// 如果查询失败，则使用默认的附件检测逻辑
+			if email.Attachments != nil && len(email.Attachments) > 0 {
+				emailContent.HasAttachment = 1
+			} else {
+				emailContent.HasAttachment = 0
+			}
+		} else {
+			// 使用PrimeEmail表中的HasAttachment值
+			emailContent.HasAttachment = primeEmail.HasAttachment
+			log.Printf("[邮件内容同步] 使用PrimeEmail记录的附件状态，邮件ID: %d, HasAttachment: %d",
+				emailOne.EmailID, primeEmail.HasAttachment)
+		}
+
+		// 处理附件 - 仅在PrimeEmail表示有附件时处理
 		var attachments []*model.PrimeEmailContentAttachment
 		var attachmentOSSTime time.Duration
 
-		if email.Attachments != nil && len(email.Attachments) > 0 {
-			emailContent.HasAttachment = 1
+		// 如果PrimeEmail表示没有附件，则跳过附件处理，不需要再检查实际邮件
+		if emailContent.HasAttachment == 0 {
+			log.Printf("[邮件内容同步] 根据PrimeEmail记录判断邮件无附件，跳过附件处理，邮件ID: %d", emailOne.EmailID)
+		} else if email.Attachments != nil && len(email.Attachments) > 0 {
 			log.Printf("[邮件内容同步] 邮件含有 %d 个附件，邮件ID: %d", len(email.Attachments), emailOne.EmailID)
 
 			attachmentCount += len(email.Attachments)

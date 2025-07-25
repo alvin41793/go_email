@@ -957,7 +957,19 @@ func ListEmailsByUid(c *gin.Context) {
 
 	// 第二步：获取指定email_id的邮件详情
 	log.Printf("[测试接口] 获取邮件详情，邮件ID: %d", req.EmailID)
-	email, err := mailClient.GetEmailContent(uint32(req.EmailID), folder)
+
+	// 先查询PrimeEmail表中的HasAttachment值
+	var primeEmail model.PrimeEmail
+	skipAttachments := false
+	if err := db.DB().Where("email_id = ? AND account_id = ?", req.EmailID, account.ID).First(&primeEmail).Error; err == nil {
+		// 如果查询成功且HasAttachment为0，则跳过附件解析
+		if primeEmail.HasAttachment == 0 {
+			skipAttachments = true
+			log.Printf("[测试接口] PrimeEmail表显示邮件无附件，将跳过附件解析，邮件ID: %d", req.EmailID)
+		}
+	}
+
+	email, err := mailClient.GetEmailContent(uint32(req.EmailID), folder, skipAttachments)
 	if err != nil {
 		log.Printf("[测试接口] 获取邮件详情失败: %v", err)
 		// 即使获取详情失败，也返回已获取的列表信息

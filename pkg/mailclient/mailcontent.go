@@ -451,18 +451,22 @@ func (m *MailClient) tryListEmailsFromUID(folder string, limit int, lastUID uint
 }
 
 // GetEmailContent 获取邮件完整内容
-func (m *MailClient) GetEmailContent(uid uint32, folder string) (*Email, error) {
-	return m.getEmailContentWithRetry(uid, folder, 5)
+func (m *MailClient) GetEmailContent(uid uint32, folder string, skipAttachments ...bool) (*Email, error) {
+	skipAttach := false
+	if len(skipAttachments) > 0 && skipAttachments[0] {
+		skipAttach = true
+	}
+	return m.getEmailContentWithRetry(uid, folder, 5, skipAttach)
 }
 
 // 带重试的获取邮件内容
-func (m *MailClient) getEmailContentWithRetry(uid uint32, folder string, maxRetries int) (*Email, error) {
+func (m *MailClient) getEmailContentWithRetry(uid uint32, folder string, maxRetries int, skipAttachments bool) (*Email, error) {
 	if folder == "" {
 		folder = "INBOX"
 	}
 
 	for attempt := 1; attempt <= maxRetries; attempt++ {
-		email, err := m.tryGetEmailContent(uid, folder)
+		email, err := m.tryGetEmailContent(uid, folder, skipAttachments)
 		if err == nil {
 			return email, nil
 		}
@@ -490,7 +494,7 @@ func (m *MailClient) getEmailContentWithRetry(uid uint32, folder string, maxRetr
 }
 
 // 尝试获取邮件内容（单次）
-func (m *MailClient) tryGetEmailContent(uid uint32, folder string) (*Email, error) {
+func (m *MailClient) tryGetEmailContent(uid uint32, folder string, skipAttachments bool) (*Email, error) {
 	// 连接IMAP服务器
 	c, err := m.ConnectIMAP()
 	if err != nil {
@@ -607,23 +611,31 @@ func (m *MailClient) tryGetEmailContent(uid uint32, folder string) (*Email, erro
 	// 调试输出
 	log.Printf("[邮件解析调试] UID: %d, 解码成功，内容长度: %d", uid, len(rawContent))
 
-	//// 保存原始内容到文件用于调试
-	//if err := saveRawContentToFile(uid, rawContent); err != nil {
-	//	log.Printf("[邮件解析调试] 保存原始内容失败: %v", err)
-	//}
+	// 保存原始内容到文件用于调试
+	if err := saveRawContentToFile(uid, rawContent); err != nil {
+		log.Printf("[邮件解析调试] 保存原始内容失败: %v", err)
+	}
 
 	// 解析邮件内容
 	if msg.BodyStructure.MIMEType == "multipart" {
 		// 多部分邮件
 		reader := strings.NewReader(rawContent)
-		err = m.parseMultipartMessage(msg, email, reader)
+
+		// 如果设置了跳过附件标志，则传递给解析函数
+		if skipAttachments {
+			log.Printf("[邮件解析] 根据设置跳过附件解析，邮件UID: %d", uid)
+			err = m.parseMultipartMessageSkipAttachments(msg, email, reader)
+		} else {
+			err = m.parseMultipartMessage(msg, email, reader)
+		}
+
 		if err != nil {
 			log.Printf("[邮件解析] 解析多部分邮件失败: %v", err)
 			// 即使解析失败，也返回基本信息
 		}
 
-		// 如果标准解析没有找到附件，尝试使用正则表达式方法
-		if len(email.Attachments) == 0 {
+		// 如果未设置跳过附件，且标准解析没有找到附件，尝试使用正则表达式方法
+		if !skipAttachments && len(email.Attachments) == 0 {
 			log.Printf("[邮件解析] 标准解析没有找到附件，尝试使用正则表达式解析")
 			if err := m.extractAttachmentsWithRegex(rawContent, email); err != nil {
 				log.Printf("[邮件解析] 正则表达式解析附件也失败: %v", err)
@@ -1819,4 +1831,122 @@ func isWrappedConnectionError(err error) bool {
 	}
 
 	return false
+}
+
+// parseMultipartMessageSkipAttachments 解析多部分邮件但跳过附件部分
+func (m *MailClient) parseMultipartMessageSkipAttachments(msg *imap.Message, email *Email, reader io.Reader) error {
+	// 使用mail包解析邮件
+	mr, err := mail.ReadMessage(reader)
+	if err != nil {
+		return fmt.Errorf("读取邮件内容失败: %v", err)
+	}
+
+	// 获取媒体类型
+	contentType := mr.Header.Get("Content-Type")
+	mediaType, params, err := mime.ParseMediaType(contentType)
+	if err != nil {
+		return fmt.Errorf("解析Content-Type失败: %v", err)
+	}
+
+	// 处理多部分邮件
+	if strings.HasPrefix(mediaType, "multipart/") {
+		// 创建一个递归函数来处理嵌套的多部分邮件
+		var parseMultipart func(reader io.Reader, boundary string, depth int) error
+		parseMultipart = func(reader io.Reader, boundary string, depth int) error {
+			mr := multipart.NewReader(reader, boundary)
+
+			// 遍历每个部分
+			for {
+				p, err := mr.NextPart()
+				if err == io.EOF {
+					break
+				}
+				if err != nil {
+					if depth == 0 {
+						return fmt.Errorf("读取下一部分失败: %v", err)
+					}
+					// 对于嵌套部分的错误，我们只记录而不中断
+					log.Printf("解析嵌套部分失败: %v", err)
+					continue
+				}
+
+				// 获取此部分的内容类型
+				partContentType := p.Header.Get("Content-Type")
+				partMediaType, partParams, err := mime.ParseMediaType(partContentType)
+				if err != nil {
+					continue // 跳过无法解析类型的部分
+				}
+
+				// 处理嵌套的多部分邮件
+				if strings.HasPrefix(partMediaType, "multipart/") {
+					partBoundary := partParams["boundary"]
+					if partBoundary != "" {
+						// 递归处理嵌套部分
+						bodyBytes, err := io.ReadAll(p)
+						if err == nil {
+							parseMultipart(bytes.NewReader(bodyBytes), partBoundary, depth+1)
+						}
+					}
+				} else if strings.HasPrefix(partMediaType, "text/plain") {
+					// 读取纯文本部分
+					bodyBytes, err := io.ReadAll(p)
+					if err != nil {
+						continue
+					}
+					// 解码内容
+					decodedBody, err := decodeContent(p.Header, bodyBytes)
+					if err == nil && decodedBody != "" {
+						email.Body = decodedBody
+					} else if len(bodyBytes) > 0 {
+						email.Body = string(bodyBytes)
+					}
+				} else if strings.HasPrefix(partMediaType, "text/html") {
+					// 读取HTML部分
+					bodyBytes, err := io.ReadAll(p)
+					if err != nil {
+						continue
+					}
+					// 解码内容
+					decodedBody, err := decodeContent(p.Header, bodyBytes)
+					if err == nil && decodedBody != "" {
+						// 清理HTML内容，移除\r\n和多余的空白
+						cleanedHTML := cleanHTMLContent(decodedBody)
+						email.BodyHTML = cleanedHTML
+					} else if len(bodyBytes) > 0 {
+						// 清理HTML内容，移除\r\n和多余的空白
+						cleanedHTML := cleanHTMLContent(string(bodyBytes))
+						email.BodyHTML = cleanedHTML
+					}
+				}
+				// 跳过附件部分
+			}
+			return nil
+		}
+
+		// 使用递归函数处理多部分邮件
+		boundary := params["boundary"]
+		if boundary == "" {
+			return fmt.Errorf("未找到boundary参数")
+		}
+
+		return parseMultipart(mr.Body, boundary, 0)
+	} else if strings.HasPrefix(mediaType, "text/plain") {
+		// 对于单一的纯文本邮件
+		bodyBytes, err := io.ReadAll(mr.Body)
+		if err != nil {
+			return err
+		}
+		email.Body = string(bodyBytes)
+	} else if strings.HasPrefix(mediaType, "text/html") {
+		// 对于单一的HTML邮件
+		bodyBytes, err := io.ReadAll(mr.Body)
+		if err != nil {
+			return err
+		}
+		// 清理HTML内容
+		cleanedHTML := cleanHTMLContent(string(bodyBytes))
+		email.BodyHTML = cleanedHTML
+	}
+
+	return nil
 }
