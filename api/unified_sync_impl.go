@@ -341,8 +341,8 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 					}
 
 					log.Printf("[附件处理] 开始上传附件到OSS，邮件ID: %d, 文件名: %s", emailOne.EmailID, att.Filename)
-					// 添加重试机制，最多尝试2次
-					maxRetries := 2
+					// 添加重试机制，最多尝试3次
+					maxRetries := 3
 					var err error
 					for attempt := 1; attempt <= maxRetries; attempt++ {
 						ossStartTime := time.Now()
@@ -376,8 +376,38 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 
 					// 检查是否所有尝试都失败了
 					if err != nil {
-						log.Printf("[附件处理] 经过 %d 次尝试，上传附件到OSS仍然失败，邮件ID: %d, 文件名: %s",
+						log.Printf("[附件处理] 经过 %d 次尝试，上传附件到OSS仍然失败，尝试使用阿里云OSS备用上传，邮件ID: %d, 文件名: %s",
 							maxRetries, emailOne.EmailID, att.Filename)
+
+						// 使用阿里云OSS作为备用上传
+						fallbackStartTime := time.Now()
+						ossUploader, fallbackErr := oss.NewOSSUploader()
+						if fallbackErr != nil {
+							log.Printf("[附件处理] 创建阿里云OSS上传器失败，邮件ID: %d, 文件名: %s, 错误: %v",
+								emailOne.EmailID, att.Filename, fallbackErr)
+						} else {
+							log.Printf("[附件处理] 开始使用阿里云OSS备用上传，邮件ID: %d, 文件名: %s",
+								emailOne.EmailID, att.Filename)
+
+							// 使用阿里云OSS上传附件
+							fallbackURL, _, fallbackErr := ossUploader.UploadFileFromBase64(att.Base64Data, att.Filename, "email_attachments")
+							fallbackDuration := time.Since(fallbackStartTime)
+							attachmentOSSTime += fallbackDuration
+
+							if fallbackErr == nil {
+								// 阿里云OSS上传成功
+								ossURL = fallbackURL
+								err = nil // 清除之前的错误
+								log.Printf("[附件处理] 阿里云OSS备用上传成功，邮件ID: %d, 文件名: %s, 耗时: %v, URL: %s",
+									emailOne.EmailID, att.Filename, fallbackDuration, ossURL)
+							} else {
+								// 阿里云OSS上传也失败了
+								log.Printf("[附件处理] 阿里云OSS备用上传也失败，邮件ID: %d, 文件名: %s, 耗时: %v, 错误: %v",
+									emailOne.EmailID, att.Filename, fallbackDuration, fallbackErr)
+								log.Printf("[附件处理] 所有上传方式均失败，邮件ID: %d, 文件名: %s",
+									emailOne.EmailID, att.Filename)
+							}
+						}
 					}
 				} else {
 					log.Printf("[附件处理] 附件没有Base64数据，邮件ID: %d, 文件名: %s", emailOne.EmailID, att.Filename)

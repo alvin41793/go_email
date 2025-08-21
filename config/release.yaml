@@ -35,3 +35,10 @@ redis:
   password: REDACTED 30
   maxActive: 30
   idleTimeout: 200
+aliyun:
+  oss:
+    endpoint: https://oss-cn-beijing.aliyuncs.com
+    access_key_id: REDACTED
+    access_key_secret: REDACTED
+    bucket-name: pai-ocr-files
+    domain: https://pai-ocr-files.oss-cn-beijing.aliyuncs.com
