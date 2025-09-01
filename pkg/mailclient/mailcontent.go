@@ -644,11 +644,115 @@ func (m *MailClient) tryGetEmailContent(uid uint32, folder string, skipAttachmen
 			}
 		}
 	} else {
-		// 单部分邮件
-		email.Body = rawContent
+		// 单部分邮件 - 需要正确分离邮件头部和正文
+		reader := strings.NewReader(rawContent)
+		mr, err := mail.ReadMessage(reader)
+		if err != nil {
+			log.Printf("[邮件解析] 单部分邮件解析失败，使用原始内容: %v", err)
+			// 如果解析失败，尝试查找邮件头部结束的位置
+			if bodyStart := findEmailBodyStart(rawContent); bodyStart != -1 {
+				email.Body = rawContent[bodyStart:]
+			} else {
+				email.Body = rawContent
+			}
+		} else {
+			// 成功解析邮件头部，读取正文
+			bodyBytes, err := io.ReadAll(mr.Body)
+			if err != nil {
+				log.Printf("[邮件解析] 读取单部分邮件正文失败: %v", err)
+				email.Body = rawContent
+			} else {
+				// 解码内容
+				decodedBody, err := decodeContent(textproto.MIMEHeader(mr.Header), bodyBytes)
+				if err == nil && decodedBody != "" {
+					email.Body = decodedBody
+				} else {
+					email.Body = string(bodyBytes)
+				}
+			}
+		}
 	}
 
 	return email, nil
+}
+
+// findEmailBodyStart 查找邮件正文开始的位置（跳过邮件头部）
+func findEmailBodyStart(rawContent string) int {
+	// 邮件头部和正文之间通常由一个空行分隔
+	// 查找连续的两个换行符（\r\n\r\n 或 \n\n）
+
+	// 首先尝试 \r\n\r\n (Windows/标准格式)
+	if idx := strings.Index(rawContent, "\r\n\r\n"); idx != -1 {
+		return idx + 4
+	}
+
+	// 然后尝试 \n\n (Unix格式)
+	if idx := strings.Index(rawContent, "\n\n"); idx != -1 {
+		return idx + 2
+	}
+
+	// 如果找不到标准分隔符，尝试查找常见的邮件头部结束标记后的内容
+	lines := strings.Split(rawContent, "\n")
+	for i, line := range lines {
+		line = strings.TrimSpace(line)
+		// 如果找到一个空行，且下一行不是邮件头部格式，则认为是正文开始
+		if line == "" && i+1 < len(lines) {
+			nextLine := strings.TrimSpace(lines[i+1])
+			// 检查下一行是否不是邮件头部格式（不包含冒号或不是常见的头部字段）
+			if !isEmailHeader(nextLine) {
+				// 计算到这一行的字符偏移量
+				offset := 0
+				for j := 0; j <= i; j++ {
+					offset += len(lines[j]) + 1 // +1 for the newline character
+				}
+				return offset
+			}
+		}
+	}
+
+	return -1 // 未找到明确的正文开始位置
+}
+
+// isEmailHeader 判断一行是否是邮件头部格式
+func isEmailHeader(line string) bool {
+	if line == "" {
+		return false
+	}
+
+	// 常见的邮件头部字段
+	commonHeaders := []string{
+		"received:", "return-path:", "x-originating-ip:", "authentication-results:",
+		"received-spf:", "content-type:", "content-transfer-encoding:", "content-disposition:",
+		"from:", "to:", "cc:", "bcc:", "subject:", "date:", "message-id:", "x-",
+		"mime-version:", "reply-to:", "sender:", "in-reply-to:", "references:",
+	}
+
+	lowerLine := strings.ToLower(line)
+
+	// 检查是否包含冒号（邮件头部的基本特征）
+	if !strings.Contains(line, ":") {
+		return false
+	}
+
+	// 检查是否以常见的邮件头部字段开头
+	for _, header := range commonHeaders {
+		if strings.HasPrefix(lowerLine, header) {
+			return true
+		}
+	}
+
+	// 如果包含冒号但不是已知的头部字段，进一步检查
+	// 邮件头部通常格式为 "Header-Name: value"
+	parts := strings.SplitN(line, ":", 2)
+	if len(parts) == 2 {
+		headerName := strings.TrimSpace(parts[0])
+		// 邮件头部名称通常不包含空格且不会太长
+		if !strings.Contains(headerName, " ") && len(headerName) < 50 {
+			return true
+		}
+	}
+
+	return false
 }
 
 // extractAttachmentsWithRegex 使用正则表达式从原始邮件内容中提取附件

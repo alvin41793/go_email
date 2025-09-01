@@ -41,7 +41,7 @@
     &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/savoki/Desktop/项目/goproject/go_email/pkg/utils&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/savoki/Desktop/项目/goproject/go_email/pkg/utils/oss&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
@@ -50,11 +50,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/pkg/utils/oss" />
       <recent name="$PROJECT_DIR$/pkg/utils" />
       <recent name="$PROJECT_DIR$/11" />
       <recent name="$PROJECT_DIR$/model" />
       <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/config" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/11/mailclient" />
