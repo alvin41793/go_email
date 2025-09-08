@@ -1,19 +1,24 @@
 package api
 
 import (
+	"archive/zip"
+	"bytes"
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"go_email/db"
 	"go_email/model"
 	"go_email/pkg/mailclient"
 	"go_email/pkg/utils"
-	"go_email/pkg/utils/oss"
+	"io"
 	"log"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/nwaples/rardecode/v2"
 	"gorm.io/gorm"
 )
 
@@ -235,12 +240,18 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 
 			// 根据错误类型决定状态：
 			// - 网络/连接错误 → -1（重新处理）
+			// - 邮件已删除 → -3（已删除）
 			// - 其他错误 → -2（永久失败）
 			var newStatus int
 			errStr := strings.ToLower(err.Error())
 
-			// 检查是否是临时性的网络/连接错误
-			isTemporaryError := strings.Contains(errStr, "timeout") ||
+			// 检查是否是邮件已删除或UID无效的错误
+			if strings.Contains(errStr, "邮件不存在") ||
+				strings.Contains(errStr, "邮件uid无效") ||
+				strings.Contains(errStr, "bad sequence") {
+				newStatus = -3 // 已删除
+				log.Printf("[邮件内容同步] 检测到邮件已删除或UID无效，标记为已删除状态: 邮件ID=%d", emailOne.EmailID)
+			} else if strings.Contains(errStr, "timeout") ||
 				strings.Contains(errStr, "connection") ||
 				strings.Contains(errStr, "network") ||
 				strings.Contains(errStr, "read tcp") ||
@@ -258,9 +269,7 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 				strings.Contains(errStr, "server busy") ||
 				strings.Contains(errStr, "please try again later") ||
 				strings.Contains(errStr, "连接状态异常") ||
-				strings.Contains(errStr, "需要重新建立连接")
-
-			if isTemporaryError {
+				strings.Contains(errStr, "需要重新建立连接") {
 				newStatus = -1 // 重新处理
 				log.Printf("[邮件内容同步] 检测到临时错误，设置状态为-1（重新处理），邮件ID: %d", emailOne.EmailID)
 			} else {
@@ -301,7 +310,7 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 		if err := db.DB().Where("email_id = ? AND account_id = ?", emailOne.EmailID, account.ID).First(&primeEmail).Error; err != nil {
 			log.Printf("[邮件内容同步] 查询PrimeEmail记录失败，使用默认附件状态: %v", err)
 			// 如果查询失败，则使用默认的附件检测逻辑
-			if email.Attachments != nil && len(email.Attachments) > 0 {
+			if len(email.Attachments) > 0 {
 				emailContent.HasAttachment = 1
 			} else {
 				emailContent.HasAttachment = 0
@@ -320,7 +329,7 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 		// 如果PrimeEmail表示没有附件，则跳过附件处理，不需要再检查实际邮件
 		if emailContent.HasAttachment == 0 {
 			log.Printf("[邮件内容同步] 根据PrimeEmail记录判断邮件无附件，跳过附件处理，邮件ID: %d", emailOne.EmailID)
-		} else if email.Attachments != nil && len(email.Attachments) > 0 {
+		} else if len(email.Attachments) > 0 {
 			log.Printf("[邮件内容同步] 邮件含有 %d 个附件，邮件ID: %d", len(email.Attachments), emailOne.EmailID)
 
 			attachmentCount += len(email.Attachments)
@@ -329,101 +338,134 @@ func syncAccountEmailContent(mailClient *mailclient.MailClient, account model.Pr
 				log.Printf("[附件处理] 开始处理附件 %d/%d，邮件ID: %d, 文件名: %s",
 					i+1, len(email.Attachments), emailOne.EmailID, att.Filename)
 
-				// 上传到OSS
-				ossURL := ""
 				if att.Base64Data != "" {
-					fileType := ""
-					if att.MimeType != "" {
-						parts := strings.Split(att.MimeType, "/")
-						if len(parts) > 1 {
-							fileType = parts[1]
-						}
-					}
+					// 检查是否为压缩包文件
+					if isArchiveFile(att.Filename) {
+						// 处理压缩包文件
+						log.Printf("[附件处理] 检测到压缩包文件，开始解压处理，邮件ID: %d, 文件名: %s", emailOne.EmailID, att.Filename)
+						archiveStartTime := time.Now()
 
-					log.Printf("[附件处理] 开始上传附件到OSS，邮件ID: %d, 文件名: %s", emailOne.EmailID, att.Filename)
-					// 添加重试机制，最多尝试3次
-					maxRetries := 3
-					var err error
-					for attempt := 1; attempt <= maxRetries; attempt++ {
-						ossStartTime := time.Now()
-						log.Printf("[附件处理] 尝试上传附件到OSS (尝试 %d/%d)，邮件ID: %d, 文件名: %s",
-							attempt, maxRetries, emailOne.EmailID, att.Filename)
+						processedAttachments, archiveErr := processArchiveAttachment(att, int64(emailOne.EmailID), uint(account.ID))
+						archiveDuration := time.Since(archiveStartTime)
+						attachmentOSSTime += archiveDuration
 
-						// 使用完整包路径调用OSS上传
-						ossURL, err = oss.UploadBase64ToOSS(att.Filename, att.Base64Data, fileType)
-						ossDuration := time.Since(ossStartTime)
-						attachmentOSSTime += ossDuration
+						if archiveErr != nil {
+							log.Printf("[附件处理] 压缩包处理失败，邮件ID: %d, 文件名: %s, 错误: %v",
+								emailOne.EmailID, att.Filename, archiveErr)
+						} else if len(processedAttachments) > 0 {
+							// 压缩包处理成功，为每个解压出来的文件创建附件记录
+							log.Printf("[附件处理] 压缩包处理成功，共上传 %d 个文件，总耗时: %v，邮件ID: %d, 文件名: %s",
+								len(processedAttachments), archiveDuration, emailOne.EmailID, att.Filename)
 
-						if err == nil {
-							// 上传成功，跳出循环
-							log.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, 耗时: %v, URL: %s",
-								emailOne.EmailID, att.Filename, ossDuration, ossURL)
-							break
-						}
-
-						// 上传失败
-						if attempt < maxRetries {
-							log.Printf("[附件处理] 上传附件到OSS失败，准备重试，邮件ID: %d, 文件名: %s, 耗时: %v, 错误: %v",
-								emailOne.EmailID, att.Filename, ossDuration, err)
-							// 添加短暂的延迟
-							time.Sleep(time.Second * 2)
+							for _, processedAtt := range processedAttachments {
+								attachment := &model.PrimeEmailContentAttachment{
+									EmailID:   emailOne.EmailID,
+									AccountId: account.ID,
+									FileName:  utils.SanitizeUTF8(processedAtt.FileName),
+									SizeKb:    processedAtt.SizeKB,
+									MimeType:  utils.SanitizeUTF8(processedAtt.MimeType),
+									OssUrl:    utils.SanitizeUTF8(processedAtt.OssURL),
+									CreatedAt: utils.JsonTime{Time: time.Now()},
+								}
+								attachments = append(attachments, attachment)
+							}
 						} else {
-							// 最后一次尝试也失败了
-							log.Printf("[附件处理] 上传附件到OSS失败，已达到最大重试次数，邮件ID: %d, 文件名: %s, 总耗时: %v, 错误: %v",
-								emailOne.EmailID, att.Filename, ossDuration, err)
+							log.Printf("[附件处理] 压缩包处理完成但没有成功上传任何文件，邮件ID: %d, 文件名: %s",
+								emailOne.EmailID, att.Filename)
 						}
-					}
 
-					// 检查是否所有尝试都失败了
-					if err != nil {
-						log.Printf("[附件处理] 经过 %d 次尝试，上传附件到OSS仍然失败，尝试使用阿里云OSS备用上传，邮件ID: %d, 文件名: %s",
-							maxRetries, emailOne.EmailID, att.Filename)
-
-						// 使用阿里云OSS作为备用上传
-						fallbackStartTime := time.Now()
-						ossUploader, fallbackErr := oss.NewOSSUploader()
-						if fallbackErr != nil {
-							log.Printf("[附件处理] 创建阿里云OSS上传器失败，邮件ID: %d, 文件名: %s, 错误: %v",
-								emailOne.EmailID, att.Filename, fallbackErr)
-						} else {
-							log.Printf("[附件处理] 开始使用阿里云OSS备用上传，邮件ID: %d, 文件名: %s",
+						// 无论压缩包处理是否成功，都为原始压缩包文件创建一个附件记录
+						originalOssURL := ""
+						if archiveErr != nil || len(processedAttachments) == 0 {
+							// 如果压缩包处理失败或没有成功上传任何文件，尝试上传原始压缩包
+							log.Printf("[附件处理] 上传原始压缩包文件，邮件ID: %d, 文件名: %s",
 								emailOne.EmailID, att.Filename)
 
-							// 使用阿里云OSS上传附件
-							fallbackURL, _, fallbackErr := ossUploader.UploadFileFromBase64(att.Base64Data, att.Filename, "email_attachments")
-							fallbackDuration := time.Since(fallbackStartTime)
-							attachmentOSSTime += fallbackDuration
+							fileType := ""
+							if att.MimeType != "" {
+								parts := strings.Split(att.MimeType, "/")
+								if len(parts) > 1 {
+									fileType = parts[1]
+								}
+							}
 
-							if fallbackErr == nil {
-								// 阿里云OSS上传成功
-								ossURL = fallbackURL
-								err = nil // 清除之前的错误
-								log.Printf("[附件处理] 阿里云OSS备用上传成功，邮件ID: %d, 文件名: %s, 耗时: %v, URL: %s",
-									emailOne.EmailID, att.Filename, fallbackDuration, ossURL)
-							} else {
-								// 阿里云OSS上传也失败了
-								log.Printf("[附件处理] 阿里云OSS备用上传也失败，邮件ID: %d, 文件名: %s, 耗时: %v, 错误: %v",
-									emailOne.EmailID, att.Filename, fallbackDuration, fallbackErr)
-								log.Printf("[附件处理] 所有上传方式均失败，邮件ID: %d, 文件名: %s",
-									emailOne.EmailID, att.Filename)
+							// 上传原始压缩包的逻辑（使用封装的重试函数）
+							ossStartTime := time.Now()
+							originalOssURL, err = uploadWithRetry(att.Filename, att.Base64Data, fileType, emailOne.EmailID, "附件处理")
+							ossDuration := time.Since(ossStartTime)
+							attachmentOSSTime += ossDuration
+							if err != nil {
+								log.Printf("[附件处理] 原始压缩包上传失败，邮件ID: %d, 文件名: %s, 错误: %v", emailOne.EmailID, att.Filename, err)
+							}
+						} else {
+							// 压缩包处理成功，也上传原始压缩包作为备份
+							log.Printf("[附件处理] 上传原始压缩包文件作为备份，邮件ID: %d, 文件名: %s",
+								emailOne.EmailID, att.Filename)
+
+							fileType := ""
+							if att.MimeType != "" {
+								parts := strings.Split(att.MimeType, "/")
+								if len(parts) > 1 {
+									fileType = parts[1]
+								}
+							}
+
+							ossStartTime := time.Now()
+							originalOssURL, err = uploadWithRetry(att.Filename, att.Base64Data, fileType, emailOne.EmailID, "附件处理")
+							ossDuration := time.Since(ossStartTime)
+							attachmentOSSTime += ossDuration
+							if err != nil {
+								log.Printf("[附件处理] 原始压缩包上传失败，邮件ID: %d, 文件名: %s, 错误: %v", emailOne.EmailID, att.Filename, err)
 							}
 						}
+
+						// 创建原始压缩包的附件记录
+						if originalOssURL != "" {
+							originalAttachment := &model.PrimeEmailContentAttachment{
+								EmailID:   emailOne.EmailID,
+								AccountId: account.ID,
+								FileName:  utils.SanitizeUTF8(att.Filename),
+								SizeKb:    att.SizeKB,
+								MimeType:  utils.SanitizeUTF8(att.MimeType),
+								OssUrl:    utils.SanitizeUTF8(originalOssURL),
+								CreatedAt: utils.JsonTime{Time: time.Now()},
+							}
+							attachments = append(attachments, originalAttachment)
+						}
+					} else {
+						// 处理普通附件文件（保持原有逻辑）
+						fileType := ""
+						if att.MimeType != "" {
+							parts := strings.Split(att.MimeType, "/")
+							if len(parts) > 1 {
+								fileType = parts[1]
+							}
+						}
+
+						// 使用封装的重试上传函数
+						ossStartTime := time.Now()
+						ossURL, err := uploadWithRetry(att.Filename, att.Base64Data, fileType, emailOne.EmailID, "附件处理")
+						ossDuration := time.Since(ossStartTime)
+						attachmentOSSTime += ossDuration
+						if err != nil {
+							log.Printf("[附件处理] 普通附件上传最终失败，邮件ID: %d, 文件名: %s, 错误: %v", emailOne.EmailID, att.Filename, err)
+						}
+
+						// 创建普通附件记录
+						attachment := &model.PrimeEmailContentAttachment{
+							EmailID:   emailOne.EmailID,
+							AccountId: account.ID,
+							FileName:  utils.SanitizeUTF8(att.Filename),
+							SizeKb:    att.SizeKB,
+							MimeType:  utils.SanitizeUTF8(att.MimeType),
+							OssUrl:    utils.SanitizeUTF8(ossURL),
+							CreatedAt: utils.JsonTime{Time: time.Now()},
+						}
+						attachments = append(attachments, attachment)
 					}
 				} else {
-					log.Printf("[附件处理] 附件没有Base64数据，邮件ID: %d, 文件名: %s", emailOne.EmailID, att.Filename)
+					log.Printf("[附件处理] 附件没有Base64数据，跳过创建附件记录，邮件ID: %d, 文件名: %s", emailOne.EmailID, att.Filename)
 				}
-
-				// 创建附件记录
-				attachment := &model.PrimeEmailContentAttachment{
-					EmailID:   emailOne.EmailID,
-					AccountId: account.ID,
-					FileName:  utils.SanitizeUTF8(att.Filename),
-					SizeKb:    att.SizeKB, // 直接使用SizeKB字段
-					MimeType:  utils.SanitizeUTF8(att.MimeType),
-					OssUrl:    utils.SanitizeUTF8(ossURL),
-					CreatedAt: utils.JsonTime{Time: time.Now()},
-				}
-				attachments = append(attachments, attachment)
 			}
 		} else {
 			log.Printf("[邮件内容同步] 邮件没有附件，邮件ID: %d", emailOne.EmailID)
@@ -559,4 +601,251 @@ func max(a, b int) int {
 		return a
 	}
 	return b
+}
+
+// ExtractedFile 表示从压缩包中解压出的文件
+type ExtractedFile struct {
+	Name string
+	Data []byte
+}
+
+// isArchiveFile 判断文件是否为支持的压缩包格式
+func isArchiveFile(filename string) bool {
+	ext := strings.ToLower(filepath.Ext(filename))
+	return ext == ".zip" || ext == ".rar"
+}
+
+// extractZipFiles 解压ZIP文件并返回所有文件内容
+func extractZipFiles(base64Data string) ([]ExtractedFile, error) {
+	// 解码Base64数据
+	zipData, err := base64.StdEncoding.DecodeString(base64Data)
+	if err != nil {
+		return nil, fmt.Errorf("解码Base64数据失败: %v", err)
+	}
+
+	// 创建ZIP reader
+	reader, err := zip.NewReader(bytes.NewReader(zipData), int64(len(zipData)))
+	if err != nil {
+		return nil, fmt.Errorf("创建ZIP reader失败: %v", err)
+	}
+
+	var extractedFiles []ExtractedFile
+
+	// 遍历ZIP文件中的所有文件
+	for _, file := range reader.File {
+		// 跳过目录
+		if file.FileInfo().IsDir() {
+			continue
+		}
+
+		// 打开文件
+		rc, err := file.Open()
+		if err != nil {
+			log.Printf("打开ZIP文件 %s 失败: %v", file.Name, err)
+			continue
+		}
+
+		// 读取文件内容
+		data, err := io.ReadAll(rc)
+		rc.Close()
+		if err != nil {
+			log.Printf("读取ZIP文件 %s 内容失败: %v", file.Name, err)
+			continue
+		}
+
+		extractedFiles = append(extractedFiles, ExtractedFile{
+			Name: file.Name,
+			Data: data,
+		})
+	}
+
+	return extractedFiles, nil
+}
+
+// extractRarFiles 解压RAR文件并返回所有文件内容
+func extractRarFiles(base64Data string) ([]ExtractedFile, error) {
+	// 解码Base64数据
+	rarData, err := base64.StdEncoding.DecodeString(base64Data)
+	if err != nil {
+		return nil, fmt.Errorf("解码Base64数据失败: %v", err)
+	}
+
+	// 创建RAR reader
+	reader, err := rardecode.NewReader(bytes.NewReader(rarData))
+	if err != nil {
+		return nil, fmt.Errorf("创建RAR reader失败: %v", err)
+	}
+
+	var extractedFiles []ExtractedFile
+
+	// 遍历RAR文件中的所有文件
+	for {
+		header, err := reader.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Printf("读取RAR文件头失败: %v", err)
+			break
+		}
+
+		// 跳过目录
+		if header.IsDir {
+			continue
+		}
+
+		// 读取文件内容
+		data, err := io.ReadAll(reader)
+		if err != nil {
+			log.Printf("读取RAR文件 %s 内容失败: %v", header.Name, err)
+			continue
+		}
+
+		extractedFiles = append(extractedFiles, ExtractedFile{
+			Name: header.Name,
+			Data: data,
+		})
+	}
+
+	return extractedFiles, nil
+}
+
+// processArchiveAttachment 处理压缩包附件，解压并上传所有文件
+// ProcessedAttachment 表示处理后的附件信息
+type ProcessedAttachment struct {
+	FileName string
+	SizeKB   float64
+	MimeType string
+	OssURL   string
+}
+
+func processArchiveAttachment(attachment mailclient.AttachmentInfo, emailID int64, accountID uint) ([]ProcessedAttachment, error) {
+	var extractedFiles []ExtractedFile
+	var err error
+
+	// 根据文件扩展名选择解压方法
+	ext := strings.ToLower(filepath.Ext(attachment.Filename))
+	switch ext {
+	case ".zip":
+		log.Printf("[压缩包处理] 开始解压ZIP文件，邮件ID: %d, 文件名: %s", emailID, attachment.Filename)
+		extractedFiles, err = extractZipFiles(attachment.Base64Data)
+	case ".rar":
+		log.Printf("[压缩包处理] 开始解压RAR文件，邮件ID: %d, 文件名: %s", emailID, attachment.Filename)
+		extractedFiles, err = extractRarFiles(attachment.Base64Data)
+	default:
+		return nil, fmt.Errorf("不支持的压缩包格式: %s", ext)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("解压压缩包失败: %v", err)
+	}
+
+	log.Printf("[压缩包处理] 成功解压压缩包，共提取到 %d 个文件，邮件ID: %d, 压缩包: %s",
+		len(extractedFiles), emailID, attachment.Filename)
+
+	var processedAttachments []ProcessedAttachment
+
+	// 遍历所有解压出的文件并上传到OSS
+	for i, file := range extractedFiles {
+		log.Printf("[压缩包处理] 开始上传解压文件 %d/%d，邮件ID: %d, 原压缩包: %s, 文件: %s",
+			i+1, len(extractedFiles), emailID, attachment.Filename, file.Name)
+
+		// 将文件数据编码为Base64
+		fileBase64 := base64.StdEncoding.EncodeToString(file.Data)
+
+		// 获取文件扩展名作为文件类型
+		fileType := strings.TrimPrefix(filepath.Ext(file.Name), ".")
+		if fileType == "" {
+			fileType = "bin" // 默认为二进制文件
+		}
+
+		// 为解压文件生成新的文件名，包含原压缩包名
+		archiveName := strings.TrimSuffix(attachment.Filename, filepath.Ext(attachment.Filename))
+		newFileName := fmt.Sprintf("%s_%s", archiveName, file.Name)
+
+		// 使用封装的重试上传函数
+		ossURL, uploadErr := uploadWithRetry(newFileName, fileBase64, fileType, int(emailID), "压缩包处理")
+		if uploadErr == nil {
+			// 计算文件大小（KB）
+			sizeKB := float64(len(file.Data)) / 1024.0
+
+			// 根据文件扩展名推断MIME类型
+			mimeType := getMimeTypeByExtension(file.Name)
+
+			processedAttachment := ProcessedAttachment{
+				FileName: newFileName,
+				SizeKB:   sizeKB,
+				MimeType: mimeType,
+				OssURL:   ossURL,
+			}
+			processedAttachments = append(processedAttachments, processedAttachment)
+		} else {
+			log.Printf("[压缩包处理] 解压文件上传失败，邮件ID: %d, 文件: %s, 错误: %v",
+				emailID, file.Name, uploadErr)
+		}
+	}
+
+	log.Printf("[压缩包处理] 压缩包处理完成，邮件ID: %d, 压缩包: %s, 成功上传: %d/%d",
+		emailID, attachment.Filename, len(processedAttachments), len(extractedFiles))
+
+	return processedAttachments, nil
+}
+
+// getMimeTypeByExtension 根据文件扩展名推断MIME类型
+func getMimeTypeByExtension(filename string) string {
+	ext := strings.ToLower(filepath.Ext(filename))
+	switch ext {
+	case ".txt":
+		return "text/plain"
+	case ".pdf":
+		return "application/pdf"
+	case ".doc":
+		return "application/msword"
+	case ".docx":
+		return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+	case ".xls":
+		return "application/vnd.ms-excel"
+	case ".xlsx":
+		return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+	case ".ppt":
+		return "application/vnd.ms-powerpoint"
+	case ".pptx":
+		return "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+	case ".jpg", ".jpeg":
+		return "image/jpeg"
+	case ".png":
+		return "image/png"
+	case ".gif":
+		return "image/gif"
+	case ".bmp":
+		return "image/bmp"
+	case ".zip":
+		return "application/zip"
+	case ".rar":
+		return "application/x-rar-compressed"
+	case ".7z":
+		return "application/x-7z-compressed"
+	case ".tar":
+		return "application/x-tar"
+	case ".gz":
+		return "application/gzip"
+	case ".json":
+		return "application/json"
+	case ".xml":
+		return "application/xml"
+	case ".html", ".htm":
+		return "text/html"
+	case ".css":
+		return "text/css"
+	case ".js":
+		return "application/javascript"
+	case ".mp3":
+		return "audio/mpeg"
+	case ".mp4":
+		return "video/mp4"
+	case ".avi":
+		return "video/x-msvideo"
+	default:
+		return "application/octet-stream"
+	}
 }

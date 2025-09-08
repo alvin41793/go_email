@@ -20,6 +20,109 @@ import (
 	"gorm.io/gorm"
 )
 
+// uploadWithRetry 带重试机制的OSS上传函数
+func uploadWithRetry(filename, base64Data, fileType string, emailID int, logContext string) (string, error) {
+	maxRetries := 3
+	var err error
+	var ossURL string
+
+	for attempt := 1; attempt <= maxRetries; attempt++ {
+		ossStartTime := time.Now()
+		log.Printf("[%s] 尝试上传文件到OSS (尝试 %d/%d)，邮件ID: %d, 文件名: %s",
+			logContext, attempt, maxRetries, emailID, filename)
+
+		// 使用完整包路径调用OSS上传
+		ossURL, err = oss.UploadBase64ToOSS(filename, base64Data, fileType)
+		ossDuration := time.Since(ossStartTime)
+
+		if err == nil {
+			// 上传成功，跳出循环
+			log.Printf("[%s] 成功上传文件到OSS，邮件ID: %d, 文件名: %s, 耗时: %v, URL: %s",
+				logContext, emailID, filename, ossDuration, ossURL)
+			return ossURL, nil
+		}
+
+		// 上传失败
+		if attempt < maxRetries {
+			log.Printf("[%s] 上传文件到OSS失败，准备重试，邮件ID: %d, 文件名: %s, 耗时: %v, 错误: %v",
+				logContext, emailID, filename, ossDuration, err)
+			// 添加短暂的延迟
+			time.Sleep(time.Second * 2)
+		} else {
+			// 最后一次尝试也失败了
+			log.Printf("[%s] 上传文件到OSS失败，已达到最大重试次数，邮件ID: %d, 文件名: %s, 总耗时: %v, 错误: %v",
+				logContext, emailID, filename, ossDuration, err)
+		}
+	}
+
+	// 尝试备用上传方法
+	log.Printf("[%s] 经过 %d 次尝试，上传文件到OSS仍然失败，尝试使用阿里云OSS备用上传，邮件ID: %d, 文件名: %s",
+		logContext, maxRetries, emailID, filename)
+
+	ossUploader, fallbackErr := oss.NewOSSUploader()
+	if fallbackErr != nil {
+		log.Printf("[%s] 创建阿里云OSS上传器失败，邮件ID: %d, 文件名: %s, 错误: %v",
+			logContext, emailID, filename, fallbackErr)
+		return "", fmt.Errorf("主上传失败: %v, 备用上传器创建失败: %v", err, fallbackErr)
+	}
+
+	fallbackURL, _, fallbackErr := ossUploader.UploadFileFromBase64(base64Data, filename, "email_attachments")
+	if fallbackErr != nil {
+		log.Printf("[%s] 阿里云OSS备用上传也失败，邮件ID: %d, 文件名: %s, 错误: %v",
+			logContext, emailID, filename, fallbackErr)
+		return "", fmt.Errorf("主上传失败: %v, 备用上传失败: %v", err, fallbackErr)
+	}
+
+	log.Printf("[%s] 阿里云OSS备用上传成功，邮件ID: %d, 文件名: %s, URL: %s",
+		logContext, emailID, filename, fallbackURL)
+	return fallbackURL, nil
+}
+
+// handleEmailError 统一处理邮件错误并设置相应状态
+func handleEmailError(emailID int, err error, logContext string) int {
+	errStr := strings.ToLower(err.Error())
+	var newStatus int
+	
+	// 检查是否是邮件已删除或UID无效的错误
+	if strings.Contains(errStr, "邮件不存在") ||
+		strings.Contains(errStr, "邮件uid无效") ||
+		strings.Contains(errStr, "bad sequence") {
+		newStatus = -3 // 已删除
+		log.Printf("[%s] 检测到邮件已删除或UID无效，标记为已删除状态: 邮件ID=%d", logContext, emailID)
+	} else if strings.Contains(errStr, "server error") ||
+		strings.Contains(errStr, "please try again later") ||
+		strings.Contains(errStr, "service unavailable") ||
+		strings.Contains(errStr, "temporary failure") ||
+		strings.Contains(errStr, "server busy") ||
+		strings.Contains(errStr, "timeout") ||
+		strings.Contains(errStr, "connection") ||
+		strings.Contains(errStr, "network") ||
+		strings.Contains(errStr, "read tcp") ||
+		strings.Contains(errStr, "write tcp") ||
+		strings.Contains(errStr, "broken pipe") ||
+		strings.Contains(errStr, "connection reset") ||
+		strings.Contains(errStr, "i/o timeout") ||
+		strings.Contains(errStr, "operation timed out") ||
+		strings.Contains(errStr, "context deadline exceeded") ||
+		strings.Contains(errStr, "context canceled") ||
+		strings.Contains(errStr, "error reading response") ||
+		strings.Contains(errStr, "连接状态异常") ||
+		strings.Contains(errStr, "需要重新建立连接") {
+		newStatus = -1 // 临时错误，重新处理
+		log.Printf("[%s] 检测到临时错误，回滚状态为待处理: 邮件ID=%d, 错误=%v", logContext, emailID, err)
+	} else {
+		newStatus = -2 // 永久失败
+		log.Printf("[%s] 其他错误，设置为失败状态: 邮件ID=%d, 错误=%v", logContext, emailID, err)
+	}
+	
+	// 更新邮件状态
+	if resetErr := model.ResetEmailStatus(emailID, newStatus); resetErr != nil {
+		log.Printf("[%s] 设置邮件状态失败，邮件ID: %d, 状态: %d, 错误: %v", logContext, emailID, newStatus, resetErr)
+	}
+	
+	return newStatus
+}
+
 // 邮件服务器配置
 var mailConfig struct {
 	IMAPServer   string
@@ -194,33 +297,8 @@ func GetEmailContent(limit int, node int) error {
 			fmt.Printf("❌ 失败: %v\n", err)
 			failureCount++
 
-			// 特殊处理：如果是UID不存在的错误，将邮件标记为已删除状态
-			if strings.Contains(strings.ToLower(err.Error()), "邮件不存在") ||
-				strings.Contains(strings.ToLower(err.Error()), "邮件uid无效") ||
-				strings.Contains(strings.ToLower(err.Error()), "bad sequence") {
-				log.Printf("[邮件处理] 检测到邮件已删除或UID无效，标记为已删除状态: 邮件ID=%d", emailOne.EmailID)
-				resetErr := model.ResetEmailStatus(emailOne.EmailID, -3) // -3表示已删除
-				if resetErr != nil {
-					log.Printf("[邮件处理] 设置邮件已删除状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
-				}
-			} else if strings.Contains(strings.ToLower(err.Error()), "server error") ||
-				strings.Contains(strings.ToLower(err.Error()), "please try again later") ||
-				strings.Contains(strings.ToLower(err.Error()), "service unavailable") ||
-				strings.Contains(strings.ToLower(err.Error()), "temporary failure") ||
-				strings.Contains(strings.ToLower(err.Error()), "server busy") {
-				// SELECT服务器临时错误，将状态回滚为-1以便重新处理
-				log.Printf("[邮件处理] 检测到服务器临时错误，回滚状态为待处理: 邮件ID=%d, 错误=%v", emailOne.EmailID, err)
-				resetErr := model.ResetEmailStatus(emailOne.EmailID, -1) // -1表示待处理，可以重新尝试
-				if resetErr != nil {
-					log.Printf("[邮件处理] 回滚邮件状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
-				}
-			} else {
-				// 其他错误，设置为失败状态
-				resetErr := model.ResetEmailStatus(emailOne.EmailID, -2)
-				if resetErr != nil {
-					log.Printf("[邮件处理] 设置邮件状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
-				}
-			}
+			// 使用统一错误处理函数
+			handleEmailError(emailOne.EmailID, err, "邮件处理")
 			// 继续处理下一个邮件，而不是直接返回错误
 			continue
 		}
@@ -271,45 +349,13 @@ func GetEmailContent(limit int, node int) error {
 
 					log.Printf("[附件处理] 开始上传附件到OSS，邮件ID: %d, 文件名: %s", emailOne.EmailID, attachment.Filename)
 					fmt.Printf("        正在上传到OSS... ")
+					// 使用统一的上传重试函数
 					var err error
-					// 添加重试机制，最多尝试2次
-					maxRetries := 2
-					for attempt := 1; attempt <= maxRetries; attempt++ {
-						log.Printf("[附件处理] 尝试上传附件到OSS (尝试 %d/%d)，邮件ID: %d, 文件名: %s",
-							attempt, maxRetries, emailOne.EmailID, attachment.Filename)
-						if attempt > 1 {
-							fmt.Printf("        重试上传到OSS (尝试 %d/%d)... ", attempt, maxRetries)
-						} else {
-							fmt.Printf("        正在上传到OSS... ")
-						}
-
-						ossURL, err = oss.UploadBase64ToOSS(attachment.Filename, attachment.Base64Data, fileType)
-						if err == nil {
-							// 上传成功，跳出循环
-							log.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, URL: %s", emailOne.EmailID, attachment.Filename, ossURL)
-							fmt.Printf("✅ 成功\n")
-							break
-						}
-
-						// 上传失败
-						if attempt < maxRetries {
-							log.Printf("[附件处理] 上传附件到OSS失败，准备重试，邮件ID: %d, 文件名: %s, 错误: %v",
-								emailOne.EmailID, attachment.Filename, err)
-							fmt.Printf("❌ 失败: %v，准备重试\n", err)
-							// 可以在这里添加短暂的延迟
-							time.Sleep(time.Second * 2)
-						} else {
-							// 最后一次尝试也失败了
-							log.Printf("[附件处理] 上传附件到OSS失败，已达到最大重试次数，邮件ID: %d, 文件名: %s, 错误: %v",
-								emailOne.EmailID, attachment.Filename, err)
-							fmt.Printf("❌ 最终失败: %v\n", err)
-						}
-					}
-
-					// 检查是否所有尝试都失败了
-					if err != nil {
-						fmt.Printf("[附件处理] 经过 %d 次尝试，上传附件到OSS仍然失败，邮件ID: %d, 文件名: %s\n",
-							maxRetries, emailOne.EmailID, attachment.Filename)
+					ossURL, err = uploadWithRetry(attachment.Filename, attachment.Base64Data, fileType, emailOne.EmailID, "附件处理")
+					if err == nil {
+						fmt.Printf("✅ 成功\n")
+					} else {
+						fmt.Printf("❌ 最终失败: %v\n", err)
 					}
 				} else {
 					log.Printf("[附件处理] 附件没有Base64数据，邮件ID: %d, 文件名: %s", emailOne.EmailID, attachment.Filename)
@@ -600,33 +646,8 @@ func GetEmailContentWithAccounts(limit int, node int, accounts []model.PrimeEmai
 			fmt.Printf("❌ 失败: %v\n", err)
 			failureCount++
 
-			// 特殊处理：如果是UID不存在的错误，将邮件标记为已删除状态
-			if strings.Contains(strings.ToLower(err.Error()), "邮件不存在") ||
-				strings.Contains(strings.ToLower(err.Error()), "邮件uid无效") ||
-				strings.Contains(strings.ToLower(err.Error()), "bad sequence") {
-				log.Printf("[邮件处理] 检测到邮件已删除或UID无效，标记为已删除状态: 邮件ID=%d", emailOne.EmailID)
-				resetErr := model.ResetEmailStatus(emailOne.EmailID, -3) // -3表示已删除
-				if resetErr != nil {
-					log.Printf("[邮件处理] 设置邮件已删除状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
-				}
-			} else if strings.Contains(strings.ToLower(err.Error()), "server error") ||
-				strings.Contains(strings.ToLower(err.Error()), "please try again later") ||
-				strings.Contains(strings.ToLower(err.Error()), "service unavailable") ||
-				strings.Contains(strings.ToLower(err.Error()), "temporary failure") ||
-				strings.Contains(strings.ToLower(err.Error()), "server busy") {
-				// SELECT服务器临时错误，将状态回滚为-1以便重新处理
-				log.Printf("[邮件处理] 检测到服务器临时错误，回滚状态为待处理: 邮件ID=%d, 错误=%v", emailOne.EmailID, err)
-				resetErr := model.ResetEmailStatus(emailOne.EmailID, -1) // -1表示待处理，可以重新尝试
-				if resetErr != nil {
-					log.Printf("[邮件处理] 回滚邮件状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
-				}
-			} else {
-				// 其他错误，设置为失败状态
-				resetErr := model.ResetEmailStatus(emailOne.EmailID, -2)
-				if resetErr != nil {
-					log.Printf("[邮件处理] 设置邮件状态失败，邮件ID: %d, 错误: %v", emailOne.EmailID, resetErr)
-				}
-			}
+			// 使用统一错误处理函数
+			handleEmailError(emailOne.EmailID, err, "邮件处理")
 			// 继续处理下一个邮件，而不是直接返回错误
 			continue
 		}
@@ -677,45 +698,13 @@ func GetEmailContentWithAccounts(limit int, node int, accounts []model.PrimeEmai
 
 					log.Printf("[附件处理] 开始上传附件到OSS，邮件ID: %d, 文件名: %s", emailOne.EmailID, attachment.Filename)
 					fmt.Printf("        正在上传到OSS... ")
+					// 使用统一的上传重试函数
 					var err error
-					// 添加重试机制，最多尝试2次
-					maxRetries := 2
-					for attempt := 1; attempt <= maxRetries; attempt++ {
-						log.Printf("[附件处理] 尝试上传附件到OSS (尝试 %d/%d)，邮件ID: %d, 文件名: %s",
-							attempt, maxRetries, emailOne.EmailID, attachment.Filename)
-						if attempt > 1 {
-							fmt.Printf("        重试上传到OSS (尝试 %d/%d)... ", attempt, maxRetries)
-						} else {
-							fmt.Printf("        正在上传到OSS... ")
-						}
-
-						ossURL, err = oss.UploadBase64ToOSS(attachment.Filename, attachment.Base64Data, fileType)
-						if err == nil {
-							// 上传成功，跳出循环
-							log.Printf("[附件处理] 成功上传附件到OSS，邮件ID: %d, 文件名: %s, URL: %s", emailOne.EmailID, attachment.Filename, ossURL)
-							fmt.Printf("✅ 成功\n")
-							break
-						}
-
-						// 上传失败
-						if attempt < maxRetries {
-							log.Printf("[附件处理] 上传附件到OSS失败，准备重试，邮件ID: %d, 文件名: %s, 错误: %v",
-								emailOne.EmailID, attachment.Filename, err)
-							fmt.Printf("❌ 失败: %v，准备重试\n", err)
-							// 可以在这里添加短暂的延迟
-							time.Sleep(time.Second * 2)
-						} else {
-							// 最后一次尝试也失败了
-							log.Printf("[附件处理] 上传附件到OSS失败，已达到最大重试次数，邮件ID: %d, 文件名: %s, 错误: %v",
-								emailOne.EmailID, attachment.Filename, err)
-							fmt.Printf("❌ 最终失败: %v\n", err)
-						}
-					}
-
-					// 检查是否所有尝试都失败了
-					if err != nil {
-						fmt.Printf("[附件处理] 经过 %d 次尝试，上传附件到OSS仍然失败，邮件ID: %d, 文件名: %s\n",
-							maxRetries, emailOne.EmailID, attachment.Filename)
+					ossURL, err = uploadWithRetry(attachment.Filename, attachment.Base64Data, fileType, emailOne.EmailID, "附件处理")
+					if err == nil {
+						fmt.Printf("✅ 成功\n")
+					} else {
+						fmt.Printf("❌ 最终失败: %v\n", err)
 					}
 				} else {
 					log.Printf("[附件处理] 附件没有Base64数据，邮件ID: %d, 文件名: %s", emailOne.EmailID, attachment.Filename)
