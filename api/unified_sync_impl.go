@@ -615,6 +615,37 @@ func isArchiveFile(filename string) bool {
 	return ext == ".zip" || ext == ".rar"
 }
 
+// isSystemFile 判断是否为系统文件（需要跳过的文件）
+func isSystemFile(filename string) bool {
+	filename = strings.ToLower(filename)
+
+	// macOS系统文件
+	if strings.HasPrefix(filename, "._") {
+		return true
+	}
+	if filename == ".ds_store" {
+		return true
+	}
+
+	// Windows系统文件
+	if filename == "thumbs.db" {
+		return true
+	}
+	if filename == "desktop.ini" {
+		return true
+	}
+	if strings.HasPrefix(filename, "~$") {
+		return true
+	}
+
+	// 其他常见系统文件
+	if strings.HasPrefix(filename, ".") && strings.HasSuffix(filename, ".tmp") {
+		return true
+	}
+
+	return false
+}
+
 // extractZipFiles 解压ZIP文件并返回所有文件内容
 func extractZipFiles(base64Data string) ([]ExtractedFile, error) {
 	// 解码Base64数据
@@ -635,6 +666,13 @@ func extractZipFiles(base64Data string) ([]ExtractedFile, error) {
 	for _, file := range reader.File {
 		// 跳过目录
 		if file.FileInfo().IsDir() {
+			continue
+		}
+
+		// 过滤系统文件
+		baseFileName := filepath.Base(file.Name)
+		if isSystemFile(baseFileName) {
+			log.Printf("跳过系统文件: %s", file.Name)
 			continue
 		}
 
@@ -694,6 +732,13 @@ func extractRarFiles(base64Data string) ([]ExtractedFile, error) {
 			continue
 		}
 
+		// 过滤系统文件
+		baseFileName := filepath.Base(header.Name)
+		if isSystemFile(baseFileName) {
+			log.Printf("跳过系统文件: %s", header.Name)
+			continue
+		}
+
 		// 读取文件内容
 		data, err := io.ReadAll(reader)
 		if err != nil {
@@ -746,22 +791,34 @@ func processArchiveAttachment(attachment mailclient.AttachmentInfo, emailID int6
 	var processedAttachments []ProcessedAttachment
 
 	// 遍历所有解压出的文件并上传到OSS
-	for i, file := range extractedFiles {
+	validFileIndex := 0
+	for _, file := range extractedFiles {
+		// 只使用文件的基本名称，不包含目录路径
+		baseFileName := filepath.Base(file.Name)
+
+		// 过滤系统文件
+		if isSystemFile(baseFileName) {
+			log.Printf("[压缩包处理] 跳过系统文件，邮件ID: %d, 原压缩包: %s, 文件: %s",
+				emailID, attachment.Filename, baseFileName)
+			continue
+		}
+
+		validFileIndex++
 		log.Printf("[压缩包处理] 开始上传解压文件 %d/%d，邮件ID: %d, 原压缩包: %s, 文件: %s",
-			i+1, len(extractedFiles), emailID, attachment.Filename, file.Name)
+			validFileIndex, len(extractedFiles), emailID, attachment.Filename, baseFileName)
 
 		// 将文件数据编码为Base64
 		fileBase64 := base64.StdEncoding.EncodeToString(file.Data)
 
 		// 获取文件扩展名作为文件类型
-		fileType := strings.TrimPrefix(filepath.Ext(file.Name), ".")
+		fileType := strings.TrimPrefix(filepath.Ext(baseFileName), ".")
 		if fileType == "" {
 			fileType = "bin" // 默认为二进制文件
 		}
 
 		// 为解压文件生成新的文件名，包含原压缩包名
 		archiveName := strings.TrimSuffix(attachment.Filename, filepath.Ext(attachment.Filename))
-		newFileName := fmt.Sprintf("%s_%s", archiveName, file.Name)
+		newFileName := fmt.Sprintf("%s_%s", archiveName, baseFileName)
 
 		// 使用封装的重试上传函数
 		ossURL, uploadErr := uploadWithRetry(newFileName, fileBase64, fileType, int(emailID), "压缩包处理")
@@ -770,7 +827,7 @@ func processArchiveAttachment(attachment mailclient.AttachmentInfo, emailID int6
 			sizeKB := float64(len(file.Data)) / 1024.0
 
 			// 根据文件扩展名推断MIME类型
-			mimeType := getMimeTypeByExtension(file.Name)
+			mimeType := getMimeTypeByExtension(baseFileName)
 
 			processedAttachment := ProcessedAttachment{
 				FileName: newFileName,
@@ -781,7 +838,7 @@ func processArchiveAttachment(attachment mailclient.AttachmentInfo, emailID int6
 			processedAttachments = append(processedAttachments, processedAttachment)
 		} else {
 			log.Printf("[压缩包处理] 解压文件上传失败，邮件ID: %d, 文件: %s, 错误: %v",
-				emailID, file.Name, uploadErr)
+				emailID, baseFileName, uploadErr)
 		}
 	}
 

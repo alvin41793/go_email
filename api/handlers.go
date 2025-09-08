@@ -82,7 +82,7 @@ func uploadWithRetry(filename, base64Data, fileType string, emailID int, logCont
 func handleEmailError(emailID int, err error, logContext string) int {
 	errStr := strings.ToLower(err.Error())
 	var newStatus int
-	
+
 	// 检查是否是邮件已删除或UID无效的错误
 	if strings.Contains(errStr, "邮件不存在") ||
 		strings.Contains(errStr, "邮件uid无效") ||
@@ -114,12 +114,12 @@ func handleEmailError(emailID int, err error, logContext string) int {
 		newStatus = -2 // 永久失败
 		log.Printf("[%s] 其他错误，设置为失败状态: 邮件ID=%d, 错误=%v", logContext, emailID, err)
 	}
-	
+
 	// 更新邮件状态
 	if resetErr := model.ResetEmailStatus(emailID, newStatus); resetErr != nil {
 		log.Printf("[%s] 设置邮件状态失败，邮件ID: %d, 状态: %d, 错误: %v", logContext, emailID, newStatus, resetErr)
 	}
-	
+
 	return newStatus
 }
 
