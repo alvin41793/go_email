@@ -8,6 +8,8 @@ import (
 	"io"
 	"net/http"
 	"path/filepath"
+	"sync"
+	"time"
 )
 
 // OSS响应结构
@@ -29,6 +31,52 @@ type TokenResponse struct {
 	Data    struct {
 		AccessToken string `json:"accessToken"`
 	} `json:"data"`
+}
+
+// Token缓存结构
+type TokenCache struct {
+	Token      string
+	ExpiryTime time.Time
+	mu         sync.RWMutex
+}
+
+// 全局token缓存实例
+var tokenCache = &TokenCache{}
+
+// getCachedToken 获取缓存的token，如果缓存过期或不存在则重新获取
+func getCachedToken() (string, error) {
+	tokenCache.mu.RLock()
+	// 检查缓存是否还有效（未过期且token不为空）
+	if tokenCache.Token != "" && time.Now().Before(tokenCache.ExpiryTime) {
+		token := tokenCache.Token
+		tokenCache.mu.RUnlock()
+		fmt.Printf("使用缓存的token: %s\n", token)
+		return token, nil
+	}
+	tokenCache.mu.RUnlock()
+
+	// 缓存无效，需要重新获取token
+	tokenCache.mu.Lock()
+	defer tokenCache.mu.Unlock()
+
+	// 双重检查，防止并发时重复获取
+	if tokenCache.Token != "" && time.Now().Before(tokenCache.ExpiryTime) {
+		fmt.Printf("使用缓存的token (并发检查): %s\n", tokenCache.Token)
+		return tokenCache.Token, nil
+	}
+
+	// 获取新的token
+	newToken, err := getToken()
+	if err != nil {
+		return "", err
+	}
+
+	// 更新缓存，设置2小时过期时间
+	tokenCache.Token = newToken
+	tokenCache.ExpiryTime = time.Now().Add(2 * time.Hour)
+	fmt.Printf("获取新token并缓存2小时: %s\n", newToken)
+
+	return newToken, nil
 }
 
 func getToken() (string, error) {
@@ -90,7 +138,7 @@ func UploadBase64ToOSS(filename string, base64Data string, fileType string) (str
 
 	fmt.Printf("成功解码base64数据，大小: %d 字节\n", len(data))
 
-	token, err := getToken()
+	token, err := getCachedToken()
 	if err != nil {
 		return "", fmt.Errorf("获取令牌失败: %w", err)
 	}
