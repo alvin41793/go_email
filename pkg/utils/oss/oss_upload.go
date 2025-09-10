@@ -35,7 +35,7 @@ func getToken() (string, error) {
 	payload := map[string]interface{}{
 		"client_id":     "ff80808195b14b9c0195b14b9cab0000",
 		"client_secret": "edgk375852v9c2550s83bpr575kdf3p7",
-		"validity_time": 4 * 60 * 60 * 1000,
+		"validity_time": 10 * 60 * 60 * 1000,
 	}
 
 	body, _ := json.Marshal(payload)
