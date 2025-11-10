@@ -27,8 +27,8 @@ type OSSConfig struct {
 func GetOSSConfig() *OSSConfig {
 	return &OSSConfig{
 		Endpoint:        viper.GetString("aliyun.oss.endpoint"),
-		access_key_id: REDACTED.GetString("aliyun.oss.access-key-id"),
-		access_key_secret: REDACTED.GetString("aliyun.oss.access-key-secret"),
+		AccessKeyID:     viper.GetString("aliyun.oss.access-key-id"),
+		AccessKeySecret: viper.GetString("aliyun.oss.access-key-secret"),
 		BucketName:      viper.GetString("aliyun.oss.bucket-name"),
 		Domain:          viper.GetString("aliyun.oss.domain"),
 	}

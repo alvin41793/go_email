@@ -154,7 +154,7 @@ func InitMailClient(imapServer, smtpServer, emailAddress, password string, imapP
 	mailConfig.IMAPServer = imapServer
 	mailConfig.SMTPServer = smtpServer
 	mailConfig.EmailAddress = emailAddress
-	mailConfig.password: REDACTED
+	mailConfig.Password = password
 	mailConfig.IMAPPort = imapPort
 	mailConfig.SMTPPort = smtpPort
 	mailConfig.UseSSL = useSSL

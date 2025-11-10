@@ -7,10 +7,10 @@ var (
 	ErrBind             = &Errno{Code: 10002, Message: "Error occurred while binding the request body to the struct."}
 	ErrParam            = &Errno{Code: 10008, Message: "Param error, see doc for more info."}
 
-	ErrValidation = &Errno{Code: 20001, Message: "Validation failed."}
-	ErrDatabase   = &Errno{Code: 20002, Message: "Database error."}
-	ErrCodeToken   = &Errno{Code: 20003, Message: "code is timeOut."}
-	ErrExportNoData  = &Errno{Code: 20004, Message: "no data."}
+	ErrValidation   = &Errno{Code: 20001, Message: "Validation failed."}
+	ErrDatabase     = &Errno{Code: 20002, Message: "Database error."}
+	ErrCodeToken    = &Errno{Code: 20003, Message: "code is timeOut."}
+	ErrExportNoData = &Errno{Code: 20004, Message: "no data."}
 	// user errors
 	ErrEncrypt           = &Errno{Code: 20101, Message: "Error occurred while encrypting the user password."}
 	ErrUserNotFound      = &Errno{Code: 20102, Message: "The user was not found."}
@@ -24,6 +24,5 @@ var (
 	ErrTokenIsTimeout    = &Errno{Code: 20110, Message: "The token is timeout."}
 	ErrCode              = &Errno{Code: 20111, Message: "The code is timeout."}
 	ErrJson              = &Errno{Code: 23001, Message: "The jsonUmaShall is err."}
-	Errpassword: REDACTED 23002, Message: "The password or username is err."}
-
+	ErrPassword          = &Errno{Code: 23002, Message: "The password or username is err."}
 )

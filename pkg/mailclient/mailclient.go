@@ -282,7 +282,7 @@ func createNewConnection(config *EmailConfigInfo) (*client.Client, error) {
 		log.Printf("[IMAP连接] 尝试连接 %s:%d (尝试 %d/%d)", config.IMAPServer, config.IMAPPort, attempt, maxRetries)
 
 		// 检查密码是否为空
-		if config.password: REDACTED "" {
+		if config.Password == "" {
 			return nil, fmt.Errorf("邮箱密码为空，请确认已设置应用专用密码")
 		}
 
@@ -460,22 +460,22 @@ func (m *MailClient) ConnectIMAP() (*client.Client, error) {
 // GetEmailConfig 从数据库获取邮箱配置
 func GetEmailConfig(account model.PrimeEmailAccount) (*EmailConfigInfo, error) {
 	// 检查应用专用密码是否设置
-	password: REDACTED account.AppPassword
-	if password: REDACTED "" {
-		password: REDACTED
+	password := account.AppPassword
+	if password == "" {
+		password = account.Password
 		log.Printf("[邮箱配置] 警告: AppPassword为空，使用普通密码，邮箱: %s", account.Account)
 	} else {
 		log.Printf("[邮箱配置] 使用应用专用密码，邮箱: %s", account.Account)
 	}
 
-	if password: REDACTED "" {
+	if password == "" {
 		return nil, fmt.Errorf("邮箱密码为空，请设置Password或AppPassword字段")
 	}
 
 	return &EmailConfigInfo{
 		IMAPServer:   "imap.mail.yahoo.com",
 		EmailAddress: account.Account,
-		password: REDACTED
+		Password:     password,
 		IMAPPort:     993,
 		UseSSL:       true,
 	}, nil

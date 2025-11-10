@@ -2,16 +2,17 @@ package db
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/go-redis/redis"
 	"github.com/spf13/viper"
-	"time"
 )
 
 var globalClient *redis.Client = nil
 
 func NewRedisDb() (*redis.Client, error) {
 	addr := viper.GetString("redis.host")
-	password: REDACTED viper.GetString("redis.password")
+	password := viper.GetString("redis.password")
 
 	if globalClient != nil {
 		_, err := globalClient.Ping().Result()
@@ -19,14 +20,14 @@ func NewRedisDb() (*redis.Client, error) {
 			globalClient.Close()
 			globalClient = redis.NewClient(&redis.Options{
 				Addr:     addr,
-				password: REDACTED
+				Password: password,
 				DB:       0,
 			})
 		}
 	} else {
 		globalClient = redis.NewClient(&redis.Options{
 			Addr:     addr,
-			password: REDACTED
+			Password: password,
 			DB:       0,
 		})
 	}
@@ -49,19 +50,18 @@ func NewRedisDb() (*redis.Client, error) {
 	return globalClient, nil
 }
 
-
-//连接池
+// 连接池
 func NewRedisPoolDb() (*redis.Client, error) {
 	addr := viper.GetString("redis.host")
-	password: REDACTED viper.GetString("redis.password")
-	client:= redis.NewClient(&redis.Options{
+	password := viper.GetString("redis.password")
+	client := redis.NewClient(&redis.Options{
 		Addr:         addr,
-		password: REDACTED
-		DialTimeout: 10 * time.Second,
-		ReadTimeout: 20 * time.Second,
+		Password:     password,
+		DialTimeout:  10 * time.Second,
+		ReadTimeout:  20 * time.Second,
 		WriteTimeout: 20 * time.Second,
 		PoolSize:     100,
-		PoolTimeout: 20 * time.Second,
+		PoolTimeout:  20 * time.Second,
 	})
 
 	// use different db
