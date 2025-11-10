@@ -26,7 +26,8 @@
 log/
 
 # 配置文件（根据需要调整）
-# config/*.yaml
+config/release.yaml
+config/debug.yaml
 
 # macOS系统文件
 .DS_Store

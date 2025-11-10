@@ -1,0 +1,44 @@
+run_mode: release
+addr1: :7090                   # HTTP绑定端口1
+name: email-server            # API Server的名字
+url: 127.0.0.1:8090           # pingServer函数请求的API服务器的ip:port
+max_ping_count: 10            # pingServer函数try的次数
+jwt_secret: REDACTED
+log:
+  writers: file,stdout
+  logger_level: INFO
+  logger_file: log/default/api_server.log
+  log_format_text: false
+  rollingPolicy: size
+  log_rotate_date: 1
+  log_rotate_size: 1
+  log_backup_count: 7
+sync:
+  timeout_minutes: 25
+db:
+  addr: your-mysql-host:3306
+  name: your_db_name
+  username: your_db_user
+  password: REDACTED
+  max_idle_conns: 25
+  max_open_conns: 60
+  conn_max_lifetime: 30m
+  conn_max_idle_time: 15m
+docker_db:
+  name: db_apiserver
+  addr: 127.0.0.1:3306
+  username: root
+  password: REDACTED
+redis:
+  host: 127.0.0.1:6379
+  password: REDACTED 30
+  maxActive: 30
+  idleTimeout: 200
+aliyun:
+  oss:
+    endpoint: https://oss-cn-beijing.aliyuncs.com
+    access_key_id: REDACTED
+    access_key_secret: REDACTED
+    bucket-name: your-bucket-name
+    domain: https://your-bucket-name.oss-cn-beijing.aliyuncs.com
+
