@@ -26,55 +26,77 @@ func uploadWithRetry(filename, base64Data, fileType string, emailID int, logCont
 	var err error
 	var ossURL string
 
+	// 规范化文件名，处理空格与特殊字符
+	cleanFilename := strings.TrimSpace(utils.SanitizeUTF8(filename))
+	cleanFilename = strings.Map(func(r rune) rune {
+		switch r {
+		case '<', '>', '"', ':', '/', '\\', '|', '?', '*', '#':
+			return '_'
+		}
+		if r < 32 { // 控制字符
+			return '_'
+		}
+		return r
+	}, cleanFilename)
+	// 把连续空白折叠为单个下划线
+	cleanFilename = strings.Join(strings.Fields(cleanFilename), "_")
+	if cleanFilename == "" {
+		if fileType != "" {
+			cleanFilename = fmt.Sprintf("attachment_%d.%s", emailID, fileType)
+		} else {
+			cleanFilename = fmt.Sprintf("attachment_%d", emailID)
+		}
+	}
+
 	for attempt := 1; attempt <= maxRetries; attempt++ {
 		ossStartTime := time.Now()
 		log.Printf("[%s] 尝试上传文件到OSS (尝试 %d/%d)，邮件ID: %d, 文件名: %s",
-			logContext, attempt, maxRetries, emailID, filename)
+			logContext, attempt, maxRetries, emailID, cleanFilename)
 
 		// 使用完整包路径调用OSS上传
-		ossURL, err = oss.UploadBase64ToOSS(filename, base64Data, fileType)
+		ossURL, err = oss.UploadBase64ToOSS(cleanFilename, base64Data, fileType)
 		ossDuration := time.Since(ossStartTime)
 
 		if err == nil {
 			// 上传成功，跳出循环
 			log.Printf("[%s] 成功上传文件到OSS，邮件ID: %d, 文件名: %s, 耗时: %v, URL: %s",
-				logContext, emailID, filename, ossDuration, ossURL)
+				logContext, emailID, cleanFilename, ossDuration, ossURL)
 			return ossURL, nil
 		}
 
 		// 上传失败
 		if attempt < maxRetries {
 			log.Printf("[%s] 上传文件到OSS失败，准备重试，邮件ID: %d, 文件名: %s, 耗时: %v, 错误: %v",
-				logContext, emailID, filename, ossDuration, err)
+				logContext, emailID, cleanFilename, ossDuration, err)
 			// 添加短暂的延迟
 			time.Sleep(time.Second * 2)
 		} else {
 			// 最后一次尝试也失败了
 			log.Printf("[%s] 上传文件到OSS失败，已达到最大重试次数，邮件ID: %d, 文件名: %s, 总耗时: %v, 错误: %v",
-				logContext, emailID, filename, ossDuration, err)
+				logContext, emailID, cleanFilename, ossDuration, err)
 		}
 	}
 
 	// 尝试备用上传方法
 	log.Printf("[%s] 经过 %d 次尝试，上传文件到OSS仍然失败，尝试使用阿里云OSS备用上传，邮件ID: %d, 文件名: %s",
-		logContext, maxRetries, emailID, filename)
+		logContext, maxRetries, emailID, cleanFilename)
 
 	ossUploader, fallbackErr := oss.NewOSSUploader()
 	if fallbackErr != nil {
 		log.Printf("[%s] 创建阿里云OSS上传器失败，邮件ID: %d, 文件名: %s, 错误: %v",
-			logContext, emailID, filename, fallbackErr)
+			logContext, emailID, cleanFilename, fallbackErr)
 		return "", fmt.Errorf("主上传失败: %v, 备用上传器创建失败: %v", err, fallbackErr)
 	}
 
-	fallbackURL, _, fallbackErr := ossUploader.UploadFileFromBase64(base64Data, filename, "email_attachments")
+	fallbackURL, _, fallbackErr := ossUploader.UploadFileFromBase64(base64Data, cleanFilename, "email_attachments")
 	if fallbackErr != nil {
 		log.Printf("[%s] 阿里云OSS备用上传也失败，邮件ID: %d, 文件名: %s, 错误: %v",
-			logContext, emailID, filename, fallbackErr)
+			logContext, emailID, cleanFilename, fallbackErr)
 		return "", fmt.Errorf("主上传失败: %v, 备用上传失败: %v", err, fallbackErr)
 	}
 
 	log.Printf("[%s] 阿里云OSS备用上传成功，邮件ID: %d, 文件名: %s, URL: %s",
-		logContext, emailID, filename, fallbackURL)
+		logContext, emailID, cleanFilename, fallbackURL)
 	return fallbackURL, nil
 }
 
